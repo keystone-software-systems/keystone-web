@@ -17,15 +17,19 @@ export function Nav() {
   return (
     <header className="border-b border-slate/20 bg-off-white">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+        <Link href="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
           <Image
-            src="/brand/keystone-logomark-navy.svg"
-            alt="Keystone Systems"
-            width={180}
-            height={50}
+            src="/brand/keystone-icon-navy.svg"
+            alt=""
+            width={34}
+            height={32}
             priority
             className="h-8 w-auto"
           />
+          <span className="flex items-baseline gap-1.5">
+            <span className="text-xl font-bold tracking-wide text-blueprint-navy">KEYSTONE</span>
+            <span className="text-xl font-bold tracking-wide text-slate">SYSTEMS</span>
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
