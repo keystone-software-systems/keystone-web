@@ -1,0 +1,8 @@
+<svg viewBox="0 0 360 100" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Keystone Systems logomark, pure black (monochrome/print)</title>
+<g transform="translate(30,15) scale(0.42)">
+<path d="M30,20 L170,20 Q180,20 177.9,29.8 L150.1,160.2 Q148,170 138,170 L62,170 Q52,170 49.9,160.2 L22.1,29.8 Q20,20 30,20 Z" fill="#000000"/>
+</g>
+<text x="120" y="52" font-family="Inter, Helvetica, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="1" fill="#000000">KEYSTONE</text>
+<text x="120" y="76" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" font-weight="500" letter-spacing="6" fill="#000000">SYSTEMS</text>
+</svg>
