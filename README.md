@@ -31,29 +31,18 @@ See that file for what each variable does.
 
 ## Deployment
 
-Deploys to Vercel via `.github/workflows/deploy.yml`:
+`.github/workflows/ci.yml` runs typecheck, lint, and build on every push and pull request — it's
+CI only, no deploy step.
 
-- Every push and pull request runs typecheck, lint, and build.
-- Pull requests additionally deploy a Vercel preview and comment the URL on the PR.
-- Pushes to `main` additionally deploy to Vercel production.
+Actual deploys are handled by Vercel's native GitHub integration: import this repo in the Vercel
+dashboard, set the project's Root Directory to `apps/web`, and Vercel takes it from there —
+preview deployments on every PR, production deploys on push to `main`. No repo secrets needed.
 
-The workflow needs these repo secrets (Settings → Secrets and variables → Actions):
-
-| Secret | Where to get it |
-|---|---|
-| `VERCEL_TOKEN` | Vercel → Account Settings → Tokens |
-| `VERCEL_ORG_ID` | `apps/web/.vercel/project.json` after running `vercel link` |
-| `VERCEL_PROJECT_ID` | `apps/web/.vercel/project.json` after running `vercel link` |
-
-The app itself needs these set as Vercel project environment variables (Project Settings →
-Environment Variables), which `vercel pull` fetches during CI builds:
+The app needs these set as Vercel project environment variables (Project Settings → Environment
+Variables):
 
 | Variable | Purpose |
 |---|---|
 | `RESEND_API_KEY` | Sends contact-form email via Resend |
 | `RESEND_FROM_EMAIL` | Verified sender address once `keystone.systems` is set up in Resend |
 | `CONTACT_TO_EMAIL` | Inbox that receives contact-form submissions |
-
-Until `VERCEL_TOKEN`/`VERCEL_ORG_ID`/`VERCEL_PROJECT_ID` are added, the `checks` job still runs
-on every push and PR; the `deploy-preview` and `deploy-production` jobs will fail until the
-project is linked and those secrets are added.
