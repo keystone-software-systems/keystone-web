@@ -77,6 +77,11 @@ These six lines share a common thread: **judgment applied at a specific, well-sc
 - **Priced to the outcome, not billed hourly.** Engagements are scoped and priced up front against the outcome, not billed by the hour. This is a deliberate incentive-alignment choice: hourly billing rewards a consultant for taking longer, while outcome-based pricing keeps both the client and Keystone Systems pulling toward the fastest path to done.
 - **Handoff is the default, not the only option.** Most engagements end with a clean handoff back to the client's team, documentation included, so the client is never dependent on Keystone Systems to maintain what was built. For companies that want continued senior technical leadership without a full-time hire, ongoing or **fractional-CTO-style retainer** arrangements are also available, rather than a hard requirement that every engagement wind down.
 
+### Bench depth and post-handoff support (internal only, not yet public copy)
+
+- **Bench depth:** The founder has an established network of at least three other similarly experienced independent engineering consultants he can bring in if a timeline requires it. This is a real, standing working relationship, not a last-minute improvisation. As of this writing, the founder has **not decided** whether or how to state this publicly on the site — do not add it to any client-facing page without explicit confirmation.
+- **Post-handoff support window:** Not yet defined. The founder has not settled on specific terms (length of any bug-fix window, what's covered, how due-diligence engagements are handled differently from build/harden/automate/modernize engagements) and does not want to commit to specifics in copy yet. Do not state any support-window length, guarantee, or warranty language in public copy until this is explicitly decided.
+
 ---
 
 ## Target Clients

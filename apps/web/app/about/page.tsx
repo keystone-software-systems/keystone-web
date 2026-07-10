@@ -72,6 +72,13 @@ export default function AboutPage() {
           companies that want continued senior technical leadership without a full-time hire,
           ongoing or fractional-CTO-style arrangements are available too.
         </p>
+        <p className="mt-4 text-blueprint-navy/70">
+          Keystone Systems is solo-led, but not a single point of failure: the founder works
+          alongside a small network of equally experienced independent engineers who can jump in
+          when a timeline calls for extra hands, adding capacity rather than replacing who
+          you&apos;re working with. And if something delivered doesn&apos;t hold up the way it
+          should, that&apos;s on Keystone Systems to fix, not on you to discover the hard way.
+        </p>
         <Link
           href="/contact"
           className="mt-6 inline-block rounded-md bg-blueprint-navy px-6 py-3 text-sm font-medium text-white hover:bg-technical-blue"
