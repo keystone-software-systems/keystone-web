@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { solutions } from "@/app/solutions/content";
 import { SolutionCard } from "@/components/solution-card";
-import { ArchDiagram } from "@/components/arch-diagram";
+import { HeroMark } from "@/components/hero-mark";
 import { RotatingQuestion } from "@/components/rotating-question";
 
 export const metadata: Metadata = {
@@ -76,7 +76,7 @@ export default function Home() {
             </div>
           </div>
           <div className="hidden justify-self-center lg:flex">
-            <ArchDiagram />
+            <HeroMark />
           </div>
         </div>
       </section>
@@ -120,12 +120,12 @@ export default function Home() {
             About the founder
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-blueprint-navy">
-            Keystone Systems is led by a Principal Software Engineer at Microsoft, with prior
-            experience as a Senior Software Engineer at Stripe — over a decade building
-            production systems at real scale, including systems that processed billions of
-            dollars in transactions a day. That background shapes how engagements are scoped:
-            long-term defensibility, architecture tradeoffs, and systems built to hold up under
-            real load, not just a demo.
+            Keystone Systems is led by a software engineer who previously spent over a decade in
+            engineering roles at Microsoft and Stripe, most recently as a Principal Software
+            Engineer, building production systems that processed billions of dollars in
+            transactions a day. That background shapes how engagements are scoped: long-term
+            defensibility, architecture tradeoffs, and systems built to hold up under real load,
+            not just a demo.
           </p>
           <Link
             href="/about"
