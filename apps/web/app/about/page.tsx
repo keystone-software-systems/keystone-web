@@ -38,10 +38,18 @@ export default function AboutPage() {
           The founder spent over a decade in engineering, starting as a new-grad at Microsoft and
           reaching Senior Software Engineer within three years, then building core payments
           infrastructure as a senior engineer at Stripe on systems that processed billions of
-          dollars in transactions a day, before returning to Microsoft as a Principal Software
-          Engineer. That trajectory means having been on-call for what happens when a shortcut
-          turns out to be a landmine, which is the actual source of the judgment: architecture
-          calls that still hold up under real production load two years in, not just at launch.
+          dollars in transactions a day, then back to Microsoft as a Principal Software Engineer (
+          <a
+            href="https://www.linkedin.com/in/tannerbarlow/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-technical-blue hover:underline"
+          >
+            full background on LinkedIn
+          </a>
+          ). That trajectory means having been on-call for what happens when a shortcut turns out
+          to be a landmine, which is the actual source of the judgment: architecture calls that
+          still hold up under real production load two years in, not just at launch.
         </p>
         <p>
           Fluency with AI-assisted development tools is part of how the firm operates day to day,

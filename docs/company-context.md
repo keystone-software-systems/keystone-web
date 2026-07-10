@@ -51,6 +51,8 @@ The founder is a Senior/Staff-level software engineer, currently working remotel
 - **Principal Software Engineer at Microsoft**
 - Engineering role at **Stripe**
 
+**Do not mention Cedar, or that the founder currently holds another job, anywhere in public-facing copy.** Cedar carries no brand recognition (unlike Microsoft/Stripe) and stating up front that the founder has another current job reads as off-putting to a prospective client evaluating Keystone Systems. Public copy should present the Microsoft and Stripe experience as background/credential without asserting a current-vs-past ordering (avoid "currently," "most recently," etc. framing that implies one role is more current than another).
+
 This background shapes the firm's actual differentiation: the founder thinks in terms of long-term defensibility, data moats, equity/architecture tradeoffs, and systems-level design — the kind of judgment that typically only comes from having built and scaled real infrastructure at large-scale technical organizations.
 
 The founder is also building a second, separate venture — **Scaleyard** (scaleyard.io) — a platform/marketplace for independent software consultants, with back-office tooling (payments, contracts, e-signature) and AI-assisted scoping. **Scaleyard and Keystone Systems are distinct entities**: Scaleyard is the platform/marketplace product; Keystone Systems is the founder's own personal consulting practice. They may cross-refer clients or share infrastructure over time, but they are not the same brand and should not be conflated in external-facing materials.

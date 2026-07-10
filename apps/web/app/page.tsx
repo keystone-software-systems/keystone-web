@@ -135,12 +135,12 @@ export default function Home() {
             About the founder
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-blueprint-navy">
-            Keystone Systems is led by a software engineer with over a decade of experience, most
-            recently as a Principal Software Engineer at Microsoft, and before that building core
-            payments infrastructure as a senior engineer at Stripe on systems that processed
-            billions of dollars in transactions a day. That background shapes how engagements are
-            scoped: long-term defensibility, architecture tradeoffs, and systems built to hold up
-            under real load, not just a demo.
+            Keystone Systems is led by a software engineer with over a decade of experience,
+            including as a Principal Software Engineer at Microsoft and building core payments
+            infrastructure as a senior engineer at Stripe on systems that processed billions of
+            dollars in transactions a day. That background shapes how engagements are scoped:
+            long-term defensibility, architecture tradeoffs, and systems built to hold up under
+            real load, not just a demo.
           </p>
           <Link
             href="/about"

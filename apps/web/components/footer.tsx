@@ -57,6 +57,16 @@ export function Footer() {
                   Contact
                 </Link>
               </li>
+              <li>
+                <a
+                  href="https://www.linkedin.com/in/tannerbarlow/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blueprint-navy hover:text-technical-blue"
+                >
+                  LinkedIn
+                </a>
+              </li>
             </ul>
           </div>
         </div>
