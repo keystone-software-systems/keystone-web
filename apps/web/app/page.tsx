@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { solutions } from "@/app/solutions/content";
 import { SolutionCard } from "@/components/solution-card";
+import { ArchDiagram } from "@/components/arch-diagram";
+import { RotatingQuestion } from "@/components/rotating-question";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -44,29 +46,37 @@ export default function Home() {
         }}
       />
 
-      <section className="mx-auto max-w-6xl px-6 pb-20 pt-20 sm:pt-28">
-        <div className="max-w-2xl">
-          <h1 className="text-4xl font-semibold tracking-tight text-blueprint-navy sm:text-5xl">
-            Senior engineering judgment, without the full-time hire
-          </h1>
-          <p className="mt-6 text-lg text-blueprint-navy/70">
-            From new builds to production-hardening to technical due diligence, Keystone Systems
-            brings staff-level engineering judgment to the decisions that are expensive to get
-            wrong and hard to undo later.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Link
-              href="/contact"
-              className="rounded-md bg-blueprint-navy px-6 py-3 text-sm font-medium text-white hover:bg-technical-blue"
-            >
-              Talk through your situation
-            </Link>
-            <Link
-              href="#solutions"
-              className="rounded-md border border-slate/30 px-6 py-3 text-sm font-medium text-blueprint-navy hover:border-technical-blue hover:text-technical-blue"
-            >
-              See what we do
-            </Link>
+      <section className="blueprint-grid border-b border-slate/20">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-20 sm:pt-28 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="max-w-2xl">
+            <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-technical-blue">
+              Keystone Systems
+            </p>
+            <h1 className="mt-3 text-4xl font-semibold tracking-tight text-blueprint-navy sm:text-5xl">
+              Senior engineering judgment, without the full-time hire
+            </h1>
+            <p className="mt-6 text-lg text-blueprint-navy/70">
+              From new builds to production-hardening to technical due diligence, Keystone Systems
+              brings staff-level engineering judgment to the decisions that are expensive to get
+              wrong and hard to undo later.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link
+                href="/contact"
+                className="rounded-md bg-blueprint-navy px-6 py-3 text-sm font-medium text-white hover:bg-technical-blue"
+              >
+                Talk through your situation
+              </Link>
+              <Link
+                href="#solutions"
+                className="rounded-md border border-slate/30 px-6 py-3 text-sm font-medium text-blueprint-navy hover:border-technical-blue hover:text-technical-blue"
+              >
+                See what we do
+              </Link>
+            </div>
+          </div>
+          <div className="hidden justify-self-center lg:flex">
+            <ArchDiagram />
           </div>
         </div>
       </section>
@@ -110,12 +120,12 @@ export default function Home() {
             About the founder
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-blueprint-navy">
-            Keystone Systems is led by a Senior/Staff-level software engineer currently working
-            at Cedar, with prior experience as a Principal Software Engineer at Microsoft and an
-            engineering role at Stripe, building systems that processed billions of dollars in
-            transactions a day. That background shapes how engagements are scoped: long-term
-            defensibility, architecture tradeoffs, and systems built to hold up under real load,
-            not just a demo.
+            Keystone Systems is led by a Principal Software Engineer at Microsoft, with prior
+            experience as a Senior Software Engineer at Stripe — over a decade building
+            production systems at real scale, including systems that processed billions of
+            dollars in transactions a day. That background shapes how engagements are scoped:
+            long-term defensibility, architecture tradeoffs, and systems built to hold up under
+            real load, not just a demo.
           </p>
           <Link
             href="/about"
@@ -128,9 +138,7 @@ export default function Home() {
 
       <section className="py-20">
         <div className="mx-auto max-w-6xl px-6 text-center">
-          <h2 className="text-2xl font-semibold text-blueprint-navy sm:text-3xl">
-            Have a decision that&apos;s expensive to get wrong?
-          </h2>
+          <RotatingQuestion />
           <p className="mt-3 text-blueprint-navy/70">Let&apos;s talk through your situation before you commit to a direction.</p>
           <Link
             href="/contact"

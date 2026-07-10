@@ -27,13 +27,12 @@ export default function AboutPage() {
           company makes before a big technical decision, not after.
         </p>
         <p>
-          The founder is a Senior/Staff-level software engineer, currently working remotely at
-          Cedar. Prior experience includes a role as Principal Software Engineer at Microsoft and
-          an engineering role at Stripe, building systems that processed billions of dollars in
-          transactions a day. That background shapes the firm&apos;s actual differentiation: thinking
-          in terms of long-term defensibility, architecture tradeoffs, and systems-level design
-          built to hold up under real load, the kind of judgment that typically comes from having
-          built and scaled real infrastructure at large-scale technical organizations.
+          The founder spent over a decade at Microsoft and Stripe — starting as a new-grad
+          engineer and reaching Senior Software Engineer within three years, then moving to
+          Stripe as a Senior Software Engineer on systems that processed billions of dollars in
+          transactions a day, before returning to Microsoft as a Principal Software Engineer.
+          That trajectory is the firm&apos;s differentiation: architecture calls that still hold up
+          under real production load two years in, not just at launch.
         </p>
         <p>
           Keystone Systems isn&apos;t a dev shop. It doesn&apos;t compete on headcount, cheap hourly rates,
