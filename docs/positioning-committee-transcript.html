@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Positioning Committee — Full Transcript</title>
+<style>
+  :root {
+    --navy: #14324d;
+    --blue: #3e7cb1;
+    --slate: #8c97a6;
+    --paper: #f5f7fa;
+    --paper-raised: #ffffff;
+    --pale: #b7cbdd;
+    --rule: rgba(20, 50, 77, 0.14);
+    --rule-strong: rgba(20, 50, 77, 0.28);
+    --text: var(--navy);
+    --text-dim: var(--slate);
+    --accent: var(--blue);
+    --final-bg: #eef4f9;
+    --final-border: rgba(62, 124, 177, 0.35);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --navy: #eef3f8;
+      --blue: #7cadde;
+      --slate: #93a4b8;
+      --paper: #0c1c2b;
+      --paper-raised: #122539;
+      --pale: #2a4258;
+      --rule: rgba(238, 243, 248, 0.14);
+      --rule-strong: rgba(238, 243, 248, 0.28);
+      --text: var(--navy);
+      --text-dim: var(--slate);
+      --accent: var(--blue);
+      --final-bg: #10283c;
+      --final-border: rgba(124, 173, 222, 0.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --navy: #eef3f8;
+    --blue: #7cadde;
+    --slate: #93a4b8;
+    --paper: #0c1c2b;
+    --paper-raised: #122539;
+    --pale: #2a4258;
+    --rule: rgba(238, 243, 248, 0.14);
+    --rule-strong: rgba(238, 243, 248, 0.28);
+    --final-bg: #10283c;
+    --final-border: rgba(124, 173, 222, 0.35);
+  }
+
+  :root[data-theme="light"] {
+    --navy: #14324d;
+    --blue: #3e7cb1;
+    --slate: #8c97a6;
+    --paper: #f5f7fa;
+    --paper-raised: #ffffff;
+    --pale: #b7cbdd;
+    --rule: rgba(20, 50, 77, 0.14);
+    --rule-strong: rgba(20, 50, 77, 0.28);
+    --final-bg: #eef4f9;
+    --final-border: rgba(62, 124, 177, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+  }
+
+  .mono {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+  }
+
+  header.masthead {
+    margin-bottom: 3rem;
+  }
+
+  .kicker {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    line-height: 1.15;
+    margin: 0.5rem 0 0.75rem;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  .masthead p.meta {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    max-width: 62ch;
+  }
+
+  .participants {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem 1.5rem;
+  }
+
+  .participants .who {
+    font-size: 0.85rem;
+  }
+
+  .participants .who .name {
+    font-weight: 600;
+    display: block;
+  }
+
+  .participants .who .role {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+  }
+
+  section.brief {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 3rem;
+  }
+
+  section.brief .kicker {
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+
+  section.brief blockquote {
+    margin: 0;
+    font-style: italic;
+    color: var(--text);
+    font-size: 0.98rem;
+  }
+
+  section.brief blockquote p {
+    margin: 0 0 0.8rem;
+  }
+  section.brief blockquote p:last-child { margin-bottom: 0; }
+
+  section.speaker {
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  section.speaker:first-of-type {
+    border-top: none;
+  }
+
+  .speaker-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.3rem;
+    flex-wrap: wrap;
+  }
+
+  .speaker-num {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    color: var(--pale);
+    font-size: 0.85rem;
+  }
+
+  .speaker-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .speaker-role {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    margin: 0 0 1.4rem;
+    max-width: 58ch;
+  }
+
+  h4.field {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 1.6rem 0 0.5rem;
+  }
+
+  section.speaker p, section.speaker li {
+    font-size: 0.98rem;
+    max-width: 68ch;
+  }
+
+  section.speaker ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .oneliner-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .oneliner-list li {
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.4;
+    padding-left: 1.6rem;
+    position: relative;
+    max-width: 60ch;
+  }
+
+  .oneliner-list li::before {
+    content: "“";
+    position: absolute;
+    left: 0;
+    top: -0.1em;
+    color: var(--pale);
+    font-size: 1.4em;
+    font-weight: 700;
+  }
+
+  .callout {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  section.final {
+    margin-top: 3.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .final-doc {
+    background: var(--final-bg);
+    border: 1px solid var(--final-border);
+    border-radius: 8px;
+    padding: 1.75rem 2rem;
+    margin-top: 1rem;
+  }
+
+  .final-doc h3 {
+    font-size: 1.1rem;
+    margin: 1.4rem 0 0.5rem;
+  }
+  .final-doc h3:first-child { margin-top: 0; }
+
+  .final-doc p, .final-doc li {
+    font-size: 0.96rem;
+    max-width: 66ch;
+  }
+
+  .final-doc strong { color: var(--text); }
+
+  .changelog {
+    margin-top: 1.5rem;
+  }
+
+  .changelog li {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+
+  .concerns li {
+    font-size: 0.9rem;
+  }
+
+  footer.note {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    color: var(--text-dim);
+    font-size: 0.88rem;
+  }
+
+  a { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .page { padding: 2.5rem 1.25rem 4rem; }
+    .final-doc { padding: 1.25rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <span class="kicker">Keystone Systems — Internal Working Doc</span>
+    <h1>Positioning Committee: Full Transcript</h1>
+    <p class="meta">Five agents, run in sequence, each given the founder's raw brain dump on why Keystone Systems exists and asked to work it into something that can live in <span class="mono">company-context.md</span>. This is their full output, unedited beyond formatting.</p>
+
+    <div class="participants">
+      <div class="who"><span class="name">Customer Advocate</span><span class="role">represents the buyer</span></div>
+      <div class="who"><span class="name">Positioning Strategist</span><span class="role">finds the sharpest angle</span></div>
+      <div class="who"><span class="name">Skeptic</span><span class="role">red-teams for hype</span></div>
+      <div class="who"><span class="name">Synthesis</span><span class="role">drafts the doc section</span></div>
+      <div class="who"><span class="name">Voice Check</span><span class="role">final authenticity pass</span></div>
+    </div>
+  </header>
+
+  <section class="brief">
+    <span class="kicker">The brief, verbatim</span>
+    <blockquote>
+      <p>"The gap that we're trying to fill with this company is that artificial intelligence or AI coding tools have accelerated the ability of anyone to get code out in the world. While that is awesome, we're looking to empower people to actually ship things in a lean way with the experience, context, and wisdom that I've developed over the years through shipping all these different things at these different companies."</p>
+      <p>"I'm actually really good at using these AI coding tools to make that process a lot faster, leaner, and better than it has been in the past, when, if you were hiring a consultant, you might go through a traditional dev shop which has dozens or more employees and has all this different process. Now, because of these tools, we just don't need all of that."</p>
+      <p>"There still is a lack of credibility and reliability that I think a lot of business owners want for systems that are running their business. Because I have both those things — the expertise and the ability to use these AI coding tools to the max, and the technical experience to know what a good system looks like and what a bad system looks like, because I've done it, been there, and made them myself — companies can then have access to that expertise and knowledge and wisdom without taking me on as a full-time hire, because frankly they can't afford me as a full-time hire for the most part."</p>
+      <p>"I mean, because honestly I think we're selling them some sort of peace of mind. If you can have a system that's validated and certified by someone with actual experience, then I think you feel better about it."</p>
+    </blockquote>
+  </section>
+
+  <section class="speaker">
+    <div class="speaker-head">
+      <span class="speaker-num mono">01</span>
+      <h2 class="speaker-name">Customer Advocate</h2>
+    </div>
+    <p class="speaker-role">Briefed to represent the buyer and stay concrete about what they actually fear and what they'd actually pay for — not what sounds good to the founder.</p>
+
+    <h4 class="field">The real pain, in their words</h4>
+    <p>"I've got a Lovable/Cursor/Replit-built product that actually works, and now either real users or a funding round (or both) are riding on it, and I genuinely cannot tell if it's a solid foundation or a house of cards. I don't know if there's a SQL injection hole, whether the data model will force a rewrite in six months, or whether it falls over at 10x the traffic it has now. And I can't just ask the AI that built it — it doesn't know what it doesn't know, and it never says 'this part is going to break.'"</p>
+    <p>This is the sharpest version of the pain across all six service lines — due-diligence buyers, acquirers, and codebase-improvement clients have the same underlying fear (something expensive and hard to undo is hiding in this system and I can't see it myself), just at a different moment.</p>
+
+    <h4 class="field">What they're actually buying</h4>
+    <p>Not "quality code" as an abstract good — a specific, named person to put their judgment behind, at the one moment being wrong is expensive and hard to undo. Concretely: someone who will say "no, don't do that" when an AI tool would just comply; a credible, specific proxy for "will this hold up"; and cognitive offload — the buyer's job is running their company, not becoming a part-time systems architect.</p>
+    <p>Vague comfort language undersells it: this buyer doesn't want to feel reassured, they want a specific list of what's broken and what it'll cost to fix, plus a name attached to that list. "Certified" in particular implies a stamp or standard that doesn't exist in custom software — using it would undercut credibility rather than build it.</p>
+
+    <h4 class="field">Why the price is justified</h4>
+    <p>The buyer already took the free path — that's how the prototype exists. The premium isn't for writing code; it's for the judgment about which of the AI's shortcuts are harmless and which are landmines. The honest framing is insurance, even without using the word: pay a few thousand to a few tens of thousands now to avoid a six-figure mistake later.</p>
+
+    <h4 class="field">Objections this buyer would actually have</h4>
+    <ul>
+      <li>Solo, founder-led, no bench — if he's mid-engagement elsewhere or on vacation, what happens to my timeline, especially on a deal clock?</li>
+      <li>No pricing, sample scope, or typical timeline anywhere on the site — an unscoped "talk through your situation" CTA reads as "get on a call and find out the number."</li>
+      <li>No client logos, testimonials, or before/after examples — every claim is self-asserted with zero third-party proof.</li>
+      <li>The Stripe/Microsoft scale credibility cuts both ways: reassuring for an acquisition buyer, but a pre-seed founder with 200 users might worry about being over-engineered and over-billed.</li>
+      <li>No stated recourse if a "hardened" system still breaks weeks after handoff, or a diligence report misses something material to a deal.</li>
+    </ul>
+
+    <h4 class="field">Their need, in one sentence</h4>
+    <p class="callout">"I need someone who has actually built things that survived real production load to look at my system before I bet real money, users, or my company's future on it, and either tell me it's solid or fix the specific things that will break."</p>
+  </section>
+
+  <section class="speaker">
+    <div class="speaker-head">
+      <span class="speaker-num mono">02</span>
+      <h2 class="speaker-name">Positioning Strategist</h2>
+    </div>
+    <p class="speaker-role">Briefed to find the sharpest, least generic version of the core claim — and to avoid anything that reads as "AI-powered consulting" boilerplate.</p>
+
+    <h4 class="field">The core insight</h4>
+    <p>AI coding tools collapsed the cost of writing code, which means writing code was never the scarce, valuable thing — knowing whether the code is sound was. That judgment premium didn't shrink; it went up, because the market is now flooded with unverified code from people who can produce but can't evaluate. Using AI tools well is table stakes, claimed by everyone. The actual differentiator is the scar tissue to judge the output — AI fluency is just what lets that judgment get delivered at solo speed instead of dev-shop overhead.</p>
+
+    <h4 class="field">Candidate one-liners</h4>
+    <ul class="oneliner-list">
+      <li>Code got cheap. Knowing which code is worth keeping didn't. That's what I sell.</li>
+      <li>Anyone can generate code now. I've been on-call for the code that didn't hold up — that's the difference you're actually paying for.</li>
+      <li>The bottleneck moved from writing code to knowing which code deserves to survive contact with production. I do the second part.</li>
+      <li>Senior judgment, earned the hard way — delivered at the speed a dev shop can't match and the overhead one doesn't need.</li>
+      <li>I don't sell AI-assisted development. I sell the scar tissue that tells you when the AI is wrong.</li>
+      <li>Every shop can produce code fast now. Few can tell you, before it ships, which parts will break at scale — I can, because I've watched them break.</li>
+    </ul>
+
+    <h4 class="field">Where AI-tool fluency fits</h4>
+    <p>Structurally, not rhetorically: it's the answer to "how can one person deliver this," never the answer to "why should I trust this." It's leverage that collapses the overhead a traditional dev shop needs (PMs, standups, multi-person handoffs) — the reason this doesn't cost dev-shop rates or take dev-shop timelines. The differentiation stays anchored entirely in the judgment claim; AI fluency is the quiet multiplier, never the headline.</p>
+  </section>
+
+  <section class="speaker">
+    <div class="speaker-head">
+      <span class="speaker-num mono">03</span>
+      <h2 class="speaker-name">Skeptic</h2>
+    </div>
+    <p class="speaker-role">Briefed to red-team the raw enthusiasm in the brief against the site's own established brand-voice rules, and to check the positioning doesn't collapse into a generic claim.</p>
+
+    <h4 class="field">Overclaim risks from the raw brief</h4>
+    <ul>
+      <li>"Awesome" / "amazing" applied to the firm's own work — self-congratulatory, contradicts the explicit ban on superlatives.</li>
+      <li>"To the max" or any maximalist intensifier — the doc explicitly bans "10x" and "cutting-edge" as overselling.</li>
+      <li>"Empower" applied to clients — a vague startup-verb asserting an outcome without evidence.</li>
+      <li>Leading with AI capability as the flashy hook risks reading as overclaiming competence in an already skepticism-inducing category.</li>
+    </ul>
+
+    <h4 class="field">The generic-collapse risk</h4>
+    <p>If the pitch centers on "we use AI to build/harden software faster/better," it collapses into the exact same claim every dev shop and freelancer has made since 2023 — undifferentiated and unverifiable from outside. What prevents that: AI is one of six service lines, not the headline identity. The real differentiator is judgment, a named engagement model, a specific buyer moment, and a specific credibility source, stated once and plainly. Positioning copy should foreground those structural specifics rather than AI-augmentation, which is now table stakes.</p>
+
+    <h4 class="field">Recommended cuts</h4>
+    <ul>
+      <li>Any standalone hype adjective — cut entirely, don't soften. The doc's own pattern is a concrete noun phrase, not a toned-down superlative.</li>
+      <li>AI-as-the-headline framing — demote to its place as 2 of 6 named service lines.</li>
+      <li>Repeated or embellished credential mentions — state Stripe/Microsoft once, plainly.</li>
+      <li>Any explanation of what "Keystone" personally means to the founder — already flagged elsewhere as intentionally private.</li>
+      <li>Vague transformation language ("empowering founders to scale") — replace with named deliverables or the specific problem each service solves.</li>
+    </ul>
+  </section>
+
+  <section class="speaker">
+    <div class="speaker-head">
+      <span class="speaker-num mono">04</span>
+      <h2 class="speaker-name">Synthesis</h2>
+    </div>
+    <p class="speaker-role">Combined all three perspectives into a draft <span class="mono">company-context.md</span> section, then produced concrete, directional copy recommendations for the live site.</p>
+
+    <h4 class="field">Copy recommendations for the live site</h4>
+    <ul>
+      <li><strong>Hero:</strong> lead with the decision-timing framing, not AI or the service list. E.g. pair the headline with a one-line explanation of the judgment gap.</li>
+      <li><strong>Hero subhead:</strong> name the specific fear directly rather than a benefit statement — "find out if it's a solid foundation or a house of cards" over "ship with confidence."</li>
+      <li><strong>About page:</strong> open with the market shift, not the founder bio — introduce the founder as the answer to that specific gap.</li>
+      <li><strong>About page:</strong> reframe AI-tool use as a delivery mechanism, not a capability claim — "how one person delivers this without dev-shop overhead," not "I use the latest AI tools."</li>
+      <li><strong>Diligence / hardening pages:</strong> replace "peace of mind" language with concrete deliverable lists.</li>
+      <li><strong>Diligence / hardening pages:</strong> directly address that AI assistants are structurally agreeable — "an AI assistant will comply, I'll tell you when not to."</li>
+      <li><strong>Every page:</strong> audit for hype adjectives and em dashes; replace with the concrete noun-phrase pattern already used for "senior engineering judgment."</li>
+      <li><strong>Solutions pages:</strong> consider a short, plain "how engagements work" block near the CTA addressing bench depth and post-handoff recourse — the two sharpest unaddressed objections.</li>
+    </ul>
+  </section>
+
+  <section class="final">
+    <div class="speaker-head">
+      <span class="speaker-num mono">05</span>
+      <h2 class="speaker-name">Voice Check — Final Draft</h2>
+    </div>
+    <p class="speaker-role">Final pass for founder-voice authenticity and brand-voice compliance. This is the version proposed for <span class="mono">company-context.md</span>.</p>
+
+    <div class="final-doc">
+      <h3>Positioning: The Judgment Gap</h3>
+
+      <p><strong>The real shift in the market.</strong> AI coding tools collapsed the cost of producing code. They did not collapse the cost of knowing whether that code is sound. Writing code was never the scarce, valuable thing, and now that everyone can generate a plausible-looking product in a weekend, the market is flooded with unverified systems built by people who can produce but cannot evaluate what they produced. The judgment premium did not shrink. It went up, because there is more code than ever that nobody with the right experience has looked at.</p>
+
+      <p>This is the gap Keystone Systems fills: not "AI-assisted development," which every dev shop and freelancer now claims, but the judgment layer sitting on top of it. Knowing what to build, what to refuse to build, and which shortcuts are harmless versus which ones quietly become an outage or a failed audit six months out.</p>
+
+      <h3>Why the founder specifically can fill it</h3>
+      <p>The founder has built and operated real systems at scale (Stripe-level payments infrastructure, Principal Engineer at Microsoft) and has been on-call for what happens when a shortcut turns out to be a landmine. That is the source of the judgment: not credentials for their own sake, stated once and plainly, but the pattern recognition that only comes from having paid for failures directly in production.</p>
+
+      <p>Fluency with AI coding tools is not the pitch. It is the infrastructure underneath the pitch: it is what lets one person deliver senior-level judgment at solo speed, without the standups, handoffs, and telephone-game overhead a traditional dev shop needs to move at the same pace. The AI tools are the leverage that makes the judgment affordable and fast. They are never the reason to trust the work.</p>
+
+      <h3>What is actually being sold</h3>
+      <p>Not "quality code" as an abstract good, and not reassurance. Clients are buying a specific, named person to put their judgment behind, at the one moment where being wrong is expensive and hard to undo: pre-launch, pre-raise, pre-acquisition-close, pre-scale.</p>
+      <p>Concretely, that means:</p>
+      <ul>
+        <li><strong>Someone who says no.</strong> AI coding assistants are structurally agreeable and have no skin in the game. A dev-shop contractor has an incentive to keep billing. Keystone's founder has a professional reputation to protect and will tell a client not to do something an AI tool would happily generate.</li>
+        <li><strong>A credible, specific proxy for "will this hold up."</strong> A non-technical buyer cannot personally evaluate a data model or an auth flow. They are outsourcing that call to someone whose judgment has already been tested against real production load.</li>
+        <li><strong>Not their job to know this.</strong> The client's job is running their company, not becoming a part-time systems architect. They are paying so they don't have to develop that expertise themselves.</li>
+        <li><strong>A concrete deliverable, not a feeling.</strong> Phrases like "a clear-eyed technical assessment of what's solid and what isn't," "know what you're buying before you close," and "a second set of senior eyes" all point at the same thing: a specific list of what's broken, what it will cost to fix, and a name attached to that list. Not "peace of mind." Not "validated and certified" (there is no such certification in custom software, and claiming one undercuts credibility with a technical audience).</li>
+      </ul>
+      <p>The pricing logic follows an insurance framing without ever using the word insurance: a client pays a few thousand to a few tens of thousands of dollars now to avoid a six-figure mistake later (a breach discovered after a raise, an acquisition that turns into a money pit, a rebuild forced by a bad early data-model decision).</p>
+
+      <h3>Guardrails on how this gets said</h3>
+      <p>No superlatives ("world-class," "rockstar," "best-in-class," "amazing," "cutting-edge," "game-changing"). The substitute for all of these is a concrete noun phrase like "senior engineering judgment" or a named deliverable, never a toned-down version of the hype word. No "empower," "revolutionize," or vague transformation language; replace with the specific problem solved or the specific artifact delivered. State the Stripe/Microsoft credential once, plainly, in a single place; do not repeat or dramatize it elsewhere, and do not lead with AI capability as the headline hook since it is one of six service lines, not the identity of the firm. No em dashes, no exclamation points, no urgency language. Confidence comes from specificity, not adjectives.</p>
+    </div>
+
+    <div class="changelog">
+      <h4 class="field">What changed from the synthesis draft</h4>
+      <ul>
+        <li>"Has a professional judgment to protect" didn't scan — changed to "has a professional reputation to protect."</li>
+        <li>Renamed the bullet header "Cognitive offload" to "Not their job to know this" — the one term in the piece that sounded like a consulting deck rather than the founder's own voice.</li>
+        <li>Rewrote a run of three bare quoted phrases into one connected sentence so it reads as something a person would actually say.</li>
+        <li>Split a dense sentence into two short, declarative ones to match the piece's blunt rhythm elsewhere ("The judgment premium did not shrink. It went up.").</li>
+        <li>Confirmed: no em dashes, no exclamation points, no banned superlatives anywhere in the body copy. Stripe/Microsoft credential appears exactly once.</li>
+      </ul>
+    </div>
+
+    <div class="concerns">
+      <h4 class="field">Flagged, not resolved</h4>
+      <ul>
+        <li>"The judgment layer" and "pattern recognition" sit slightly more abstract than the piece's punchier phrases ("landmine," "money pit") — left as-is since they're immediately clarified, but worth a pass if you want the whole piece pulled toward that more visceral register.</li>
+        <li>"One of six service lines" is asserted but not re-explained in this section — worth confirming that number is still current wherever this doc gets used, given how much the piece leans on specificity as the differentiator.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="note">
+    Produced by a 5-agent workflow run against the founder's raw brain dump and the current <span class="mono">company-context.md</span>. The synthesized output was incorporated into <span class="mono">docs/company-context.md</span> under "Positioning: The Judgment Gap."
+  </footer>
+
+</div>
+</body>
+</html>

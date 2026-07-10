@@ -12,6 +12,39 @@ Clients bring Keystone Systems in for the decisions that are expensive to get wr
 
 ---
 
+## Positioning: The Judgment Gap
+
+### The real shift in the market
+
+AI coding tools collapsed the cost of producing code. They did not collapse the cost of knowing whether that code is sound. Writing code was never the scarce, valuable thing, and now that everyone can generate a plausible-looking product in a weekend, the market is flooded with unverified systems built by people who can produce but cannot evaluate what they produced. The judgment premium did not shrink. It went up, because there is more code than ever that nobody with the right experience has looked at.
+
+This is the gap Keystone Systems fills: not "AI-assisted development," which every dev shop and freelancer now claims, but the judgment layer sitting on top of it. Knowing what to build, what to refuse to build, and which shortcuts are harmless versus which ones quietly become an outage or a failed audit six months out.
+
+### Why the founder specifically can fill it
+
+The founder has built and operated real systems at scale (Stripe-level payments infrastructure, Principal Engineer at Microsoft) and has been on-call for what happens when a shortcut turns out to be a landmine. That is the source of the judgment: not credentials for their own sake, stated once and plainly, but the pattern recognition that only comes from having paid for failures directly in production.
+
+Fluency with AI coding tools is not the pitch. It is the infrastructure underneath the pitch: it is what lets one person deliver senior-level judgment at solo speed, without the standups, handoffs, and telephone-game overhead a traditional dev shop needs to move at the same pace. The AI tools are the leverage that makes the judgment affordable and fast. They are never the reason to trust the work.
+
+### What is actually being sold
+
+Not "quality code" as an abstract good, and not reassurance. Clients are buying a specific, named person to put their judgment behind, at the one moment where being wrong is expensive and hard to undo: pre-launch, pre-raise, pre-acquisition-close, pre-scale.
+
+Concretely, that means:
+
+- **Someone who says no.** AI coding assistants are structurally agreeable and have no skin in the game. A dev-shop contractor has an incentive to keep billing. Keystone's founder has a professional reputation to protect and will tell a client not to do something an AI tool would happily generate.
+- **A credible, specific proxy for "will this hold up."** A non-technical buyer cannot personally evaluate a data model or an auth flow. They are outsourcing that call to someone whose judgment has already been tested against real production load.
+- **Not their job to know this.** The client's job is running their company, not becoming a part-time systems architect. They are paying so they don't have to develop that expertise themselves.
+- **A concrete deliverable, not a feeling.** Phrases like "a clear-eyed technical assessment of what's solid and what isn't," "know what you're buying before you close," and "a second set of senior eyes" all point at the same thing: a specific list of what's broken, what it will cost to fix, and a name attached to that list. Not "peace of mind." Not "validated and certified" (there is no such certification in custom software, and claiming one undercuts credibility with a technical audience).
+
+The pricing logic follows an insurance framing without ever using the word insurance: a client pays a few thousand to a few tens of thousands of dollars now to avoid a six-figure mistake later (a breach discovered after a raise, an acquisition that turns into a money pit, a rebuild forced by a bad early data-model decision).
+
+### Guardrails on how this gets said
+
+No superlatives ("world-class," "rockstar," "best-in-class," "amazing," "cutting-edge," "game-changing"). The substitute for all of these is a concrete noun phrase like "senior engineering judgment" or a named deliverable, never a toned-down version of the hype word. No "empower," "revolutionize," or vague transformation language; replace with the specific problem solved or the specific artifact delivered (a risk assessment, a fixed data model, a handoff document). State the Stripe/Microsoft credential once, plainly, in a single place; do not repeat or dramatize it elsewhere, and do not lead with AI capability as the headline hook since it is one of six service lines, not the identity of the firm. No em dashes, no exclamation points, no urgency language. Confidence comes from specificity (named deliverables, a stated engagement model, a stated decision-timing moment), not from adjectives.
+
+---
+
 ## Founder Background
 
 The founder is a Senior/Staff-level software engineer, currently working remotely at **Cedar** (Mountain Time zone, with East Coast teammates). Prior experience includes:
@@ -36,6 +69,13 @@ Keystone Systems offers six categories of engagement:
 6. **Existing Codebase Improvement** — dropping into a company's existing codebase for audits, refactors, incremental feature development, and ongoing improvement — not just greenfield work.
 
 These six lines share a common thread: **judgment applied at a specific, well-scoped moment** — a new build, a fragile prototype, a messy workflow, an acquisition target, an AI rollout, or an existing system that needs a second set of senior eyes. None of them are "staff augmentation" in the traditional sense.
+
+---
+
+## Engagement Model & Pricing
+
+- **Priced to the outcome, not billed hourly.** Engagements are scoped and priced up front against the outcome, not billed by the hour. This is a deliberate incentive-alignment choice: hourly billing rewards a consultant for taking longer, while outcome-based pricing keeps both the client and Keystone Systems pulling toward the fastest path to done.
+- **Handoff is the default, not the only option.** Most engagements end with a clean handoff back to the client's team, documentation included, so the client is never dependent on Keystone Systems to maintain what was built. For companies that want continued senior technical leadership without a full-time hire, ongoing or **fractional-CTO-style retainer** arrangements are also available, rather than a hard requirement that every engagement wind down.
 
 ---
 
