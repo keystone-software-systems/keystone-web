@@ -8,6 +8,13 @@
     "dev": "npm run dev -w apps/web",
     "build": "npm run build -w apps/web",
     "lint": "npm run lint -w apps/web",
-    "typecheck": "npm run typecheck -w apps/web"
+    "typecheck": "npm run typecheck -w apps/web",
+    "dev:admin": "npm run dev -w apps/admin",
+    "build:admin": "npm run build -w apps/admin",
+    "lint:admin": "npm run lint -w apps/admin",
+    "typecheck:admin": "npm run typecheck -w apps/admin",
+    "build:all": "npm run build && npm run build:admin",
+    "lint:all": "npm run lint && npm run lint:admin",
+    "typecheck:all": "npm run typecheck && npm run typecheck:admin"
   }
 }

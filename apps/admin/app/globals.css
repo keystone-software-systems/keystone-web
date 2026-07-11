@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+:root {
+  --color-blueprint-navy: #14324d;
+  --color-technical-blue: #3e7cb1;
+  --color-slate: #8c97a6;
+  --color-off-white: #f5f7fa;
+  --color-pale-blue: #b7cbdd;
+}
+
+@theme inline {
+  --color-blueprint-navy: var(--color-blueprint-navy);
+  --color-technical-blue: var(--color-technical-blue);
+  --color-slate: var(--color-slate);
+  --color-off-white: var(--color-off-white);
+  --color-pale-blue: var(--color-pale-blue);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-plex-mono);
+}
+
+body {
+  background: var(--color-off-white);
+  color: var(--color-blueprint-navy);
+}
+
+.input {
+  @apply rounded-md border border-pale-blue bg-white px-3 py-2 text-sm text-blueprint-navy outline-none;
+}
+.input:focus {
+  @apply border-technical-blue;
+}
