@@ -669,24 +669,29 @@ extending. Scoped in §8 and `docs/admin-tool-notion-workspace.md`.
 
 ---
 
-## 15. Open decisions (resolve before Phase 1)
+## 15. Decisions
 
-1. **Repo boundary.** Keystone-internal in this monorepo (assumed), or the start of the Scaleyard
-   back-office and therefore its own repo? Affects naming and where secrets live, not the design.
-2. **Zoho product.** Zoho **Sign** (e-signature) is assumed for "contracts." Confirm it is Sign and
-   not Zoho Books (invoicing) or CRM — Stripe already owns invoicing in this design.
-3. **Notion scope.** *Resolved for v1:* just link a Notion doc to a project (paste a URL; optional
-   one-click create). The deeper two-way workspace integration is designed
-   (`docs/admin-tool-notion-workspace.md`) but deferred until the basics are in use.
-4. **Notion "Create doc" button.** Enable the optional API-backed create (needs `NOTION_TOKEN` + a
-   parent page), or ship paste-to-link only for v1? Paste-only is zero-dependency and the safe start.
-5. **Invoicing model detail.** Confirm hosted-invoice email from Stripe (assumed) vs. quotes/
-   estimates first, and whether milestone-staged billing (deposit/midpoint/handoff) is needed day
-   one or later.
-6. **Users at launch.** Just the founder, or bench consultants too on day one? Determines whether
-   `viewer`/user-management ships in Phase 1 vs. Phase 4.
-7. **Domain & email.** `admin.keystone.systems`? And is Resend (already configured in `apps/web`)
-   the channel for internal notifications, or is that out of scope initially?
+**Resolved (2026-07):**
+
+1. **Repo boundary.** *Keystone-internal in this monorepo as `apps/admin`*, deployed as a separate
+   Vercel project. Relocatable later if it becomes the Scaleyard back-office.
+2. **Auth method.** *Email magic link* at launch (no external OAuth app to set up); Google can be
+   added later.
+3. **Users at launch.** *Founder-only.* Seed the founder as `owner`; defer the `staff`/`viewer`
+   roles and user-management UI (Phase 4) until bench consultants actually need access.
+4. **Notion scope (v1).** Just link a Notion doc to a project (paste a URL; optional one-click
+   create). Deeper two-way integration is designed (`docs/admin-tool-notion-workspace.md`) but
+   deferred.
+
+**Still open (not blocking Phase 0/1):**
+
+5. **Notion "Create doc" button.** Paste-to-link only (default, zero-dependency) vs. also the
+   optional API-backed create (needs `NOTION_TOKEN` + a parent page). Defaulting to paste-only.
+6. **Zoho product.** Zoho **Sign** assumed for "contracts" — confirm before Phase 3.
+7. **Invoicing model detail (Phase 2).** Hosted-invoice email from Stripe (assumed) vs. quotes
+   first; whether milestone-staged billing (deposit/midpoint/handoff) is needed day one.
+8. **Domain & email.** `admin.keystone.systems` vs. a Vercel URL to start; whether Resend (already
+   in `apps/web`) sends internal notifications later.
 
 ---
 
