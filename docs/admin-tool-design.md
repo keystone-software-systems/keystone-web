@@ -460,7 +460,9 @@ founder's **task manager, notes, and meeting record** — used heavily with **No
 meeting notes**, which generate summaries and action items directly inside the workspace. The admin
 tool provisions each project's Notion page, keeps it stamped with authoritative commercial status,
 and reads a few Notion-owned signals back for a unified glance. The discipline that makes this
-"tight" rather than fragile is the ownership split below.
+"tight" rather than fragile is the ownership split below. The concrete workspace design — every
+database, property, ownership tag, value mapping, and the webhook routing table — lives in
+`docs/admin-tool-notion-workspace.md`, which becomes `lib/notion/schema.ts` at build time.
 
 **Boundary: the tool feeds Notion AI, it does not compete with it.** All intelligence — summarizing
 meetings, drafting action items, answering questions across the workspace — stays in Notion AI. The
@@ -509,8 +511,9 @@ Server Action (role-checked), best-effort after the DB row commits
   1. notion.pages.create under NOTION_PROJECTS_DB_ID with:
        - properties: Name, Client (relation or text), Service line,
          Status (mirror of project.status), Amount, Admin link (URL back to /projects/[id])
-       - children: a code-defined block skeleton — Scope · Notes · Tasks ·
-         Meeting log · Deliverables · Handoff  (the "template")
+       - children: a code-defined block skeleton — a "managed by admin" callout +
+         Scope · Notes · Deliverables · Handoff  (the "template"; Tasks and
+         Meetings live in their own related databases, per the workspace design)
   2. Store page id + url → projects.notion_page_id, notion_url; set notion_synced_at
   3. activity_log: "Notion workspace created for <project>"
 ```
@@ -739,9 +742,11 @@ ZOHO_REFRESH_TOKEN=
 ZOHO_ACCOUNTS_DOMAIN=https://accounts.zoho.com
 ZOHO_API_DOMAIN=https://sign.zoho.com
 
-# Notion
+# Notion  (workspace/database design: docs/admin-tool-notion-workspace.md)
 NOTION_TOKEN=                       # internal integration secret, server only
 NOTION_PROJECTS_DB_ID=
+NOTION_TASKS_DB_ID=
+NOTION_MEETINGS_DB_ID=
 NOTION_CLIENTS_DB_ID=               # optional
 NOTION_WEBHOOK_SECRET=              # verifies inbound Notion change subscriptions
 
@@ -840,13 +845,10 @@ heavily used — the project workspace is valuable the moment projects exist, be
    not Zoho Books (invoicing) or CRM — Stripe already owns invoicing in this design.
 3. **Notion as the PM surface.** *Resolved:* Notion is the task manager, notes, and meeting record;
    all task/kanban PM and note-taking stay in Notion, and the tool never duplicates them.
-4. **Notion structure.** Do the Projects (and Clients) Notion databases already exist with a settled
-   property schema, or should the design define them? The block skeleton and property map depend on
-   this. Specifically: (a) one shared workspace vs. per-client workspaces; (b) how meeting notes are
-   organized — a **Meetings** database with a project/client relation, or sub-pages under each
-   project page — since that determines how the read-back surfaces AI meeting notes and action
-   items; (c) where AI-meeting-notes action items land (a Tasks database, or inline in the meeting
-   page) so the tool can roll them up.
+4. **Notion structure.** *Designed greenfield* in `docs/admin-tool-notion-workspace.md` (Projects ·
+   Tasks · Meetings · optional Clients, with ownership tags and webhook routing). Remaining calls are
+   listed there: whether to use the Clients DB, the Working-phase vocabulary, and manual-vs-inferred
+   meeting→project linking.
 5. **Invoicing model detail.** Confirm hosted-invoice email from Stripe (assumed) vs. quotes/
    estimates first, and whether milestone-staged billing (deposit/midpoint/handoff) is needed day
    one or later.
@@ -859,4 +861,5 @@ heavily used — the project workspace is valuable the moment projects exist, be
 
 *Ties into existing docs: `docs/company-context.md` (business model, service lines, outcome
 pricing), `branding/keystone-systems-brand-guide.md` (palette, type), `docs/build-plan.md`
-(marketing-site stack conventions this app mirrors).*
+(marketing-site stack conventions this app mirrors). Companion: `docs/admin-tool-notion-workspace.md`
+(the concrete Notion database/property schema this integration provisions and syncs).*
