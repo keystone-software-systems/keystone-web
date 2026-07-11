@@ -5,7 +5,10 @@ provisions and syncs with: databases, properties, ownership, value mappings, the
 skeleton, and how webhook events route. This is greenfield — no existing Notion structure is
 assumed — so it doubles as a recommended task/notes/meetings setup and as the integration contract.*
 
-Status: **proposed design**. The few genuinely-your-call choices are flagged at the end.
+Status: **deferred**. This is the design for a *future* deeper Notion integration. **v1 does not
+build any of this** — it only links a Notion doc URL to a project (see `docs/admin-tool-design.md`
+§8). Keep this doc as the blueprint for if/when the two-way integration is worth extending; nothing
+here is scheduled.
 
 ---
 

@@ -1,7 +1,7 @@
 # Keystone Systems — Internal Admin Tool Design
 
 *Design document for an internal back-office application: invoicing (Stripe), contracts and
-e-signature (Zoho Sign), project management, and a tight Notion integration. Data and auth on
+e-signature (Zoho Sign), project management, and a linked Notion doc per project. Data and auth on
 Supabase.*
 
 Status: **proposed**. This is a design, not a commitment. Open decisions are listed at the end;
@@ -19,12 +19,9 @@ side of the consultancy:
 - **Invoicing** — issue and track invoices through Stripe, with payment status synced back.
 - **Contracts** — generate an engagement agreement, send it for signature through Zoho Sign, and
   track it to signed.
-- **Notion** — every project gets a linked Notion workspace page (scoping docs, notes, tasks,
-  meeting notes, handoff material), auto-provisioned and kept status-stamped by the tool. Notion is
-  the day-to-day working surface — the founder's task manager, notes, and AI meeting notes all live
-  there — and the admin tool is the commercial spine that orchestrates it and feeds it authoritative
-  status. The tool does not rebuild any of Notion's intelligence; it makes Notion AI smarter by
-  putting real invoice/contract/milestone truth into the workspace it reasons over.
+- **Notion link** — each project can link to its Notion doc, so the founder jumps between the
+  commercial record here and the working doc (notes, tasks, AI meeting notes) in Notion. v1 is just
+  the link; deeper two-way integration is designed but deferred (§8).
 - **Activity** — an audit trail of what happened and when.
 
 It is deliberately narrow. It is not a CRM, not a time tracker (engagements are priced to the
@@ -33,26 +30,22 @@ Each external system owns its domain and the admin tool owns the links between t
 
 - **Stripe** — system of record for money.
 - **Zoho Sign** — system of record for signatures.
-- **Notion** — system of record for project *knowledge and working docs* (scoping, notes, tasks,
-  deliverables, handoff). Heavily used; the founder lives here for the actual work.
+- **Notion** — where the founder's actual working docs, notes, tasks, and AI meeting notes live.
+  Heavily used, but the admin tool only needs to *link* to it in v1.
 - **Admin tool (Postgres)** — system of record for the *commercial spine*: clients, project
   lifecycle status, milestones (they gate billing), and the references that tie a project to its
-  invoices, its contract, and its Notion page.
+  invoices, its contract, and its Notion doc.
 
 ### Design principles
 
 - **Boring and durable.** Same values as the brand: understated, correct, low-surface-area. No
   feature we cannot maintain solo.
-- **External systems own their domain.** We store *references* (Stripe/Zoho/Notion IDs) and a cached
-  status, never a second source of truth for money, signatures, or project docs. Webhooks and
-  on-demand syncs reconcile.
-- **Fast both ways, but no field written by two systems.** Communication is bidirectional and
-  near-real-time — the tool pushes commercial truth into Notion on events, and Notion changes stream
-  back within seconds via webhook → cache → Supabase Realtime. The rule that keeps that safe: every
-  field has exactly one owner and syncs one direction. Postgres owns commercial fields (and mirrors
-  them *into* Notion as display-only); Notion owns working fields (and the tool reads them *out* for
-  display). Bidirectional *communication*, never two-way *sync* of a shared field — that is what
-  keeps a tight integration from becoming a merge-conflict-and-loop maintenance sink.
+- **External systems own their domain.** We store *references* (Stripe/Zoho IDs, a Notion URL) and a
+  cached status, never a second source of truth for money, signatures, or project docs. Webhooks
+  reconcile.
+- **Start small on Notion.** v1 just links a Notion doc to a project. The deeper two-way design is
+  captured but deferred; if it is ever built, the rule is: every field has one owner and syncs one
+  direction — bidirectional communication, never two-way sync of a shared field.
 - **Server-side secrets, always.** Stripe secret key, Zoho refresh token, and the Supabase service
   role key never reach the browser. All privileged work runs in Route Handlers / Server Actions.
 - **Least privilege, audited.** Small user set, role-gated, every mutation logged.
@@ -91,12 +84,13 @@ from the marketing site).
 | Data + Auth | Supabase (Postgres, Auth, Storage, RLS) |
 | Payments | Stripe (Invoicing API + webhooks) |
 | E-signature | Zoho Sign (REST API + webhooks) |
-| Project docs | Notion (official SDK; auto-provisioned project pages, status mirror, read-back) |
+| Project docs | Notion (v1: store a linked doc URL; optional one-click create via the official SDK) |
 | Hosting | Vercel (separate project, Node runtime for integration routes) |
 
-New dependencies (admin app only): `@supabase/supabase-js`, `@supabase/ssr`, `stripe`,
-`@notionhq/client` (official, maintained Notion SDK), `zod` (input validation). Zoho is called over
-`fetch` (thin, no maintained first-party Node SDK worth pulling in).
+New dependencies (admin app only): `@supabase/supabase-js`, `@supabase/ssr`, `stripe`, `zod`
+(input validation). Zoho is called over `fetch` (thin, no maintained first-party Node SDK worth
+pulling in). `@notionhq/client` is only needed if the optional "Create Notion doc" button is
+enabled; paste-to-link needs no Notion dependency.
 
 > **Next.js version note:** `apps/web/AGENTS.md` warns this Next.js has breaking changes vs. prior
 > training data. Before writing app code, read the relevant guides in
@@ -116,31 +110,24 @@ New dependencies (admin app only): `@supabase/supabase-js`, `@supabase/ssr`, `st
                        └──────┬──────────┬──────────┬──────────┬────────┘
                               │          │          │          │
                  Supabase     │   Stripe │    Zoho  │   Notion │
-              (Postgres/Auth/ │ (secret, │  (OAuth2,│ (SDK,    │
-               Storage/RLS)   │ Invoicing)│  Sign)  │ internal │
-                              │          │          │ integ.)  │
+              (Postgres/Auth/ │ (secret, │  (OAuth2,│ (linked  │
+               Storage/RLS)   │ Invoicing)│  Sign)  │ doc URL) │
                               │          │          │          │
                               ▼          ▼          ▼          ▼
              Reconcile status back into Postgres:
-             /api/webhooks/stripe  /api/webhooks/zoho   /api/webhooks/notion
-             Notion: push on events (out) + webhook (in) → cache → Supabase Realtime → live UI
+             /api/webhooks/stripe  /api/webhooks/zoho
+             Notion (v1): just a stored doc link; no webhook (see §8)
 ```
 
 - **Reads** happen in Server Components using a request-scoped Supabase client bound to the signed-in
   user, so **RLS** governs what is visible.
-- **Mutations** happen in Server Actions / Route Handlers. Calls to Stripe/Zoho/Notion and any
-  privileged DB write use the **service-role** client (RLS-bypassing) and re-check the caller's role
-  in code.
+- **Mutations** happen in Server Actions / Route Handlers. Calls to Stripe/Zoho and any privileged
+  DB write use the **service-role** client (RLS-bypassing) and re-check the caller's role in code.
 - **Webhooks** (Stripe, Zoho) are unauthenticated public routes that verify a provider signature,
   then write with the service-role client. They are the primary way external status enters the DB,
   which keeps reconciliation in one place.
-- **Notion** is bidirectional but field-scoped, and both directions are near-real-time: the tool
-  *pushes* commercial status onto the linked page on events (invoice paid, contract signed,
-  milestone/status change), and a **Notion webhook** (`/api/webhooks/notion`) *pulls* Notion-owned
-  fields (working phase, task rollups, action items, meetings) within seconds of an edit into a
-  read-back cache, which **Supabase Realtime** streams to the open UI live. No single field flows
-  both ways, so fast two-way traffic never conflicts or loops (see §8). A cron pass is a backstop
-  for missed webhooks, not the primary path.
+- **Notion** in v1 is just a stored doc URL on a project (optionally created via the Notion SDK). No
+  webhook, no sync — the deferred two-way design is in §8 and `docs/admin-tool-notion-workspace.md`.
 
 ### Two Supabase clients
 
@@ -228,12 +215,12 @@ never floats.
 ```
 profiles           id (= auth.users.id) · email · full_name · role · active
 clients            id · name · legal_name · stripe_customer_id · billing_email ·
-                     address_json · notion_page_id · notion_url · notes · created_by
+                     address_json · notes · created_by
 contacts           id · client_id → clients · name · email · title · phone · is_primary
 projects           id · client_id → clients · name · service_line · status ·
                      pricing_type · amount_total · currency · summary ·
                      start_date · target_end_date ·
-                     notion_page_id · notion_url · notion_synced_at · created_by
+                     notion_url · notion_page_id · created_by
 milestones         id · project_id → projects · title · amount · currency ·
                      due_date · status · sort_order · invoice_id → invoices (nullable)
 invoices           id · client_id → clients · project_id → projects (nullable) ·
@@ -246,9 +233,6 @@ contracts          id · client_id → clients · project_id → projects (nulla
                      signed_pdf_path (Supabase Storage) · template_key
 payments           id · invoice_id → invoices · stripe_payment_intent_id ·
                      amount · currency · status · received_at
-notion_project_state project_id → projects (pk) · working_phase · next_action ·
-                     open_tasks · done_tasks · open_action_items ·
-                     recent_meetings_json · notion_state_synced_at
 activity_log       id · actor_id → profiles (nullable) · entity_type · entity_id ·
                      action · summary · metadata_json · created_at
 integration_events id · provider · event_type · external_id (unique) ·
@@ -279,17 +263,11 @@ integration_events id · provider · event_type · external_id (unique) ·
 - A **milestone** can trigger an invoice; `milestone.invoice_id` links them so "milestone accepted →
   invoice X sent → paid" is traceable. Useful for fixed-price engagements billed in stages
   (e.g. deposit / midpoint / on-handoff).
-- A **project** maps 1:1 to a **Notion page** (`notion_page_id`), auto-created on project creation.
-  `notion_url` is the deep link shown in the UI; `notion_synced_at` records the last successful
-  push so the UI can flag drift. `clients.notion_page_id` is optional — link a client-level Notion
-  wiki page if one is used. These are the *only* Notion identifiers we persist; Notion's own content
-  is never copied into Postgres.
-- `notion_project_state` is a **read-back cache** (one row per project) of Notion-owned display
-  fields, kept fresh by the Notion webhook. The UI reads it from Postgres for instant renders, and
-  the project page / dashboard subscribe to it via **Supabase Realtime** so Notion edits appear live.
-  It is a cache, never a source of truth — safe to rebuild from Notion at any time.
+- A **project** can link to a **Notion doc**: `notion_url` is the link shown in the UI, and
+  `notion_page_id` is parsed from it for any future API use. Both are nullable (a project need not
+  have a doc). This is the *only* Notion state we persist in v1; Notion content is never copied in.
 - `integration_events.external_id` is **unique** — this is the idempotency guard so a replayed
-  webhook (Stripe, Zoho, or a Notion subscription event if adopted) is a no-op.
+  webhook (Stripe or Zoho) is a no-op.
 
 ### `updated_at` trigger
 
@@ -453,164 +431,37 @@ Templates live in Zoho (so legal copy is edited there, not in code); the app onl
 
 ---
 
-## 8. Notion — project workspace integration
+## 8. Notion — link a doc to a project
 
-Notion will be heavily used, so it is a first-class integration, not a link field. Notion is the
-founder's **task manager, notes, and meeting record** — used heavily with **Notion AI and AI
-meeting notes**, which generate summaries and action items directly inside the workspace. The admin
-tool provisions each project's Notion page, keeps it stamped with authoritative commercial status,
-and reads a few Notion-owned signals back for a unified glance. The discipline that makes this
-"tight" rather than fragile is the ownership split below. The concrete workspace design — every
-database, property, ownership tag, value mapping, and the webhook routing table — lives in
-`docs/admin-tool-notion-workspace.md`, which becomes `lib/notion/schema.ts` at build time.
+**Scope now: link a Notion doc to a project.** Notion is heavily used (task manager, notes, AI
+meeting notes), but for v1 the tool does not need to model any of that — it just needs each project
+to point at its Notion doc so the founder can jump between the commercial record here and the working
+doc there. Deeper two-way integration is designed but deferred (see "Later" below).
 
-**Boundary: the tool feeds Notion AI, it does not compete with it.** All intelligence — summarizing
-meetings, drafting action items, answering questions across the workspace — stays in Notion AI. The
-admin tool contributes the one thing Notion does not have on its own: authoritative commercial truth
-(is this invoice paid, is the contract signed, which milestone is live). Pushing that onto the
-linked pages means Notion AI answers questions like "which active projects have an unpaid invoice"
-grounded in real state, without the tool building any AI of its own.
+### What v1 does
 
-### Ownership split (the golden rule)
+- **Store a Notion link on a project.** `projects.notion_url` holds the URL of the project's Notion
+  doc; `projects.notion_page_id` holds the page id parsed from it (for future API use).
+- **Link an existing doc.** The project page has a "Notion doc" field: paste a Notion URL to link it.
+  This needs **no Notion API and no secret** — it is just a stored, validated URL rendered as an
+  "Open in Notion" link.
+- **Optional one-click create.** If a `NOTION_TOKEN` and a parent location are configured, an
+  optional "Create Notion doc" button creates a blank page under that parent (titled after the
+  project, with a link back to the tool) and stores the URL. Without the token, the button is hidden
+  and linking-by-paste is the only path. This keeps v1 dependency-free by default.
 
-| Field / concern | Owner | Sync direction |
-|---|---|---|
-| Client, project lifecycle status, milestones, amounts, invoice/contract status | **Postgres** | push → Notion (display-only mirror) |
-| Scoping docs, meeting notes (incl. AI meeting notes), research, deliverable drafts, handoff docs | **Notion** | not synced — lives only in Notion |
-| Granular tasks / kanban, action items, "working phase", "next action" | **Notion** | pull → tool (read-only display) |
-| The link itself (`notion_page_id`) | **Postgres** | set once on creation |
+That is the whole v1 surface: one column, a paste-to-link field, an optional create button.
 
-No field is written by both systems. A mirrored property edited by hand in Notion is cosmetic and
-is overwritten on the next push; a commercial value is never authored in Notion.
+### Later (deferred — designed, not built)
 
-> **Decided:** Notion is the founder's task manager, notes, and meeting record, so **all task/kanban
-> PM and note-taking stay in Notion**. The admin tool owns project *records, lifecycle status, and
-> milestones* (because milestones gate billing) and never duplicates task management. The tool's
-> `/projects` board tracks the commercial lifecycle (lead → closed); day-to-day execution, tasks,
-> and AI meeting notes live in the linked Notion page.
-
-### Auth & config
-
-Single Notion workspace, so a **Notion internal integration** (not OAuth): one secret token, with
-the relevant databases/pages explicitly shared to the integration in Notion's UI.
-
-- `NOTION_TOKEN` — internal integration secret, server only.
-- `NOTION_PROJECTS_DB_ID` — parent database new project pages are created under.
-- `NOTION_CLIENTS_DB_ID` — optional, if client wiki pages are used.
-
-Property names/IDs on those databases are kept in one `lib/notion/schema.ts` map so a Notion schema
-change is a one-file edit, not a hunt.
-
-### Flow 1 — auto-provision a project page (Postgres → Notion)
-
-```
-Project created in the admin tool
-      │
-      ▼
-Server Action (role-checked), best-effort after the DB row commits
-  1. notion.pages.create under NOTION_PROJECTS_DB_ID with:
-       - properties: Name, Client (relation or text), Service line,
-         Status (mirror of project.status), Amount, Admin link (URL back to /projects/[id])
-       - children: a code-defined block skeleton — a "managed by admin" callout +
-         Scope · Notes · Deliverables · Handoff  (the "template"; Tasks and
-         Meetings live in their own related databases, per the workspace design)
-  2. Store page id + url → projects.notion_page_id, notion_url; set notion_synced_at
-  3. activity_log: "Notion workspace created for <project>"
-```
-
-The template is a **block skeleton defined in code**, not a duplicated Notion template page — the
-Notion API has no first-class "duplicate this template" call, and a code skeleton is versioned with
-the app. One click in the tool yields a ready project workspace.
-
-### Flow 2 — push authoritative status (Postgres → Notion)
-
-On events that change commercial state — project status change, milestone completed, invoice paid,
-contract signed — update the mirrored **Status** property on the linked page and append a dated
-entry to its **Log** section. Triggered from the same Server Actions / webhook handlers that already
-process those events (e.g. the Stripe `invoice.paid` handler also pushes "Invoice paid" to Notion).
-
-- **Property sets are naturally idempotent** (setting Status='active' twice is a no-op), so status
-  mirroring needs no dedupe.
-- **Log appends are guarded** against webhook retries: each timeline event carries a stable key
-  (e.g. `invoice:<id>:paid`) recorded in `activity_log`; we append to Notion only if that key has
-  not already been pushed.
-- **Best-effort, non-blocking.** A Notion failure never blocks a payment or a signature. On failure
-  we leave `notion_synced_at` stale and surface a "Notion out of sync — Resync" affordance on the
-  project page; a manual/cron resync is idempotent.
-
-### Flow 3 — read Notion-owned signals back, near-real-time (Notion → tool)
-
-The tool surfaces a small set of Notion-owned fields next to the commercial context: a "Working
-phase" property, a "Next action" text, task rollup counts (open / done), open **action items**
-(which AI meeting notes generate), and a link list of **recent meeting notes** for the project.
-These stay **read-only in the tool and are never written back** — Notion remains their home and
-Notion AI remains what produces them. What changes for *fast bidirectional* is how quickly and by
-what mechanism they land.
-
-**Webhook-driven, not poll-driven (the fast path).**
-
-```
-Founder (or Notion AI meeting notes) edits the project page / a task / an action item
-      │
-      ▼
-Notion change subscription fires → POST /api/webhooks/notion
-  1. Verify Notion's signature; dedupe via integration_events on the event id
-  2. Map the changed entity → the owning project (via notion_page_id / relation)
-  3. Pull only the changed Notion-owned fields for that entity (1–2 API calls)
-  4. Upsert them into the notion_project_state cache table; set notion_state_synced_at
-      │
-      ▼
-Supabase Realtime broadcasts the cache row change → the open project page updates live
-```
-
-- **Fast reads:** the UI reads Notion-owned fields from the `notion_project_state` cache in Postgres,
-  so pages render instantly with no live Notion call. The webhook keeps that cache fresh within
-  seconds of a Notion edit.
-- **Live UI:** the project page and dashboard subscribe to the cache table via **Supabase Realtime**,
-  so a change made in Notion appears without a manual refresh. Combined with the immediate Flow-2
-  push the other way, both directions feel live.
-- **Cron is a backstop, not the path:** `/api/cron/notion-sync` runs infrequently only to reconcile
-  anything a missed/failed webhook left stale (self-healing), plus a manual "Refresh from Notion"
-  button per project.
-
-If a **Meetings** database exists with a relation to projects/clients, the webhook maps meeting/task
-events to the project through that relation; if meeting notes are sub-pages under the project page,
-it maps by parent. `lib/notion/schema.ts` records whichever structure is in use.
-
-### Why fast two-way traffic stays safe (no loops, no conflicts)
-
-The single-owner-per-field rule is what makes bidirectional communication safe to run fast:
-
-- **Disjoint field sets → no merge conflicts.** The tool only ever *writes* its own fields to Notion
-  (Flow 2) and only ever *reads* Notion-owned fields back (Flow 3). No property is authored by both.
-- **No echo loop by construction.** An inbound Notion webhook only updates the read-back cache; it
-  never triggers a push back to Notion. A tool-side push only writes tool-owned mirror fields; it
-  never reacts to its own resulting webhook. The cycle cannot close.
-- **Belt-and-suspenders loop guard.** Webhook events whose actor is our own integration are ignored,
-  and we compare incoming values against the cache before writing, so a redundant event is a no-op.
-- **Mirror fields are authority-wins.** If someone hand-edits a tool-owned mirror property in Notion
-  (e.g. flips Status), the tool does not adopt it; the next push re-asserts the authoritative value.
-  Notion-owned fields always win for Notion-owned fields; tool-owned fields always win for theirs.
-- **Debounce.** Rapid successive edits to one page are coalesced within a short window before the
-  pull, keeping us well under Notion's ~3 req/s limit and avoiding thrash.
-
-> Notion change subscriptions are a newer capability with a one-time verification handshake and a
-> signed delivery scheme; confirm the current event catalog and signature method against the Notion
-> API docs during Phase 2 rather than hard-coding from memory. If a needed event type is not yet
-> offered, the cron backstop covers that field until it is — correctness never depends on the
-> webhook alone.
-
-### Operational notes
-
-- **Rate limits:** the Notion API averages ~3 requests/second. Webhook-triggered pulls are bounded by
-  human editing rate and debounced; event pushes are trivial volume. Any backfill (provisioning pages
-  for pre-existing projects) must throttle and paginate with the API's cursor.
-- **Reconciliation:** `notion_synced_at` (push freshness) and `notion_state_synced_at` (read-back
-  freshness) plus the `/settings` integration-health panel show whether a project is current;
-  "Resync" re-pushes status and re-pulls read-back fields.
-- **Backfill:** a one-off script provisions Notion pages for projects that predate the integration,
-  linking existing Notion pages by id where the founder already made one (paste the URL to link
-  instead of create).
+A fuller bidirectional integration is fully specced in `docs/admin-tool-notion-workspace.md` and was
+previously drafted here: a Notion workspace schema (Projects/Tasks/Meetings databases with
+ownership-tagged properties), the tool pushing authoritative commercial status onto the linked page
+(so Notion AI reasons over real invoice/contract/milestone state), and reading Notion-owned signals
+(working phase, task rollups, action items, recent meetings) back near-real-time via Notion webhooks
+→ a read-back cache → Supabase Realtime. The guiding rule if/when it is built: **every field has one
+owner and syncs one direction — bidirectional communication, never two-way sync of a shared field.**
+None of that is needed to link a doc, so it is out of scope until the basics are in use.
 
 ---
 
@@ -626,28 +477,25 @@ Organized around the **project** as the hub.
 | `/` (dashboard) | At-a-glance: projects by status, invoices outstanding (open + overdue), contracts awaiting signature, recent activity |
 | `/clients` · `/clients/[id]` | Client list; client detail with contacts, projects, billing (Stripe customer link) |
 | `/projects` | Board view grouped by `status` (lead → … → closed); filter by service line |
-| `/projects/[id]` | **The workhorse.** Tabs: **Overview** (scope, commercials, dates, Notion panel), **Milestones**, **Invoices**, **Contract**, **Activity** |
+| `/projects/[id]` | **The workhorse.** Tabs: **Overview** (scope, commercials, dates, Notion doc link), **Milestones**, **Invoices**, **Contract**, **Activity** |
 | `/invoices` | All invoices with status filters; drill to Stripe hosted page |
 | `/contracts` | All contracts with signature status |
 | `/settings` | Users & roles (owner only), integration health (Stripe / Zoho / Notion) |
 
 ### Project detail — the core interaction
 
-The project page is where the four systems meet. From one screen the founder can:
+The project page is where the systems meet. From one screen the founder can:
 
 - see scope, service line, price, and current status;
 - define milestones and, for each, **create an invoice** (Stripe) — with the milestone's amount
   prefilled;
 - **send the engagement contract** (Zoho Sign) and watch it go `sent → viewed → signed`;
-- **open the linked Notion workspace** (deep link + an embedded panel showing the Notion-owned
-  working phase, next action, task rollup, open action items, and recent meeting notes), or
-  provision/link one if it does not exist yet;
+- **open the linked Notion doc** (an "Open in Notion" link), or paste a URL to link one (optionally
+  create one, if the Notion token is configured);
 - read the activity trail (contract sent, invoice paid, milestone closed) in one place.
 
-Status badges reflect the *cached* external state, refreshed by webhooks (Stripe/Zoho) or the last
-Notion sync — the UI never blocks on a live external call to render. A per-object "Sync" button
-re-pulls on demand; the project header shows a "Notion out of sync" flag when `notion_synced_at`
-lags a commercial change.
+Status badges reflect the *cached* external state, refreshed by webhooks (Stripe/Zoho) — the UI
+never blocks on a live external call to render, and a per-object "Sync" button re-pulls on demand.
 
 ### UI conventions
 
@@ -675,8 +523,6 @@ apps/admin/
     api/
       webhooks/stripe/route.ts       raw-body, signature-verified
       webhooks/zoho/route.ts
-      webhooks/notion/route.ts       Notion change subscriptions (near-real-time read-back)
-      cron/notion-sync/route.ts      reconciliation backstop for missed webhooks
     layout.tsx  globals.css
   lib/
     supabase/server.ts               request-scoped client (RLS)
@@ -684,12 +530,12 @@ apps/admin/
     supabase/middleware.ts           session refresh helper
     stripe/client.ts  stripe/invoices.ts
     zoho/auth.ts       zoho/sign.ts
-    notion/client.ts   notion/projects.ts   notion/schema.ts
+    notion/link.ts                   parse/validate Notion URLs; optional create-doc
     auth.ts                          requireRole(), current profile
     activity.ts                      log() helper
     validation.ts                    zod schemas
   actions/
-    invoices.ts  contracts.ts  projects.ts  clients.ts  notion.ts   (Server Actions)
+    invoices.ts  contracts.ts  projects.ts  clients.ts   (Server Actions)
   components/                        tables, forms, status badges
   supabase/migrations/*.sql
   middleware.ts
@@ -742,13 +588,9 @@ ZOHO_REFRESH_TOKEN=
 ZOHO_ACCOUNTS_DOMAIN=https://accounts.zoho.com
 ZOHO_API_DOMAIN=https://sign.zoho.com
 
-# Notion  (workspace/database design: docs/admin-tool-notion-workspace.md)
-NOTION_TOKEN=                       # internal integration secret, server only
-NOTION_PROJECTS_DB_ID=
-NOTION_TASKS_DB_ID=
-NOTION_MEETINGS_DB_ID=
-NOTION_CLIENTS_DB_ID=               # optional
-NOTION_WEBHOOK_SECRET=              # verifies inbound Notion change subscriptions
+# Notion  (v1: linking a doc needs no secret; these enable the optional "Create doc" button)
+NOTION_TOKEN=                       # optional — internal integration secret, server only
+NOTION_PARENT_PAGE_ID=              # optional — where "Create Notion doc" makes the page
 
 # App
 APP_BASE_URL=https://admin.keystone.systems
@@ -756,13 +598,12 @@ APP_BASE_URL=https://admin.keystone.systems
 
 - **Two Supabase projects** (or at least two schemas): one for local/preview, one for production.
   Test-mode Stripe keys and a Zoho sandbox for non-prod so previews cannot touch real money or send
-  real contracts. For Notion, point non-prod at a **separate throwaway Notion workspace** (or a
-  clearly-marked "Sandbox" database) so preview deploys never write into the real project workspace.
+  real contracts. Notion in v1 stores only a URL, so there is nothing environment-specific to isolate
+  unless the optional create-doc button is enabled (then point non-prod at a throwaway parent page).
 - **Local dev:** `stripe listen --forward-to localhost:3000/api/webhooks/stripe` for webhook
   testing; Supabase CLI for local Postgres + migrations.
 - **Deploy:** separate Vercel project, Root Directory `apps/admin`. Register the production webhook
-  URLs in the Stripe and Zoho dashboards after first deploy; share the production Notion databases
-  with the integration and (if adopted) register the Notion subscription endpoint.
+  URLs in the Stripe and Zoho dashboards after first deploy. Notion needs no webhook in v1.
 
 Extend root scripts so `npm run dev -w apps/admin`, `build`, `lint`, `typecheck` all work alongside
 the existing `apps/web` ones. Add `apps/admin` to CI (`.github/workflows/ci.yml`) so typecheck /
@@ -772,8 +613,8 @@ lint / build run on it too.
 
 ## 13. Build phases
 
-Each phase is independently shippable and useful. Notion lands early (Phase 2) because it will be
-heavily used — the project workspace is valuable the moment projects exist, before invoicing.
+Each phase is independently shippable and useful. The Notion doc link folds into Phase 1 (it is one
+field); the deeper two-way Notion integration is deferred, not scheduled here.
 
 **Phase 0 — Scaffold & auth**
 - Scaffold `apps/admin` (Next 16, Tailwind v4, TS), brand tokens, app shell.
@@ -781,59 +622,50 @@ heavily used — the project workspace is valuable the moment projects exist, be
 - Seed the founder as `owner`. Deploy behind auth. *Outcome: a locked-down empty app you can log
   into.*
 
-**Phase 1 — Clients & projects (no integrations)**
-- Migrations for `clients`, `contacts`, `projects`, `milestones`, `activity_log` + RLS.
+**Phase 1 — Clients & projects (+ Notion doc link)**
+- Migrations for `clients`, `contacts`, `projects` (incl. `notion_url` / `notion_page_id`),
+  `milestones`, `activity_log` + RLS.
 - CRUD UI: client list/detail, project board, project detail (Overview, Milestones, Activity tabs).
-- *Outcome: usable project tracker, replaces whatever spreadsheet exists today.*
+- Notion doc field on a project: paste-to-link + "Open in Notion"; optional "Create doc" button if
+  `NOTION_TOKEN` is set (`lib/notion/link.ts`).
+- *Outcome: usable project tracker with a linked Notion doc per project — replaces the spreadsheet.*
 
-**Phase 2 — Notion project workspaces (fast bidirectional)**
-- `notion_page_id` / `notion_url` / `notion_synced_at` columns + `notion_project_state` cache;
-  `lib/notion/*` + `NOTION_TOKEN`.
-- Auto-provision a Notion page on project creation (code-defined block skeleton); link-existing flow.
-- Push project status/milestone changes onto the Notion page (out).
-- `/api/webhooks/notion` change subscriptions (in) → cache refresh; **Supabase Realtime** so the
-  project page and dashboard update live; loop/debounce guards; `/api/cron/notion-sync` backstop.
-- Read-back panel (phase, next action, task rollup, action items, recent meeting notes) + manual
-  Refresh; backfill script for existing projects.
-- *Outcome: every project has a linked, status-stamped Notion workspace that updates both ways within
-  seconds — the daily working surface, live inside the tool.*
-
-**Phase 3 — Stripe invoicing**
+**Phase 2 — Stripe invoicing**
 - `invoices`, `invoice_line_items`, `payments` migrations; `integration_events`.
 - Create-invoice Server Action (customer lazy-create, line items, finalize/send, idempotency).
 - `/api/webhooks/stripe` with signature verify + idempotency; invoice status sync; milestone→paid.
-- On `invoice.paid`, also push "Invoice paid" to the linked Notion page.
 - Invoices tab + `/invoices`. *Outcome: send and track real invoices from the tool.*
 
-**Phase 4 — Zoho Sign contracts**
+**Phase 3 — Zoho Sign contracts**
 - `contracts` migration; private Storage bucket.
 - Zoho OAuth token service; send-from-template Server Action.
-- `/api/webhooks/zoho`: status sync + signed-PDF download to Storage; push "Contract signed" to Notion.
+- `/api/webhooks/zoho`: status sync + signed-PDF download to Storage.
 - Contract tab + `/contracts`. *Outcome: paper an engagement end-to-end from the tool.*
 
-**Phase 5 — Dashboard, roles, polish**
-- Dashboard aggregates (outstanding invoices, contracts pending, project pipeline, Notion rollups).
-- `viewer` role, user management in `/settings`, integration health panel (Stripe/Zoho/Notion,
-  showing last webhook and last Notion sync), per-object manual Sync.
+**Phase 4 — Dashboard, roles, polish**
+- Dashboard aggregates (outstanding invoices, contracts pending, project pipeline).
+- `viewer` role, user management in `/settings`, integration health panel (Stripe/Zoho), per-object
+  manual Sync.
 - Overdue-invoice / stalled-contract nudges (email the founder via the existing Resend setup).
+
+**Later (deferred) — deeper Notion two-way integration.** Only if the linked-doc basics prove worth
+extending. Scoped in §8 and `docs/admin-tool-notion-workspace.md`.
 
 ---
 
 ## 14. Testing & operations
 
 - **Unit:** pure helpers (money formatting, Stripe line-item mapping, Zoho payload building, Notion
-  block-skeleton + property mapping, log-append dedupe keys, idempotency logic).
+  URL parse/validate, idempotency logic).
 - **Integration:** run webhook handlers against recorded Stripe/Zoho fixture payloads; assert DB
-  state transitions and idempotency (replay = no-op). For Notion, test against the sandbox workspace
-  and assert push idempotency (status set twice = one state; log append twice = one entry).
+  state transitions and idempotency (replay = no-op).
 - **RLS tests:** a `viewer` JWT cannot write; an unprovisioned user reads nothing.
-- **Manual E2E in test mode:** create client → project → verify Notion page provisioned and linked →
-  milestone → invoice (Stripe test) → `stripe trigger invoice.paid` → verify paid *and* Notion log
-  updated; send contract (Zoho sandbox) → sign → verify PDF stored and Notion stamped.
-- **Observability:** `integration_events` is the source of truth for "did we process this?";
-  `notion_synced_at` flags Notion drift. A simple `/settings` health view shows last webhook per
-  provider, last Notion sync, and any unprocessed events. Stripe/Zoho dashboards remain the deep
-  audit trail; Notion page history covers its own edits.
+- **Manual E2E in test mode:** create client → project → paste a Notion URL and confirm "Open in
+  Notion" works → milestone → invoice (Stripe test) → `stripe trigger invoice.paid` → verify paid;
+  send contract (Zoho sandbox) → sign → verify PDF stored.
+- **Observability:** `integration_events` is the source of truth for "did we process this?"; a simple
+  `/settings` health view shows last webhook per provider and any unprocessed events. Stripe/Zoho
+  dashboards remain the deep audit trail.
 
 ---
 
@@ -843,17 +675,16 @@ heavily used — the project workspace is valuable the moment projects exist, be
    back-office and therefore its own repo? Affects naming and where secrets live, not the design.
 2. **Zoho product.** Zoho **Sign** (e-signature) is assumed for "contracts." Confirm it is Sign and
    not Zoho Books (invoicing) or CRM — Stripe already owns invoicing in this design.
-3. **Notion as the PM surface.** *Resolved:* Notion is the task manager, notes, and meeting record;
-   all task/kanban PM and note-taking stay in Notion, and the tool never duplicates them.
-4. **Notion structure.** *Designed greenfield* in `docs/admin-tool-notion-workspace.md` (Projects ·
-   Tasks · Meetings · optional Clients, with ownership tags and webhook routing). Remaining calls are
-   listed there: whether to use the Clients DB, the Working-phase vocabulary, and manual-vs-inferred
-   meeting→project linking.
+3. **Notion scope.** *Resolved for v1:* just link a Notion doc to a project (paste a URL; optional
+   one-click create). The deeper two-way workspace integration is designed
+   (`docs/admin-tool-notion-workspace.md`) but deferred until the basics are in use.
+4. **Notion "Create doc" button.** Enable the optional API-backed create (needs `NOTION_TOKEN` + a
+   parent page), or ship paste-to-link only for v1? Paste-only is zero-dependency and the safe start.
 5. **Invoicing model detail.** Confirm hosted-invoice email from Stripe (assumed) vs. quotes/
    estimates first, and whether milestone-staged billing (deposit/midpoint/handoff) is needed day
    one or later.
 6. **Users at launch.** Just the founder, or bench consultants too on day one? Determines whether
-   `viewer`/user-management ships in Phase 1 vs. Phase 5.
+   `viewer`/user-management ships in Phase 1 vs. Phase 4.
 7. **Domain & email.** `admin.keystone.systems`? And is Resend (already configured in `apps/web`)
    the channel for internal notifications, or is that out of scope initially?
 
@@ -862,4 +693,4 @@ heavily used — the project workspace is valuable the moment projects exist, be
 *Ties into existing docs: `docs/company-context.md` (business model, service lines, outcome
 pricing), `branding/keystone-systems-brand-guide.md` (palette, type), `docs/build-plan.md`
 (marketing-site stack conventions this app mirrors). Companion: `docs/admin-tool-notion-workspace.md`
-(the concrete Notion database/property schema this integration provisions and syncs).*
+(the deferred deeper Notion integration — not built in v1, kept as a future blueprint).*
