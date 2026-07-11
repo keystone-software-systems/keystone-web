@@ -119,6 +119,37 @@ pulling in).
 The service-role key is server-only (never in a `NEXT_PUBLIC_` var, never imported into a Client
 Component).
 
+### Backend hosting (decided)
+
+**Supabase for everything stateful; one Next.js app on Vercel for the app runtime.** No third
+platform and no containers.
+
+- **Supabase** owns the backbone: Postgres (all data), Auth (login/sessions/roles), Storage (signed
+  contract PDFs), and RLS (the real security boundary).
+- **Vercel** hosts the single Next.js app, which serves the UI *and* runs the server-side glue —
+  the Server Actions that call Stripe/Zoho and the two webhook routes that receive their callbacks.
+  This is the same two-vendor shape as `apps/web` today, plus Supabase as the data layer.
+
+Rationale: one codebase, one language, shared types end to end, and type-safe UI→server calls with
+no network boilerplate — the least to build and maintain solo, matching the small-surface-area
+principle. The workloads are short request/response (CRUD + a few outbound API calls + inbound
+webhooks), a textbook serverless fit; a long-running container would be provisioning for a problem
+this app does not have.
+
+**Graduation paths (not needed now, no rewrite to adopt later):**
+- *Supabase Edge Functions* — the natural first candidate is peeling just the Stripe/Zoho **webhook
+  receivers** out of Next.js so they sit next to Postgres and are decoupled from the frontend
+  deploy. On Deno this needs Stripe's fetch HTTP client and the async webhook verifier
+  (`constructEventAsync`); Zoho is plain `fetch` and unchanged. Consider only if webhook decoupling
+  becomes a real need.
+- *Containerized worker* (Fly / Railway / Render / Cloud Run) — add **alongside** the app only when
+  a concrete feature needs a long-running process: background PDF pipeline, nightly reconciliation
+  batch, job queue, or websockets. Do not move the whole app into a container.
+- *Supabase-only backend* — if minimizing vendors ever outranks build ergonomics, the frontend can
+  go client-rendered (static export / SPA) talking to `supabase-js` directly for RLS-guarded reads
+  and to Edge Functions for privileged integration calls, dropping Vercel from the backend. Noted
+  as an alternative, not the plan.
+
 ---
 
 ## 4. Authentication & authorization
