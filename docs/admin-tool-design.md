@@ -1,7 +1,8 @@
 # Keystone Systems — Internal Admin Tool Design
 
 *Design document for an internal back-office application: invoicing (Stripe), contracts and
-e-signature (Zoho Sign), and project management. Data and auth on Supabase.*
+e-signature (Zoho Sign), project management, and a tight Notion integration. Data and auth on
+Supabase.*
 
 Status: **proposed**. This is a design, not a commitment. Open decisions are listed at the end;
 resolve those before Phase 1.
@@ -18,19 +19,34 @@ side of the consultancy:
 - **Invoicing** — issue and track invoices through Stripe, with payment status synced back.
 - **Contracts** — generate an engagement agreement, send it for signature through Zoho Sign, and
   track it to signed.
+- **Notion** — every project gets a linked Notion workspace page (scoping docs, notes, tasks,
+  handoff material), auto-provisioned and kept status-stamped by the tool. Notion is the day-to-day
+  working surface; the admin tool is the commercial spine that orchestrates it.
 - **Activity** — an audit trail of what happened and when.
 
 It is deliberately narrow. It is not a CRM, not a time tracker (engagements are priced to the
 outcome, not the hour — see `docs/company-context.md`), and not a general accounting system.
-Stripe is the system of record for money; Zoho Sign is the system of record for signatures; this
-app is the operational layer that ties a project to its invoices and its contract.
+Each external system owns its domain and the admin tool owns the links between them:
+
+- **Stripe** — system of record for money.
+- **Zoho Sign** — system of record for signatures.
+- **Notion** — system of record for project *knowledge and working docs* (scoping, notes, tasks,
+  deliverables, handoff). Heavily used; the founder lives here for the actual work.
+- **Admin tool (Postgres)** — system of record for the *commercial spine*: clients, project
+  lifecycle status, milestones (they gate billing), and the references that tie a project to its
+  invoices, its contract, and its Notion page.
 
 ### Design principles
 
 - **Boring and durable.** Same values as the brand: understated, correct, low-surface-area. No
   feature we cannot maintain solo.
-- **External systems own their domain.** We store *references* (Stripe/Zoho IDs) and a cached
-  status, never a second source of truth for money or signatures. Webhooks reconcile.
+- **External systems own their domain.** We store *references* (Stripe/Zoho/Notion IDs) and a cached
+  status, never a second source of truth for money, signatures, or project docs. Webhooks and
+  on-demand syncs reconcile.
+- **No field written by two systems.** The tight Notion integration follows one rule: every field
+  has exactly one owner and syncs one direction. Postgres owns commercial fields (and mirrors them
+  *into* Notion as display-only); Notion owns working fields (and the tool reads them *out* for
+  display). This is what keeps a "tight" integration from becoming a two-way-sync maintenance sink.
 - **Server-side secrets, always.** Stripe secret key, Zoho refresh token, and the Supabase service
   role key never reach the browser. All privileged work runs in Route Handlers / Server Actions.
 - **Least privilege, audited.** Small user set, role-gated, every mutation logged.
@@ -69,11 +85,12 @@ from the marketing site).
 | Data + Auth | Supabase (Postgres, Auth, Storage, RLS) |
 | Payments | Stripe (Invoicing API + webhooks) |
 | E-signature | Zoho Sign (REST API + webhooks) |
+| Project docs | Notion (official SDK; auto-provisioned project pages, status mirror, read-back) |
 | Hosting | Vercel (separate project, Node runtime for integration routes) |
 
-New dependencies (admin app only): `@supabase/supabase-js`, `@supabase/ssr`, `stripe`, `zod`
-(input validation). Zoho is called over `fetch` (thin, no maintained first-party Node SDK worth
-pulling in).
+New dependencies (admin app only): `@supabase/supabase-js`, `@supabase/ssr`, `stripe`,
+`@notionhq/client` (official, maintained Notion SDK), `zod` (input validation). Zoho is called over
+`fetch` (thin, no maintained first-party Node SDK worth pulling in).
 
 > **Next.js version note:** `apps/web/AGENTS.md` warns this Next.js has breaking changes vs. prior
 > training data. Before writing app code, read the relevant guides in
@@ -85,29 +102,36 @@ pulling in).
 ## 3. Architecture
 
 ```
-                          ┌────────────────────────────────────────────┐
-                          │            apps/admin (Next.js)             │
-  Browser  ──────────────▶│  Server Components  ·  Server Actions       │
-  (staff, authed)         │  Route Handlers (/api/*)                    │
-                          │  Middleware (session refresh + gate)        │
-                          └───────┬───────────────┬───────────────┬─────┘
-                                  │               │               │
-                     Supabase     │        Stripe │         Zoho  │ Sign
-                  (Postgres/Auth/ │  (secret key, │      (OAuth2, │
-                   Storage/RLS)   │   Invoicing)  │       Sign)   │
-                                  │               │               │
-                                  ▼               ▼               ▼
-                          Webhooks reconcile status back into Postgres:
-                          /api/webhooks/stripe   /api/webhooks/zoho
+                       ┌───────────────────────────────────────────────┐
+                       │             apps/admin (Next.js)               │
+  Browser  ───────────▶│  Server Components  ·  Server Actions          │
+  (staff, authed)      │  Route Handlers (/api/*)                       │
+                       │  Middleware (session refresh + gate)           │
+                       └──────┬──────────┬──────────┬──────────┬────────┘
+                              │          │          │          │
+                 Supabase     │   Stripe │    Zoho  │   Notion │
+              (Postgres/Auth/ │ (secret, │  (OAuth2,│ (SDK,    │
+               Storage/RLS)   │ Invoicing)│  Sign)  │ internal │
+                              │          │          │ integ.)  │
+                              │          │          │          │
+                              ▼          ▼          ▼          ▼
+             Reconcile status back into Postgres:
+             /api/webhooks/stripe  /api/webhooks/zoho   Notion: push on events,
+                                                        pull on-demand/cron
 ```
 
 - **Reads** happen in Server Components using a request-scoped Supabase client bound to the signed-in
   user, so **RLS** governs what is visible.
-- **Mutations** happen in Server Actions / Route Handlers. Calls to Stripe/Zoho and any privileged
-  DB write use the **service-role** client (RLS-bypassing) and re-check the caller's role in code.
-- **Webhooks** are unauthenticated public routes that verify a provider signature, then write with
-  the service-role client. They are the *only* way external status enters the DB, which keeps
-  reconciliation in one place.
+- **Mutations** happen in Server Actions / Route Handlers. Calls to Stripe/Zoho/Notion and any
+  privileged DB write use the **service-role** client (RLS-bypassing) and re-check the caller's role
+  in code.
+- **Webhooks** (Stripe, Zoho) are unauthenticated public routes that verify a provider signature,
+  then write with the service-role client. They are the primary way external status enters the DB,
+  which keeps reconciliation in one place.
+- **Notion** is bidirectional but field-scoped: the tool *pushes* commercial status onto the linked
+  Notion page on events (invoice paid, contract signed, milestone/status change), and *pulls*
+  Notion-owned fields (working phase, task rollups) on demand or via a light cron — because Notion's
+  event-push support is newer and the pull model is simpler and sufficient. No field flows both ways.
 
 ### Two Supabase clients
 
@@ -195,11 +219,12 @@ never floats.
 ```
 profiles           id (= auth.users.id) · email · full_name · role · active
 clients            id · name · legal_name · stripe_customer_id · billing_email ·
-                     address_json · notes · created_by
+                     address_json · notion_page_id · notion_url · notes · created_by
 contacts           id · client_id → clients · name · email · title · phone · is_primary
 projects           id · client_id → clients · name · service_line · status ·
                      pricing_type · amount_total · currency · summary ·
-                     start_date · target_end_date · created_by
+                     start_date · target_end_date ·
+                     notion_page_id · notion_url · notion_synced_at · created_by
 milestones         id · project_id → projects · title · amount · currency ·
                      due_date · status · sort_order · invoice_id → invoices (nullable)
 invoices           id · client_id → clients · project_id → projects (nullable) ·
@@ -242,8 +267,13 @@ integration_events id · provider · event_type · external_id (unique) ·
 - A **milestone** can trigger an invoice; `milestone.invoice_id` links them so "milestone accepted →
   invoice X sent → paid" is traceable. Useful for fixed-price engagements billed in stages
   (e.g. deposit / midpoint / on-handoff).
+- A **project** maps 1:1 to a **Notion page** (`notion_page_id`), auto-created on project creation.
+  `notion_url` is the deep link shown in the UI; `notion_synced_at` records the last successful
+  push so the UI can flag drift. `clients.notion_page_id` is optional — link a client-level Notion
+  wiki page if one is used. These are the *only* Notion identifiers we persist; Notion's own content
+  is never copied into Postgres.
 - `integration_events.external_id` is **unique** — this is the idempotency guard so a replayed
-  webhook is a no-op.
+  webhook (Stripe, Zoho, or a Notion subscription event if adopted) is a no-op.
 
 ### `updated_at` trigger
 
@@ -407,7 +437,109 @@ Templates live in Zoho (so legal copy is edited there, not in code); the app onl
 
 ---
 
-## 8. Project management UI
+## 8. Notion — project workspace integration
+
+Notion will be heavily used, so it is a first-class integration, not a link field. The founder does
+the actual work in Notion (scoping docs, notes, task boards, deliverable drafts, handoff material);
+the admin tool provisions that workspace, keeps it stamped with authoritative commercial status, and
+reads a few Notion-owned signals back for a unified glance. The discipline that makes this "tight"
+rather than fragile is the ownership split below.
+
+### Ownership split (the golden rule)
+
+| Field / concern | Owner | Sync direction |
+|---|---|---|
+| Client, project lifecycle status, milestones, amounts, invoice/contract status | **Postgres** | push → Notion (display-only mirror) |
+| Scoping docs, meeting notes, research, deliverable drafts, handoff docs | **Notion** | not synced — lives only in Notion |
+| Granular tasks / kanban, "working phase", "next action" | **Notion** | pull → tool (read-only display) |
+| The link itself (`notion_page_id`) | **Postgres** | set once on creation |
+
+No field is written by both systems. A mirrored property edited by hand in Notion is cosmetic and
+is overwritten on the next push; a commercial value is never authored in Notion.
+
+> **Decision baked in (confirm):** granular task/kanban project management lives in **Notion**; the
+> admin tool owns project *records, lifecycle status, and milestones* (because milestones gate
+> billing). The tool's `/projects` board tracks the commercial lifecycle (lead → closed); day-to-day
+> execution happens in the linked Notion page. If instead you want task-level PM inside the admin
+> tool, that is a larger build — see open decisions.
+
+### Auth & config
+
+Single Notion workspace, so a **Notion internal integration** (not OAuth): one secret token, with
+the relevant databases/pages explicitly shared to the integration in Notion's UI.
+
+- `NOTION_TOKEN` — internal integration secret, server only.
+- `NOTION_PROJECTS_DB_ID` — parent database new project pages are created under.
+- `NOTION_CLIENTS_DB_ID` — optional, if client wiki pages are used.
+
+Property names/IDs on those databases are kept in one `lib/notion/schema.ts` map so a Notion schema
+change is a one-file edit, not a hunt.
+
+### Flow 1 — auto-provision a project page (Postgres → Notion)
+
+```
+Project created in the admin tool
+      │
+      ▼
+Server Action (role-checked), best-effort after the DB row commits
+  1. notion.pages.create under NOTION_PROJECTS_DB_ID with:
+       - properties: Name, Client (relation or text), Service line,
+         Status (mirror of project.status), Amount, Admin link (URL back to /projects/[id])
+       - children: a code-defined block skeleton — Scope · Notes · Tasks ·
+         Meeting log · Deliverables · Handoff  (the "template")
+  2. Store page id + url → projects.notion_page_id, notion_url; set notion_synced_at
+  3. activity_log: "Notion workspace created for <project>"
+```
+
+The template is a **block skeleton defined in code**, not a duplicated Notion template page — the
+Notion API has no first-class "duplicate this template" call, and a code skeleton is versioned with
+the app. One click in the tool yields a ready project workspace.
+
+### Flow 2 — push authoritative status (Postgres → Notion)
+
+On events that change commercial state — project status change, milestone completed, invoice paid,
+contract signed — update the mirrored **Status** property on the linked page and append a dated
+entry to its **Log** section. Triggered from the same Server Actions / webhook handlers that already
+process those events (e.g. the Stripe `invoice.paid` handler also pushes "Invoice paid" to Notion).
+
+- **Property sets are naturally idempotent** (setting Status='active' twice is a no-op), so status
+  mirroring needs no dedupe.
+- **Log appends are guarded** against webhook retries: each timeline event carries a stable key
+  (e.g. `invoice:<id>:paid`) recorded in `activity_log`; we append to Notion only if that key has
+  not already been pushed.
+- **Best-effort, non-blocking.** A Notion failure never blocks a payment or a signature. On failure
+  we leave `notion_synced_at` stale and surface a "Notion out of sync — Resync" affordance on the
+  project page; a manual/cron resync is idempotent.
+
+### Flow 3 — read Notion-owned signals back (Notion → tool, read-only)
+
+For the dashboard and project page, pull a small set of Notion-owned fields for display: a "Working
+phase" property, a "Next action" text, and task rollup counts (open / done) from the project page's
+task board. These are **read-only, cached with a short TTL, and never written back**.
+
+- **On-demand + cache:** fetched when a project page renders (served from cache within TTL), with a
+  manual "Refresh from Notion" button.
+- **Optional light cron:** a Vercel Cron route (`/api/cron/notion-sync`) refreshes dashboard rollups
+  every N minutes so the home dashboard is warm without a live call per view.
+- **Notion webhooks are optional, not required.** Notion now supports change subscriptions (with a
+  one-time verification handshake); we can later add `/api/webhooks/notion` to react to Notion-side
+  edits in near-real-time. The pull model is the baseline because it is simpler and sufficient;
+  confirm current Notion webhook capabilities against the docs before adopting them.
+
+### Operational notes
+
+- **Rate limits:** the Notion API averages ~3 requests/second. Event pushes are trivial volume. Any
+  backfill (e.g. provisioning pages for pre-existing projects) must throttle and paginate with the
+  API's cursor.
+- **Reconciliation:** `notion_synced_at` plus the `/settings` integration-health panel show whether
+  a project's Notion mirror is current; "Resync" re-pushes status and re-pulls read-back fields.
+- **Backfill:** a one-off script provisions Notion pages for projects that predate the integration,
+  linking existing Notion pages by id where the founder already made one (paste the URL to link
+  instead of create).
+
+---
+
+## 9. Project management UI
 
 Organized around the **project** as the hub.
 
@@ -419,24 +551,27 @@ Organized around the **project** as the hub.
 | `/` (dashboard) | At-a-glance: projects by status, invoices outstanding (open + overdue), contracts awaiting signature, recent activity |
 | `/clients` · `/clients/[id]` | Client list; client detail with contacts, projects, billing (Stripe customer link) |
 | `/projects` | Board view grouped by `status` (lead → … → closed); filter by service line |
-| `/projects/[id]` | **The workhorse.** Tabs: **Overview** (scope, commercials, dates), **Milestones**, **Invoices**, **Contract**, **Activity** |
+| `/projects/[id]` | **The workhorse.** Tabs: **Overview** (scope, commercials, dates, Notion panel), **Milestones**, **Invoices**, **Contract**, **Activity** |
 | `/invoices` | All invoices with status filters; drill to Stripe hosted page |
 | `/contracts` | All contracts with signature status |
-| `/settings` | Users & roles (owner only), integration health |
+| `/settings` | Users & roles (owner only), integration health (Stripe / Zoho / Notion) |
 
 ### Project detail — the core interaction
 
-The project page is where the three systems meet. From one screen the founder can:
+The project page is where the four systems meet. From one screen the founder can:
 
 - see scope, service line, price, and current status;
 - define milestones and, for each, **create an invoice** (Stripe) — with the milestone's amount
   prefilled;
 - **send the engagement contract** (Zoho Sign) and watch it go `sent → viewed → signed`;
+- **open the linked Notion workspace** (deep link + an embedded panel showing the Notion-owned
+  working phase, next action, and task rollup), or provision/link one if it does not exist yet;
 - read the activity trail (contract sent, invoice paid, milestone closed) in one place.
 
-Status badges reflect the *cached* external state, refreshed by webhooks — the UI never blocks on a
-live Stripe/Zoho call to render, and a manual "Sync" button per object re-pulls on demand as an
-escape hatch if a webhook was missed.
+Status badges reflect the *cached* external state, refreshed by webhooks (Stripe/Zoho) or the last
+Notion sync — the UI never blocks on a live external call to render. A per-object "Sync" button
+re-pulls on demand; the project header shows a "Notion out of sync" flag when `notion_synced_at`
+lags a commercial change.
 
 ### UI conventions
 
@@ -447,7 +582,7 @@ concerns; everything is behind auth and `noindex`.
 
 ---
 
-## 9. Directory structure (`apps/admin`)
+## 10. Directory structure (`apps/admin`)
 
 ```
 apps/admin/
@@ -464,6 +599,8 @@ apps/admin/
     api/
       webhooks/stripe/route.ts       raw-body, signature-verified
       webhooks/zoho/route.ts
+      webhooks/notion/route.ts       optional — Notion change subscriptions
+      cron/notion-sync/route.ts      optional — warm dashboard read-back
     layout.tsx  globals.css
   lib/
     supabase/server.ts               request-scoped client (RLS)
@@ -471,11 +608,12 @@ apps/admin/
     supabase/middleware.ts           session refresh helper
     stripe/client.ts  stripe/invoices.ts
     zoho/auth.ts       zoho/sign.ts
+    notion/client.ts   notion/projects.ts   notion/schema.ts
     auth.ts                          requireRole(), current profile
     activity.ts                      log() helper
     validation.ts                    zod schemas
   actions/
-    invoices.ts  contracts.ts  projects.ts  clients.ts   (Server Actions)
+    invoices.ts  contracts.ts  projects.ts  clients.ts  notion.ts   (Server Actions)
   components/                        tables, forms, status badges
   supabase/migrations/*.sql
   middleware.ts
@@ -484,16 +622,17 @@ apps/admin/
 ```
 
 Server Actions in `actions/*` are the single write path for the UI; webhook routes are the single
-write path for external status; both funnel through `lib/` helpers so Stripe/Zoho/Supabase access
-is centralized and testable.
+write path for external status; both funnel through `lib/` helpers so Stripe/Zoho/Notion/Supabase
+access is centralized and testable.
 
 ---
 
-## 10. Security
+## 11. Security
 
 - **Secrets** are Vercel project env vars, server-scoped. Nothing sensitive is `NEXT_PUBLIC_`.
-  `lib/supabase/admin.ts` and the Stripe/Zoho clients throw if imported where a public bundle would
-  include them.
+  `lib/supabase/admin.ts` and the Stripe/Zoho/Notion clients throw if imported where a public bundle
+  would include them. The `NOTION_TOKEN` is scoped in Notion to only the databases/pages shared with
+  the integration, so its blast radius is bounded even if leaked.
 - **Webhook routes verify signatures** before trusting a byte, and are idempotent via
   `integration_events`. They accept only the specific event types they handle.
 - **RLS on by default** on every table; the service-role key is the only bypass and lives only in
@@ -506,7 +645,7 @@ is centralized and testable.
 
 ---
 
-## 11. Environments & configuration
+## 12. Environments & configuration
 
 `apps/admin/.env.example`:
 
@@ -527,17 +666,25 @@ ZOHO_REFRESH_TOKEN=
 ZOHO_ACCOUNTS_DOMAIN=https://accounts.zoho.com
 ZOHO_API_DOMAIN=https://sign.zoho.com
 
+# Notion
+NOTION_TOKEN=                       # internal integration secret, server only
+NOTION_PROJECTS_DB_ID=
+NOTION_CLIENTS_DB_ID=               # optional
+NOTION_WEBHOOK_SECRET=              # optional, only if Notion subscriptions are adopted
+
 # App
 APP_BASE_URL=https://admin.keystone.systems
 ```
 
 - **Two Supabase projects** (or at least two schemas): one for local/preview, one for production.
   Test-mode Stripe keys and a Zoho sandbox for non-prod so previews cannot touch real money or send
-  real contracts.
+  real contracts. For Notion, point non-prod at a **separate throwaway Notion workspace** (or a
+  clearly-marked "Sandbox" database) so preview deploys never write into the real project workspace.
 - **Local dev:** `stripe listen --forward-to localhost:3000/api/webhooks/stripe` for webhook
   testing; Supabase CLI for local Postgres + migrations.
 - **Deploy:** separate Vercel project, Root Directory `apps/admin`. Register the production webhook
-  URLs in the Stripe and Zoho dashboards after first deploy.
+  URLs in the Stripe and Zoho dashboards after first deploy; share the production Notion databases
+  with the integration and (if adopted) register the Notion subscription endpoint.
 
 Extend root scripts so `npm run dev -w apps/admin`, `build`, `lint`, `typecheck` all work alongside
 the existing `apps/web` ones. Add `apps/admin` to CI (`.github/workflows/ci.yml`) so typecheck /
@@ -545,9 +692,10 @@ lint / build run on it too.
 
 ---
 
-## 12. Build phases
+## 13. Build phases
 
-Each phase is independently shippable and useful.
+Each phase is independently shippable and useful. Notion lands early (Phase 2) because it will be
+heavily used — the project workspace is valuable the moment projects exist, before invoicing.
 
 **Phase 0 — Scaffold & auth**
 - Scaffold `apps/admin` (Next 16, Tailwind v4, TS), brand tokens, app shell.
@@ -560,53 +708,70 @@ Each phase is independently shippable and useful.
 - CRUD UI: client list/detail, project board, project detail (Overview, Milestones, Activity tabs).
 - *Outcome: usable project tracker, replaces whatever spreadsheet exists today.*
 
-**Phase 2 — Stripe invoicing**
+**Phase 2 — Notion project workspaces**
+- `notion_page_id` / `notion_url` / `notion_synced_at` columns; `lib/notion/*` + `NOTION_TOKEN`.
+- Auto-provision a Notion page on project creation (code-defined block skeleton); link-existing flow.
+- Push project status/milestone changes onto the Notion page; read-back panel (phase, next action,
+  task rollup) on the project page with manual Refresh; backfill script for existing projects.
+- *Outcome: every project has a linked, status-stamped Notion workspace — the daily working surface.*
+
+**Phase 3 — Stripe invoicing**
 - `invoices`, `invoice_line_items`, `payments` migrations; `integration_events`.
 - Create-invoice Server Action (customer lazy-create, line items, finalize/send, idempotency).
 - `/api/webhooks/stripe` with signature verify + idempotency; invoice status sync; milestone→paid.
+- On `invoice.paid`, also push "Invoice paid" to the linked Notion page.
 - Invoices tab + `/invoices`. *Outcome: send and track real invoices from the tool.*
 
-**Phase 3 — Zoho Sign contracts**
+**Phase 4 — Zoho Sign contracts**
 - `contracts` migration; private Storage bucket.
 - Zoho OAuth token service; send-from-template Server Action.
-- `/api/webhooks/zoho`: status sync + signed-PDF download to Storage.
+- `/api/webhooks/zoho`: status sync + signed-PDF download to Storage; push "Contract signed" to Notion.
 - Contract tab + `/contracts`. *Outcome: paper an engagement end-to-end from the tool.*
 
-**Phase 4 — Dashboard, roles, polish**
-- Dashboard aggregates (outstanding invoices, contracts pending, project pipeline).
-- `viewer` role, user management in `/settings`, integration health panel, per-object manual Sync.
+**Phase 5 — Dashboard, roles, polish**
+- Dashboard aggregates (outstanding invoices, contracts pending, project pipeline, Notion rollups).
+- `viewer` role, user management in `/settings`, integration health panel (Stripe/Zoho/Notion),
+  per-object manual Sync, optional `/api/cron/notion-sync` and Notion change subscriptions.
 - Overdue-invoice / stalled-contract nudges (email the founder via the existing Resend setup).
 
 ---
 
-## 13. Testing & operations
+## 14. Testing & operations
 
-- **Unit:** pure helpers (money formatting, Stripe line-item mapping, Zoho payload building,
-  idempotency logic).
+- **Unit:** pure helpers (money formatting, Stripe line-item mapping, Zoho payload building, Notion
+  block-skeleton + property mapping, log-append dedupe keys, idempotency logic).
 - **Integration:** run webhook handlers against recorded Stripe/Zoho fixture payloads; assert DB
-  state transitions and idempotency (replay = no-op).
+  state transitions and idempotency (replay = no-op). For Notion, test against the sandbox workspace
+  and assert push idempotency (status set twice = one state; log append twice = one entry).
 - **RLS tests:** a `viewer` JWT cannot write; an unprovisioned user reads nothing.
-- **Manual E2E in test mode:** create client → project → milestone → invoice (Stripe test) →
-  `stripe trigger invoice.paid` → verify paid; send contract (Zoho sandbox) → sign → verify PDF
-  stored.
-- **Observability:** `integration_events` is the source of truth for "did we process this?"; a
-  simple `/settings` health view shows last webhook received per provider and any unprocessed
-  events. Stripe/Zoho dashboards remain the deep audit trail.
+- **Manual E2E in test mode:** create client → project → verify Notion page provisioned and linked →
+  milestone → invoice (Stripe test) → `stripe trigger invoice.paid` → verify paid *and* Notion log
+  updated; send contract (Zoho sandbox) → sign → verify PDF stored and Notion stamped.
+- **Observability:** `integration_events` is the source of truth for "did we process this?";
+  `notion_synced_at` flags Notion drift. A simple `/settings` health view shows last webhook per
+  provider, last Notion sync, and any unprocessed events. Stripe/Zoho dashboards remain the deep
+  audit trail; Notion page history covers its own edits.
 
 ---
 
-## 14. Open decisions (resolve before Phase 1)
+## 15. Open decisions (resolve before Phase 1)
 
 1. **Repo boundary.** Keystone-internal in this monorepo (assumed), or the start of the Scaleyard
    back-office and therefore its own repo? Affects naming and where secrets live, not the design.
 2. **Zoho product.** Zoho **Sign** (e-signature) is assumed for "contracts." Confirm it is Sign and
    not Zoho Books (invoicing) or CRM — Stripe already owns invoicing in this design.
-3. **Invoicing model detail.** Confirm hosted-invoice email from Stripe (assumed) vs. quotes/
+3. **Notion as the PM surface.** Assumed: granular task/kanban PM lives in **Notion**; the admin tool
+   owns project records, lifecycle status, and milestones. Confirm — the alternative (task-level PM
+   built inside the admin tool) is a materially larger build and partly duplicates Notion.
+4. **Notion structure.** Do the Projects (and Clients) Notion databases already exist with a settled
+   property schema, or should the design define them? The block skeleton and property map depend on
+   this. Also confirm one shared workspace vs. per-client workspaces.
+5. **Invoicing model detail.** Confirm hosted-invoice email from Stripe (assumed) vs. quotes/
    estimates first, and whether milestone-staged billing (deposit/midpoint/handoff) is needed day
-   one or Phase 4.
-4. **Users at launch.** Just the founder, or bench consultants too on day one? Determines whether
-   `viewer`/user-management ships in Phase 1 vs. Phase 4.
-5. **Domain & email.** `admin.keystone.systems`? And is Resend (already configured in `apps/web`)
+   one or later.
+6. **Users at launch.** Just the founder, or bench consultants too on day one? Determines whether
+   `viewer`/user-management ships in Phase 1 vs. Phase 5.
+7. **Domain & email.** `admin.keystone.systems`? And is Resend (already configured in `apps/web`)
    the channel for internal notifications, or is that out of scope initially?
 
 ---
