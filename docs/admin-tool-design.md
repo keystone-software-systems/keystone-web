@@ -20,8 +20,11 @@ side of the consultancy:
 - **Contracts** — generate an engagement agreement, send it for signature through Zoho Sign, and
   track it to signed.
 - **Notion** — every project gets a linked Notion workspace page (scoping docs, notes, tasks,
-  handoff material), auto-provisioned and kept status-stamped by the tool. Notion is the day-to-day
-  working surface; the admin tool is the commercial spine that orchestrates it.
+  meeting notes, handoff material), auto-provisioned and kept status-stamped by the tool. Notion is
+  the day-to-day working surface — the founder's task manager, notes, and AI meeting notes all live
+  there — and the admin tool is the commercial spine that orchestrates it and feeds it authoritative
+  status. The tool does not rebuild any of Notion's intelligence; it makes Notion AI smarter by
+  putting real invoice/contract/milestone truth into the workspace it reasons over.
 - **Activity** — an audit trail of what happened and when.
 
 It is deliberately narrow. It is not a CRM, not a time tracker (engagements are priced to the
@@ -439,29 +442,37 @@ Templates live in Zoho (so legal copy is edited there, not in code); the app onl
 
 ## 8. Notion — project workspace integration
 
-Notion will be heavily used, so it is a first-class integration, not a link field. The founder does
-the actual work in Notion (scoping docs, notes, task boards, deliverable drafts, handoff material);
-the admin tool provisions that workspace, keeps it stamped with authoritative commercial status, and
-reads a few Notion-owned signals back for a unified glance. The discipline that makes this "tight"
-rather than fragile is the ownership split below.
+Notion will be heavily used, so it is a first-class integration, not a link field. Notion is the
+founder's **task manager, notes, and meeting record** — used heavily with **Notion AI and AI
+meeting notes**, which generate summaries and action items directly inside the workspace. The admin
+tool provisions each project's Notion page, keeps it stamped with authoritative commercial status,
+and reads a few Notion-owned signals back for a unified glance. The discipline that makes this
+"tight" rather than fragile is the ownership split below.
+
+**Boundary: the tool feeds Notion AI, it does not compete with it.** All intelligence — summarizing
+meetings, drafting action items, answering questions across the workspace — stays in Notion AI. The
+admin tool contributes the one thing Notion does not have on its own: authoritative commercial truth
+(is this invoice paid, is the contract signed, which milestone is live). Pushing that onto the
+linked pages means Notion AI answers questions like "which active projects have an unpaid invoice"
+grounded in real state, without the tool building any AI of its own.
 
 ### Ownership split (the golden rule)
 
 | Field / concern | Owner | Sync direction |
 |---|---|---|
 | Client, project lifecycle status, milestones, amounts, invoice/contract status | **Postgres** | push → Notion (display-only mirror) |
-| Scoping docs, meeting notes, research, deliverable drafts, handoff docs | **Notion** | not synced — lives only in Notion |
-| Granular tasks / kanban, "working phase", "next action" | **Notion** | pull → tool (read-only display) |
+| Scoping docs, meeting notes (incl. AI meeting notes), research, deliverable drafts, handoff docs | **Notion** | not synced — lives only in Notion |
+| Granular tasks / kanban, action items, "working phase", "next action" | **Notion** | pull → tool (read-only display) |
 | The link itself (`notion_page_id`) | **Postgres** | set once on creation |
 
 No field is written by both systems. A mirrored property edited by hand in Notion is cosmetic and
 is overwritten on the next push; a commercial value is never authored in Notion.
 
-> **Decision baked in (confirm):** granular task/kanban project management lives in **Notion**; the
-> admin tool owns project *records, lifecycle status, and milestones* (because milestones gate
-> billing). The tool's `/projects` board tracks the commercial lifecycle (lead → closed); day-to-day
-> execution happens in the linked Notion page. If instead you want task-level PM inside the admin
-> tool, that is a larger build — see open decisions.
+> **Decided:** Notion is the founder's task manager, notes, and meeting record, so **all task/kanban
+> PM and note-taking stay in Notion**. The admin tool owns project *records, lifecycle status, and
+> milestones* (because milestones gate billing) and never duplicates task management. The tool's
+> `/projects` board tracks the commercial lifecycle (lead → closed); day-to-day execution, tasks,
+> and AI meeting notes live in the linked Notion page.
 
 ### Auth & config
 
@@ -514,8 +525,16 @@ process those events (e.g. the Stripe `invoice.paid` handler also pushes "Invoic
 ### Flow 3 — read Notion-owned signals back (Notion → tool, read-only)
 
 For the dashboard and project page, pull a small set of Notion-owned fields for display: a "Working
-phase" property, a "Next action" text, and task rollup counts (open / done) from the project page's
-task board. These are **read-only, cached with a short TTL, and never written back**.
+phase" property, a "Next action" text, task rollup counts (open / done) from the project page's task
+board, open **action items** (which AI meeting notes generate), and a link list of **recent meeting
+notes** for the project. These are **read-only, cached with a short TTL, and never written back** —
+the tool surfaces them next to the commercial context; Notion remains their home and Notion AI
+remains what produces them.
+
+If a **Meetings** database exists in Notion with a relation to projects/clients, the read-back
+filters it by the linked project to show that project's recent meetings and action items. If meeting
+notes instead live as sub-pages under the project page, the read-back lists recent child pages. The
+`lib/notion/schema.ts` map records whichever structure is in use.
 
 - **On-demand + cache:** fetched when a project page renders (served from cache within TTL), with a
   manual "Refresh from Notion" button.
@@ -565,7 +584,8 @@ The project page is where the four systems meet. From one screen the founder can
   prefilled;
 - **send the engagement contract** (Zoho Sign) and watch it go `sent → viewed → signed`;
 - **open the linked Notion workspace** (deep link + an embedded panel showing the Notion-owned
-  working phase, next action, and task rollup), or provision/link one if it does not exist yet;
+  working phase, next action, task rollup, open action items, and recent meeting notes), or
+  provision/link one if it does not exist yet;
 - read the activity trail (contract sent, invoice paid, milestone closed) in one place.
 
 Status badges reflect the *cached* external state, refreshed by webhooks (Stripe/Zoho) or the last
@@ -760,12 +780,15 @@ heavily used — the project workspace is valuable the moment projects exist, be
    back-office and therefore its own repo? Affects naming and where secrets live, not the design.
 2. **Zoho product.** Zoho **Sign** (e-signature) is assumed for "contracts." Confirm it is Sign and
    not Zoho Books (invoicing) or CRM — Stripe already owns invoicing in this design.
-3. **Notion as the PM surface.** Assumed: granular task/kanban PM lives in **Notion**; the admin tool
-   owns project records, lifecycle status, and milestones. Confirm — the alternative (task-level PM
-   built inside the admin tool) is a materially larger build and partly duplicates Notion.
+3. **Notion as the PM surface.** *Resolved:* Notion is the task manager, notes, and meeting record;
+   all task/kanban PM and note-taking stay in Notion, and the tool never duplicates them.
 4. **Notion structure.** Do the Projects (and Clients) Notion databases already exist with a settled
    property schema, or should the design define them? The block skeleton and property map depend on
-   this. Also confirm one shared workspace vs. per-client workspaces.
+   this. Specifically: (a) one shared workspace vs. per-client workspaces; (b) how meeting notes are
+   organized — a **Meetings** database with a project/client relation, or sub-pages under each
+   project page — since that determines how the read-back surfaces AI meeting notes and action
+   items; (c) where AI-meeting-notes action items land (a Tasks database, or inline in the meeting
+   page) so the tool can roll them up.
 5. **Invoicing model detail.** Confirm hosted-invoice email from Stripe (assumed) vs. quotes/
    estimates first, and whether milestone-staged billing (deposit/midpoint/handoff) is needed day
    one or later.
