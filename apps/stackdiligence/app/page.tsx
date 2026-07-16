@@ -89,11 +89,11 @@ export default function Home() {
             until you own it. That&apos;s what this catches before you close, not after.
           </p>
           <p className="mt-6 text-lg text-graphite/70">
-            You don&apos;t need to know how to read code to know if you&apos;re overpaying for
-            one. Before you close on a software company, someone who&apos;s actually built and
-            scaled production systems should tell you what&apos;s underneath: what will hold up,
-            what will cost you six months post-close, and what&apos;s a walk-away issue.
-            That&apos;s the job.
+            You don&apos;t need to know how to read code to know if you&apos;re overpaying for a
+            software company. Before you close, someone who&apos;s actually built and scaled
+            production systems should tell you what&apos;s underneath: what will hold up, what
+            will cost you six months post-close, and what&apos;s a walk-away issue. That&apos;s
+            the job.
           </p>
         </div>
       </section>

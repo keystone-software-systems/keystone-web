@@ -20,7 +20,7 @@ Most deal teams don't have anyone who can tell them what they're actually buying
 Software doesn't come with a Carfax. A used car with a bad engine makes noise. A software company with a bad architecture, a security hole, or a key-person dependency looks exactly like a healthy one — right up until you own it. That's what this catches before you close, not after.
 
 **Framing paragraph**
-You don't need to know how to read code to know if you're overpaying for one. Before you close on a software company, someone who's actually built and scaled production systems should tell you what's underneath: what will hold up, what will cost you six months post-close, and what's a walk-away issue. That's the job.
+You don't need to know how to read code to know if you're overpaying for a software company. Before you close, someone who's actually built and scaled production systems should tell you what's underneath: what will hold up, what will cost you six months post-close, and what's a walk-away issue. That's the job.
 
 **What this covers (short version, 4 items with one line each)**
 - Codebase & architecture — is it maintainable, or inherited debt
