@@ -32,10 +32,9 @@ export default function AboutPage() {
           looks like when a system is held together by habit rather than design.
         </p>
         <p>
-          This isn&apos;t generalist consulting with diligence as a line item. It&apos;s a
-          specialist assessment from someone who has built, scaled, and operated real systems
-          under real constraints, applied to the specific question a deal team is actually asking:
-          what does this cost me after I own it.
+          It&apos;s a specialist assessment from someone who has built, scaled, and operated real
+          systems under real constraints, applied to the specific question a deal team is actually
+          asking: what does this cost me after I own it.
         </p>
       </div>
 
