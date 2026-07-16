@@ -14,8 +14,8 @@ export default function ContactPage() {
         Get in Touch
       </h1>
       <p className="mt-4 text-lg text-graphite/70">
-        A few details on the deal and timeline. No gated content, no multi-step intake, just a
-        direct call to talk it through.
+        A few details on the deal and timeline, and we&apos;ll set up a direct call to talk it
+        through.
       </p>
       <div className="mt-10">
         <ContactForm />
