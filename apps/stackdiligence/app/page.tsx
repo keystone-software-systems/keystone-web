@@ -5,6 +5,14 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
+const processSteps = [
+  "Kickoff call",
+  "Data room & access review",
+  "Technical assessment",
+  "Team interviews",
+  "Report delivery",
+];
+
 const covers = [
   {
     title: "Codebase & architecture",
@@ -108,6 +116,29 @@ export default function Home() {
             className="mt-8 inline-block text-sm font-medium text-steel hover:underline"
           >
             See the full assessment &rarr;
+          </Link>
+        </div>
+      </section>
+
+      <section className="border-t border-slate/20 py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-steel">How it works</h2>
+          <p className="mt-2 max-w-2xl text-lg text-graphite">
+            1&ndash;3 weeks, start to report in hand.
+          </p>
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            {processSteps.map((step, i) => (
+              <div key={step}>
+                <span className="text-sm font-semibold text-steel">{i + 1}</span>
+                <h3 className="mt-1 text-sm font-semibold text-graphite">{step}</h3>
+              </div>
+            ))}
+          </div>
+          <Link
+            href="/process"
+            className="mt-8 inline-block text-sm font-medium text-steel hover:underline"
+          >
+            See the full process &rarr;
           </Link>
         </div>
       </section>
