@@ -18,11 +18,8 @@ export default function AboutPage() {
       <div className="mt-8 flex flex-col gap-6 text-lg text-graphite/70">
         <p>
           StackDiligence is built around a founder who&apos;s been the engineer responsible for
-          the kind of systems you&apos;re now evaluating: starting as an intern at Microsoft and
-          reaching Senior Software Engineer within three years of joining full-time, then building
-          core payments infrastructure as a senior engineer at Stripe on systems that processed
-          billions of dollars in transactions a day, then back to Microsoft as a Principal Software
-          Engineer (
+          the kind of systems you&apos;re now evaluating: formerly a Senior Software Engineer at
+          Stripe and a Principal Software Engineer at Microsoft (
           <a
             href="https://www.linkedin.com/in/tannerbarlow/"
             target="_blank"
@@ -47,8 +44,8 @@ export default function AboutPage() {
           Assessment, not a guarantee
         </h2>
         <p className="mt-4 text-graphite/70">
-          Findings reflect what&apos;s knowable from the codebase, infrastructure, and
-          documentation access available during the engagement window. It&apos;s a point-in-time
+          Findings reflect what&apos;s knowable from whatever codebase, infrastructure, and
+          documentation access was available during the engagement window. It&apos;s a point-in-time
           technical read to inform a deal decision, not an ongoing warranty on the target&apos;s
           systems.
         </p>
