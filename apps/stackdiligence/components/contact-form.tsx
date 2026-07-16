@@ -38,7 +38,7 @@ export function ContactForm() {
 
   if (status === "success") {
     return (
-      <div className="rounded-lg border border-ash/20 bg-white p-8 text-center">
+      <div className="rounded-lg border border-slate/20 bg-white p-8 text-center">
         <h2 className="text-lg font-semibold text-graphite">Message sent</h2>
         <p className="mt-2 text-sm text-graphite/70">
           Thanks for reaching out. We&apos;ll get back to you shortly.
@@ -59,7 +59,7 @@ export function ContactForm() {
             name="name"
             type="text"
             required
-            className="rounded-md border border-ash/30 bg-white px-3 py-2 text-sm text-graphite outline-none focus:border-ledger"
+            className="rounded-md border border-slate/30 bg-white px-3 py-2 text-sm text-graphite outline-none focus:border-steel"
           />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -71,7 +71,7 @@ export function ContactForm() {
             name="email"
             type="email"
             required
-            className="rounded-md border border-ash/30 bg-white px-3 py-2 text-sm text-graphite outline-none focus:border-ledger"
+            className="rounded-md border border-slate/30 bg-white px-3 py-2 text-sm text-graphite outline-none focus:border-steel"
           />
         </div>
       </div>
@@ -85,7 +85,7 @@ export function ContactForm() {
             id="firm"
             name="firm"
             type="text"
-            className="rounded-md border border-ash/30 bg-white px-3 py-2 text-sm text-graphite outline-none focus:border-ledger"
+            className="rounded-md border border-slate/30 bg-white px-3 py-2 text-sm text-graphite outline-none focus:border-steel"
           />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -97,7 +97,7 @@ export function ContactForm() {
             name="timeline"
             type="text"
             placeholder="e.g. closing in 3 weeks"
-            className="rounded-md border border-ash/30 bg-white px-3 py-2 text-sm text-graphite outline-none focus:border-ledger"
+            className="rounded-md border border-slate/30 bg-white px-3 py-2 text-sm text-graphite outline-none focus:border-steel"
           />
         </div>
       </div>
@@ -111,7 +111,7 @@ export function ContactForm() {
           name="message"
           required
           rows={6}
-          className="rounded-md border border-ash/30 bg-white px-3 py-2 text-sm text-graphite outline-none focus:border-ledger"
+          className="rounded-md border border-slate/30 bg-white px-3 py-2 text-sm text-graphite outline-none focus:border-steel"
         />
       </div>
 
@@ -120,7 +120,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="rounded-md bg-graphite px-6 py-3 text-sm font-medium text-paper hover:bg-ledger disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-md bg-graphite px-6 py-3 text-sm font-medium text-paper hover:bg-steel disabled:cursor-not-allowed disabled:opacity-60"
       >
         {status === "submitting" ? "Sending..." : "Send message"}
       </button>

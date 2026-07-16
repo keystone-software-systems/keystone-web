@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | StackDiligence",
   },
   description:
-    "Technical due diligence for software acquisitions — a full-stack assessment of what you're actually buying, delivered in plain language for deal teams without an in-house technical read.",
+    "Technical due diligence for software acquisitions: a full-stack assessment of what you're actually buying, delivered in plain language for deal teams without an in-house technical read.",
   openGraph: {
     type: "website",
     url: SITE_URL,

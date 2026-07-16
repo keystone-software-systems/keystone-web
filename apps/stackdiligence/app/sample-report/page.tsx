@@ -30,7 +30,7 @@ export default function SampleReportPage() {
 
       <Link
         href="/contact"
-        className="mt-10 inline-block rounded-md bg-graphite px-6 py-3 text-sm font-medium text-paper hover:bg-ledger"
+        className="mt-10 inline-block rounded-md bg-graphite px-6 py-3 text-sm font-medium text-paper hover:bg-steel"
       >
         Book a call
       </Link>

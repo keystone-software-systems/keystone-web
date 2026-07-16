@@ -1,0 +1,504 @@
+<title>StackDiligence — Mark Concepts</title>
+<style>
+  :root {
+    --bg: #eef1f2;
+    --card: #ffffff;
+    --ink: #14181b;
+    --muted: #5b6670;
+    --line: #d7dbdd;
+    --accent: #2b4356;
+    --accent-soft: #6b7684;
+    --demo-dark: #1e2328;
+    --demo-dark-ink: #eef1f2;
+    --demo-dark-accent: #6e93ac;
+    --ks-navy: #14324d;
+    --ks-blue: #3e7cb1;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121417;
+      --card: #1a1d21;
+      --ink: #e7eaec;
+      --muted: #8b96a0;
+      --line: #2a2e33;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121417;
+    --card: #1a1d21;
+    --ink: #e7eaec;
+    --muted: #8b96a0;
+    --line: #2a2e33;
+  }
+  :root[data-theme="light"] {
+    --bg: #eef1f2;
+    --card: #ffffff;
+    --ink: #14181b;
+    --muted: #5b6670;
+    --line: #d7dbdd;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: ui-monospace, "SF Mono", "IBM Plex Mono", Menlo, Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 64px 24px 96px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+    font-weight: 600;
+  }
+
+  h1 {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 800;
+    font-stretch: condensed;
+    letter-spacing: -0.02em;
+    font-size: clamp(32px, 5vw, 46px);
+    line-height: 1.05;
+    margin: 10px 0 18px;
+    text-wrap: balance;
+  }
+
+  .intro {
+    max-width: 60ch;
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+
+  section {
+    margin-top: 56px;
+  }
+
+  h2 {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+    margin: 0 0 24px;
+  }
+
+  /* palette strip */
+  .palette-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .palette-block {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--card);
+  }
+  .palette-block header {
+    padding: 12px 16px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+  }
+  .swatches {
+    display: flex;
+  }
+  .swatch-chip {
+    flex: 1;
+    height: 64px;
+    display: flex;
+    align-items: flex-end;
+    padding: 8px 10px;
+    font-size: 10.5px;
+  }
+
+  /* concept grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+    .palette-row { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .card.recommended {
+    border-color: var(--accent-soft);
+    box-shadow: 0 0 0 1px var(--accent-soft) inset;
+  }
+
+  .card-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .card-label .tag {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+  }
+  .card-label .pill {
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent-soft);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+
+  .specimen-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .swatch {
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .swatch.big {
+    width: 96px;
+    height: 96px;
+  }
+  .swatch.tiny {
+    width: 32px;
+    height: 32px;
+    margin-left: auto;
+  }
+  .swatch.light { background: var(--card); border: 1px solid var(--line); }
+  .swatch.dark { background: var(--demo-dark); }
+
+  .rationale {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .lockup-panel {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .lockup-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 22px 24px;
+  }
+  .lockup-bar.on-light { background: var(--card); }
+  .lockup-bar.on-dark { background: var(--demo-dark); }
+  .lockup-wordmark {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+  }
+  .lockup-bar.on-light .lockup-wordmark { color: var(--ink); }
+  .lockup-bar.on-dark .lockup-wordmark { color: var(--demo-dark-ink); }
+
+  /* also-considered thumbnail strip */
+  .thumb-row {
+    display: flex;
+    gap: 16px;
+  }
+  .thumb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .thumb .swatch {
+    width: 56px;
+    height: 56px;
+  }
+  .thumb-label {
+    font-size: 10.5px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* wordmark color variants */
+  .wordmark-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 640px) {
+    .wordmark-grid { grid-template-columns: 1fr; }
+  }
+  .wordmark-card {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .wordmark-card.recommended {
+    border-color: var(--accent-soft);
+    box-shadow: 0 0 0 1px var(--accent-soft) inset;
+  }
+  .wm-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .wm-bar.on-light { background: var(--card); border: 1px solid var(--line); }
+  .wm-bar.on-dark { background: var(--demo-dark); }
+  .wm-text {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+  }
+
+  .note {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Visual identity — working concepts</div>
+  <h1>StackDiligence mark concepts</h1>
+  <p class="intro">
+    Settled on the bracketed stack (D) below. Also considered: a plain
+    monogram, and two unframed stack variants — kept as small thumbnails for
+    context. Current round of work is the wordmark: STACK and DILIGENCE in
+    two different colors, four ways to split them.
+  </p>
+
+  <section>
+    <h2>Palette reference</h2>
+    <div class="palette-row">
+      <div class="palette-block">
+        <header>Keystone — existing</header>
+        <div class="swatches">
+          <div class="swatch-chip" style="background:#14324d;color:#fff;">Blueprint Navy<br>#14324D</div>
+          <div class="swatch-chip" style="background:#3e7cb1;color:#fff;">Technical Blue<br>#3E7CB1</div>
+        </div>
+      </div>
+      <div class="palette-block">
+        <header>StackDiligence — proposed</header>
+        <div class="swatches">
+          <div class="swatch-chip" style="background:#2b4356;color:#fff;">Steel Blue<br>#2B4356</div>
+          <div class="swatch-chip" style="background:#6b7684;color:#fff;">Slate<br>#6B7684</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Also considered</h2>
+    <div class="thumb-row">
+      <div class="thumb">
+        <div class="swatch dark">
+          <svg viewBox="0 0 100 100" width="40" height="40">
+            <rect x="10" y="10" width="80" height="80" rx="18" fill="var(--demo-dark-ink)"/>
+            <text x="50" y="63" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-weight="800" font-size="36" fill="var(--demo-dark)">SD</text>
+          </svg>
+        </div>
+        <span class="thumb-label">A — Monogram</span>
+      </div>
+      <div class="thumb">
+        <div class="swatch dark">
+          <svg viewBox="0 0 100 100" width="40" height="40">
+            <rect x="29" y="24" width="42" height="14" rx="4" fill="var(--demo-dark-ink)"/>
+            <rect x="22" y="43" width="56" height="14" rx="4" fill="var(--demo-dark-accent)"/>
+            <rect x="15" y="62" width="70" height="14" rx="4" fill="var(--demo-dark-ink)"/>
+          </svg>
+        </div>
+        <span class="thumb-label">B — Centered stack</span>
+      </div>
+      <div class="thumb">
+        <div class="swatch dark">
+          <svg viewBox="0 0 100 100" width="40" height="40">
+            <rect x="15" y="62" width="70" height="14" rx="4" fill="var(--demo-dark-ink)"/>
+            <rect x="25" y="43" width="56" height="14" rx="4" fill="var(--demo-dark-ink)"/>
+            <rect x="37" y="24" width="42" height="14" rx="4" fill="var(--demo-dark-accent)"/>
+          </svg>
+        </div>
+        <span class="thumb-label">C — Offset stack</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Concept D — bracketed stack</h2>
+    <div class="card recommended">
+      <div class="card-label">
+        <span class="tag">Settled direction</span>
+      </div>
+      <div class="specimen-row">
+        <div class="swatch big light">
+          <svg viewBox="0 0 100 100" width="88" height="88">
+            <polyline points="8,22 8,8 22,8" fill="none" stroke="var(--ink)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="78,8 92,8 92,22" fill="none" stroke="var(--ink)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="8,78 8,92 22,92" fill="none" stroke="var(--ink)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="92,78 92,92 78,92" fill="none" stroke="var(--ink)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="29" y="24" width="42" height="14" rx="4" fill="var(--ink)"/>
+            <rect x="22" y="43" width="56" height="14" rx="4" fill="var(--accent)"/>
+            <rect x="15" y="62" width="70" height="14" rx="4" fill="var(--ink)"/>
+          </svg>
+        </div>
+        <div class="swatch big dark">
+          <svg viewBox="0 0 100 100" width="88" height="88">
+            <polyline points="8,22 8,8 22,8" fill="none" stroke="var(--demo-dark-ink)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="78,8 92,8 92,22" fill="none" stroke="var(--demo-dark-ink)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="8,78 8,92 22,92" fill="none" stroke="var(--demo-dark-ink)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="92,78 92,92 78,92" fill="none" stroke="var(--demo-dark-ink)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="29" y="24" width="42" height="14" rx="4" fill="var(--demo-dark-ink)"/>
+            <rect x="22" y="43" width="56" height="14" rx="4" fill="var(--demo-dark-accent)"/>
+            <rect x="15" y="62" width="70" height="14" rx="4" fill="var(--demo-dark-ink)"/>
+          </svg>
+        </div>
+        <div class="swatch tiny dark">
+          <svg viewBox="0 0 100 100" width="24" height="24">
+            <polyline points="8,22 8,8 22,8" fill="none" stroke="var(--demo-dark-ink)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="78,8 92,8 92,22" fill="none" stroke="var(--demo-dark-ink)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="8,78 8,92 22,92" fill="none" stroke="var(--demo-dark-ink)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="92,78 92,92 78,92" fill="none" stroke="var(--demo-dark-ink)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="29" y="24" width="42" height="14" rx="4" fill="var(--demo-dark-ink)"/>
+            <rect x="22" y="43" width="56" height="14" rx="4" fill="var(--demo-dark-accent)"/>
+            <rect x="15" y="62" width="70" height="14" rx="4" fill="var(--demo-dark-ink)"/>
+          </svg>
+        </div>
+      </div>
+      <p class="rationale">Viewfinder brackets around the centered stack — literalizes "diligence" as the act of scrutiny, not just the stack being scrutinized. Holds up at 32px; brackets still read even when the plates blur together.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Wordmark — which word gets which color</h2>
+    <p class="intro" style="margin-bottom: 24px;">
+      Same icon, same two colors (Steel Blue accent, plus either Graphite ink
+      or Slate as the second color) — the variable is which word reads as
+      the "loud" one.
+    </p>
+    <div class="wordmark-grid">
+
+      <!-- Option 1: STACK accent / DILIGENCE ink -->
+      <div class="wordmark-card">
+        <div class="card-label"><span class="tag">1 — Stack in accent</span></div>
+        <div class="wm-bar on-light">
+          <span class="wm-text"><span style="color:#2b4356;">STACK</span><span style="color:#14181b;">DILIGENCE</span></span>
+        </div>
+        <div class="wm-bar on-dark">
+          <span class="wm-text"><span style="color:#6e93ac;">STACK</span><span style="color:#eef1f2;">DILIGENCE</span></span>
+        </div>
+        <p class="rationale">"Stack" pops — leads with the technical/software scope. "Diligence," the actual service category, recedes into plain ink.</p>
+      </div>
+
+      <!-- Option 2: DILIGENCE accent / STACK ink -->
+      <div class="wordmark-card">
+        <div class="card-label"><span class="tag">2 — Diligence in accent</span></div>
+        <div class="wm-bar on-light">
+          <span class="wm-text"><span style="color:#14181b;">STACK</span><span style="color:#2b4356;">DILIGENCE</span></span>
+        </div>
+        <div class="wm-bar on-dark">
+          <span class="wm-text"><span style="color:#eef1f2;">STACK</span><span style="color:#6e93ac;">DILIGENCE</span></span>
+        </div>
+        <p class="rationale">"Diligence" pops — leads with the service/judgment being sold. "Stack" recedes to plain ink as the scope qualifier.</p>
+      </div>
+
+      <!-- Option 3: STACK ink (primary) / DILIGENCE slate (secondary) -->
+      <div class="wordmark-card recommended">
+        <div class="card-label"><span class="tag">3 — Stack primary, Diligence secondary</span><span class="pill">Recommended</span></div>
+        <div class="wm-bar on-light">
+          <span class="wm-text"><span style="color:#14181b;">STACK</span><span style="color:#6b7684;">DILIGENCE</span></span>
+        </div>
+        <div class="wm-bar on-dark">
+          <span class="wm-text"><span style="color:#eef1f2;">STACK</span><span style="color:#8b96a0;">DILIGENCE</span></span>
+        </div>
+        <p class="rationale">Mirrors how Keystone's own wordmark actually splits (KEYSTONE in navy, SYSTEMS in slate) — bold color on the distinctive/ownable word, muted on the generic category word. "Diligence" is the generic term (any firm can claim it); "Stack" is the specific, memorable part.</p>
+      </div>
+
+      <!-- Option 4: DILIGENCE ink (primary) / STACK slate (secondary) -->
+      <div class="wordmark-card">
+        <div class="card-label"><span class="tag">4 — Diligence primary, Stack secondary</span></div>
+        <div class="wm-bar on-light">
+          <span class="wm-text"><span style="color:#6b7684;">STACK</span><span style="color:#14181b;">DILIGENCE</span></span>
+        </div>
+        <div class="wm-bar on-dark">
+          <span class="wm-text"><span style="color:#8b96a0;">STACK</span><span style="color:#eef1f2;">DILIGENCE</span></span>
+        </div>
+        <p class="rationale">Same primary/secondary split as option 3, reversed — bets that "Diligence" is the word a deal team actually searches for and remembers.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Recommended lockup, in context</h2>
+    <div class="lockup-panel">
+      <div class="lockup-bar on-light">
+        <svg viewBox="0 0 100 100" width="40" height="40">
+          <polyline points="8,22 8,8 22,8" fill="none" stroke="#14181b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="78,8 92,8 92,22" fill="none" stroke="#14181b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="8,78 8,92 22,92" fill="none" stroke="#14181b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="92,78 92,92 78,92" fill="none" stroke="#14181b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="29" y="24" width="42" height="14" rx="4" fill="#14181b"/>
+          <rect x="22" y="43" width="56" height="14" rx="4" fill="#2b4356"/>
+          <rect x="15" y="62" width="70" height="14" rx="4" fill="#14181b"/>
+        </svg>
+        <span class="wm-text"><span style="color:#14181b;">STACK</span><span style="color:#6b7684;">DILIGENCE</span></span>
+      </div>
+      <div class="lockup-bar on-dark">
+        <svg viewBox="0 0 100 100" width="40" height="40">
+          <polyline points="8,22 8,8 22,8" fill="none" stroke="#eef1f2" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="78,8 92,8 92,22" fill="none" stroke="#eef1f2" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="8,78 8,92 22,92" fill="none" stroke="#eef1f2" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="92,78 92,92 78,92" fill="none" stroke="#eef1f2" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="29" y="24" width="42" height="14" rx="4" fill="#eef1f2"/>
+          <rect x="22" y="43" width="56" height="14" rx="4" fill="#6e93ac"/>
+          <rect x="15" y="62" width="70" height="14" rx="4" fill="#eef1f2"/>
+        </svg>
+        <span class="wm-text"><span style="color:#eef1f2;">STACK</span><span style="color:#8b96a0;">DILIGENCE</span></span>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">
+    Working concepts, not final artwork — geometry, palette, and the wordmark split are
+    all easy to adjust. Pick a wordmark option (or describe a different split) and I'll
+    cut the actual <code>icon.svg</code> / <code>opengraph-image.tsx</code> / nav
+    component for the site from it.
+  </p>
+</div>

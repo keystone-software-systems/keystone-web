@@ -55,7 +55,7 @@ export default function ProcessPage() {
         ))}
       </ol>
 
-      <div className="mt-12 border-t border-ash/20 pt-8">
+      <div className="mt-12 border-t border-slate/20 pt-8">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-graphite">Pricing</h2>
         <p className="mt-3 text-graphite/70">
           Fixed-fee engagements scoped to deal size, no open-ended hourly billing.
@@ -64,7 +64,7 @@ export default function ProcessPage() {
 
       <Link
         href="/contact"
-        className="mt-10 inline-block rounded-md bg-graphite px-6 py-3 text-sm font-medium text-paper hover:bg-ledger"
+        className="mt-10 inline-block rounded-md bg-graphite px-6 py-3 text-sm font-medium text-paper hover:bg-steel"
       >
         Book a call
       </Link>

@@ -2,18 +2,16 @@
 
 :root {
   --color-graphite: #1e2328;
-  --color-ledger: #4b6357;
-  --color-ash: #7a8288;
+  --color-steel: #2b4356;
+  --color-slate: #6b7684;
   --color-paper: #f6f5f2;
-  --color-pale-green: #b9c7be;
 }
 
 @theme inline {
   --color-graphite: var(--color-graphite);
-  --color-ledger: var(--color-ledger);
-  --color-ash: var(--color-ash);
+  --color-steel: var(--color-steel);
+  --color-slate: var(--color-slate);
   --color-paper: var(--color-paper);
-  --color-pale-green: var(--color-pale-green);
   --font-sans: var(--font-inter);
 }
 

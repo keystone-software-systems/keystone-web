@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Mark } from "@/components/mark";
 
 const navLinks = [
   { href: "/what-we-assess", label: "What We Assess" },
@@ -14,13 +15,14 @@ export function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="border-b border-ash/20 bg-paper">
+    <header className="border-b border-slate/20 bg-paper">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-graphite text-sm font-bold text-paper">
-            SD
+          <Mark className="h-7 w-7 text-graphite" />
+          <span className="text-xl font-bold tracking-wide">
+            <span className="text-graphite">STACK</span>
+            <span className="text-slate">DILIGENCE</span>
           </span>
-          <span className="text-xl font-bold tracking-wide text-graphite">STACKDILIGENCE</span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -28,7 +30,7 @@ export function Nav() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-graphite hover:text-ledger"
+              className="text-sm font-medium text-graphite hover:text-steel"
             >
               {link.label}
             </Link>
@@ -36,7 +38,7 @@ export function Nav() {
 
           <Link
             href="/contact"
-            className="rounded-md bg-graphite px-4 py-2 text-sm font-medium text-paper hover:bg-ledger"
+            className="rounded-md bg-graphite px-4 py-2 text-sm font-medium text-paper hover:bg-steel"
           >
             Book a call
           </Link>
@@ -60,7 +62,7 @@ export function Nav() {
       </div>
 
       {mobileOpen && (
-        <nav className="border-t border-ash/20 bg-paper px-6 py-4 md:hidden">
+        <nav className="border-t border-slate/20 bg-paper px-6 py-4 md:hidden">
           <div className="flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link

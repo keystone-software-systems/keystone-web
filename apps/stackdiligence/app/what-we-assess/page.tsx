@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "What We Assess",
   description:
-    "A complete read on the technical risk of the software business you're buying — codebase, infrastructure, security, team, vendor risk, and AI-generated code.",
+    "A complete read on the technical risk of the software business you're buying: codebase, infrastructure, security, team, vendor risk, and AI-generated code.",
   alternates: { canonical: "/what-we-assess" },
 };
 
@@ -36,7 +36,7 @@ const categories = [
   {
     title: "AI-Generated Code Risk",
     description:
-      "An increasingly common and underassessed risk category, particularly in smaller/earlier-stage software companies — flagged and assessed explicitly rather than assumed away.",
+      "Unreviewed AI-generated code with no clear owner, inconsistent patterns from tool-assisted changes, and commits nobody on the team can fully explain. A growing blind spot in smaller and earlier-stage software companies, assessed explicitly rather than assumed away.",
   },
 ];
 
@@ -53,7 +53,7 @@ export default function WhatWeAssessPage() {
 
       <div className="mt-12 flex flex-col gap-10">
         {categories.map((category) => (
-          <div key={category.title} className="border-t border-ash/20 pt-6">
+          <div key={category.title} className="border-t border-slate/20 pt-6">
             <h2 className="text-lg font-semibold text-graphite">{category.title}</h2>
             <p className="mt-2 text-graphite/70">{category.description}</p>
           </div>
