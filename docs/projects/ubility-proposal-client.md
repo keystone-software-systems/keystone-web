@@ -83,7 +83,7 @@ This keeps the upfront number smaller and starts the ongoing relationship sooner
 Once the security work is underway, the open question is who owns this codebase now. Two options, priced
 separately. Pick based on what Ubility needs next.
 
-### Maintenance & Support — $5,500/month
+### Maintenance & Support — $8,000/month
 
 For keeping the platform stable and responsive without committing to a development roadmap.
 

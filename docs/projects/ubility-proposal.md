@@ -111,7 +111,7 @@ For keeping the platform stable and responsive without committing to a developme
 
 **For:** bug fixes, incident response, keeping the lights on. Not new features.
 
-**Price:** $5,500/month.
+**Price:** $8,000/month.
 
 ### Option B: Feature Development & AI Capabilities Retainer
 
