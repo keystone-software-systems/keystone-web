@@ -65,8 +65,8 @@ moving secrets into proper secret management.
 > - Numbers are from the Phase 0 / Phase 1+2 estimate in `ubility.md` (~22 person-days total). Confirm the
 >   final figures before this goes out; the ranges in that doc were $4–5k and $30–35k, I've picked
 >   $4,500 / $32,000 as the single numbers to quote.
-> - The itemized fix list doubles as something Steve can show Residence Billing to counter the Valiflo
->   report. Worth mentioning to him verbally, not in the doc.
+> - The itemized fix list doubles as something Steve can point to as concrete proof of what was closed out,
+>   in contrast to the Valiflo report. Worth mentioning to him verbally, not in the doc.
 > - Do not promise a warranty or support window on the fixes (per repo copy guardrails, that decision
 >   isn't made). "Delivered as a named list of what was fixed" is the sanctioned framing.
 > - Deliberately excludes the stored-procedure / Windows-VM re-architecture. That's modernization, not
@@ -173,8 +173,6 @@ tradeoff is time in seat versus experience applied to the decisions that are exp
 
 - [ ] Lock final numbers for 2a / full remediation (currently $4,500 / $32,000)
 - [ ] Decide staging: security quote first, or the whole thing at once (recommendation: security first)
-- [ ] Whether to raise Residence Billing co-funding with Steve, given their stake in Ubility surviving the
-      merger review. Suggest raising verbally, not in the written proposal
 - [ ] Confirm there's no warranty/support-window language anywhere before sending (guardrail)
 
 ---
