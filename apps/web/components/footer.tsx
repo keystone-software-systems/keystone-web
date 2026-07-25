@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { KeystoneLogo } from "@keystone/ui";
 import { solutions } from "@/app/solutions/content";
 
 export function Footer() {
@@ -10,19 +10,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-6 py-12">
         <div className="grid gap-10 sm:grid-cols-3">
           <div>
-            <div className="flex items-center gap-2">
-              <Image
-                src="/brand/keystone-icon-navy.svg"
-                alt=""
-                width={26}
-                height={25}
-                className="h-6 w-auto"
-              />
-              <span className="flex items-baseline gap-1.5">
-                <span className="text-lg font-bold tracking-wide text-blueprint-navy">KEYSTONE</span>
-                <span className="text-lg font-bold tracking-wide text-slate">SYSTEMS</span>
-              </span>
-            </div>
+            <KeystoneLogo iconClassName="h-6 w-auto" wordmarkClassName="text-lg" />
             <p className="mt-4 max-w-xs text-sm text-blueprint-navy/70">
               Senior engineering judgment, without the full-time hire.
             </p>
