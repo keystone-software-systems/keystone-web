@@ -317,9 +317,9 @@ This option prices the outcome of the full roadmap rather than a month of availa
 
 Same roadmap, same phase sequence, same included production support. Ubility can stop after any month past the initial term without owing the balance of the roadmap. Over a full six months this comes to $108,000, a $6,000 premium over Option 1, which is the price of that flexibility.
 
-### What is committed and what is held back
+### Room held back for whatever matters most
 
-Under either option, the named deliverables above are scoped to roughly four fifths of each month's capacity. The remaining fifth is kept open on purpose, for Ubility's benefit, not Keystone's: ad-hoc requests, feedback on work in progress, a production incident, a bug a resident reports, whatever comes up that wasn't on the roadmap when it was written. That reserve is why a production issue in week two does not push a roadmap deliverable into the next month, and why an unexpected request does not require a change order.
+Under either option, the named deliverables above are scoped to roughly four fifths of each month's capacity. The remaining fifth is deliberately not assigned to anything specific, so there is real, unscoped capacity available for whatever turns out to matter most: a production incident, a bug a resident reports, feedback on work in progress, a problem that was not visible when this roadmap was written. Nothing in that reserve gets scoped or billed unless it is actually needed. That is why a production issue in week two does not push a roadmap deliverable into the next month, and why an unexpected request does not require a change order.
 
 This is also where fixed-outcome pricing pays off in a way hourly billing never does. If a phase finishes ahead of schedule, Ubility isn't paying for idle time, and Keystone isn't waiting around for more to bill. Both sides want the same thing: the roadmap done well, and done as fast as that allows.
 
