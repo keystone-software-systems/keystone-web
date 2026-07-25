@@ -54,7 +54,7 @@ Keystone has already read all six repositories, verified the security findings l
 ### Communications
 
 - **A direct line to the people doing the work.** A shared channel connects Ubility staff to the Keystone team directly, not a ticket queue that has to escalate before anyone who actually knows the codebase sees it. The team monitors it together, so one person being unreachable does not leave Ubility without a way to reach someone.
-- **Automated detection, not waiting for a resident to notice first.** Uptime and health checks against the backend, frontend, and bill-processing pipeline, wired into an alerting tool (PagerDuty or incident.io, whichever fits the budget better) that pages the Keystone team directly the moment something fails, rather than relying on a customer complaint or someone happening to check. Set up on the free or low-cost tier of whichever tool is chosen, since monitoring at Ubility's current scale does not need an enterprise incident platform.
+- **Automated detection, not waiting for a customer to notice first.** Uptime and health checks against the backend, frontend, and bill-processing pipeline, wired into an alerting tool (PagerDuty or incident.io, whichever fits the budget better) that pages the Keystone team directly the moment something fails, rather than relying on a customer complaint or someone happening to check. Set up on the free or low-cost tier of whichever tool is chosen, since monitoring at Ubility's current scale does not need an enterprise incident platform.
 - **Response times, tiered by what's actually broken:**
 
 | Severity | What it looks like | Response |
@@ -196,11 +196,13 @@ One important clarification on scope: the horizontally scaled production topolog
     'taskTextColor': '#14324D',
     'taskTextOutsideColor': '#14324D',
     'taskTextDarkColor': '#14324D',
-    'sectionBkgColor': '#f7f7f5',
+    'sectionBkgColor': '#eef2f5',
     'altSectionBkgColor': '#ffffff',
     'gridColor': '#e1e0d9',
     'todayLineColor': '#d03b3b'
-}}}%%
+},
+'themeCSS': '.sectionTitle, .sectionTitle tspan { fill: #14324D !important; font-weight: 600; } .grid .tick text { fill: #52514e !important; } .titleText { fill: #14324D !important; }'
+}}%%
 gantt
     title Ubility platform roadmap
     dateFormat YYYY-MM-DD
@@ -299,7 +301,7 @@ The entire six-month roadmap quoted as one total, invoiced in six equal installm
 
 | Phase | Months | Committed scope |
 |---|---|---|
-| Phase A | 1 to 2 | Staging environment, stored procedures into version control, test harness and CI test gate, characterization tests on the billing path, migration plan |
+| Phase A | 1 to 2 | Staging environment, stored procedures into version control, test harness and automated test gate, characterization tests on the billing path, migration plan |
 | Phase B | 3 to 4 | Billing logic migrated out of stored procedures, test coverage on payables and invoicing, queued bill pipeline with retry and exception handling, operations and business metrics dashboard, jointly scoped feature slot |
 | Phase C | 5 to 6 | AI extraction expansion with confidence scoring, provider invoice extraction, natural-language reporting, scale assessment and enabling work, performance work |
 
