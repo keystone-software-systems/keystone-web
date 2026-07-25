@@ -104,8 +104,13 @@ graph TD
     BE --> EX
     EX --> BE
 
-    style PROD fill:#f5f5f5,stroke:#999,color:#1a1a1a
-    style DB fill:#ffe9e9,stroke:#c66,color:#1a1a1a
+    style PROD fill:#f5f5f5,stroke:#999999,color:#1a1a1a
+    style DEV fill:#eaeaea,stroke:#999999,color:#1a1a1a
+    style FE fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style BE fill:#fdebe3,stroke:#ec835a,color:#8a3313
+    style DB fill:#fbe2e1,stroke:#d03b3b,color:#7a1f1f
+    style SC fill:#fdebe3,stroke:#ec835a,color:#8a3313
+    style EX fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
 ```
 
 Single environment, single backend instance, and the business rules that decide what a resident owes are stored in a place that cannot be reviewed, versioned, or tested.
@@ -154,9 +159,22 @@ graph TD
         OPS --> Q
     end
 
-    style CI fill:#eef4fa,stroke:#3E7CB1,color:#1a1a1a
-    style STG fill:#eef4fa,stroke:#3E7CB1,color:#1a1a1a
-    style PRD fill:#f5f5f5,stroke:#999,color:#1a1a1a
+    style CI fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style STG fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style PRD fill:#f5f5f5,stroke:#999999,color:#1a1a1a
+    style DEV fill:#eaeaea,stroke:#999999,color:#1a1a1a
+    style BUILD fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style TEST fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style SBE fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style SDB fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style LB fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style BE1 fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style BE2 fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style SVC fill:#e3f7e3,stroke:#0ca30c,color:#0b4d0b
+    style DB2 fill:#e3f7e3,stroke:#0ca30c,color:#0b4d0b
+    style Q fill:#e3f7e3,stroke:#0ca30c,color:#0b4d0b
+    style EX2 fill:#e3f7e3,stroke:#0ca30c,color:#0b4d0b
+    style OPS fill:#e3f7e3,stroke:#0ca30c,color:#0b4d0b
 ```
 
 One important clarification on scope: the horizontally scaled production topology above is delivered in this engagement as the enabling work (packaging the backend so it can run as multiple identical copies, externalizing its configuration, making session state independent of any one instance, and a costed cutover plan with a recommended target). The cutover itself follows the same pattern as every other change in this roadmap: build and prove it in staging first, then stand up production and cut over, never modify the live system in place. It is sequenced by that plan rather than assumed to finish inside the six months, because doing it correctly depends on what the assessment finds. Everything else in the target diagram is committed roadmap scope.
