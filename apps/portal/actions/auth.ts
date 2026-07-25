@@ -1,40 +1,54 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, type AuthActionState } from "@keystone/db";
+import { ensureClientProfile } from "@/lib/auth";
 
-export type SendMagicLinkState = { error?: string; success?: boolean };
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export async function sendMagicLink(
-  _prevState: SendMagicLinkState,
+/**
+ * apps/portal-only: self-serve client signup. apps/admin has no equivalent —
+ * staff/viewer/engineer accounts are provisioned out-of-band by the founder,
+ * never through a public signup form.
+ */
+export async function signUpWithPassword(
+  _prevState: AuthActionState,
   formData: FormData,
-): Promise<SendMagicLinkState> {
+): Promise<AuthActionState> {
   const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!email || !EMAIL_RE.test(email)) {
     return { error: "Enter a valid email address." };
+  }
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters." };
   }
 
   const supabase = await createClient();
   const baseUrl = process.env.APP_BASE_URL ?? "http://localhost:3000";
 
-  const { error } = await supabase.auth.signInWithOtp({
+  const { data, error } = await supabase.auth.signUp({
     email,
+    password,
     options: {
       emailRedirectTo: `${baseUrl}/auth/confirm`,
     },
   });
 
   if (error) {
-    console.error("signInWithOtp failed", error);
-    return { error: "Could not send the sign-in link. Try again." };
+    console.error("signUp failed", error);
+    return { error: "Could not create your account. Try again." };
+  }
+
+  if (data.user) {
+    await ensureClientProfile(data.user.id, email);
+  }
+
+  // Email confirmation off: signUp already returned an active session.
+  if (data.session) {
+    redirect("/");
   }
 
   return { success: true };
-}
-
-export async function signOut() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect("/login");
 }

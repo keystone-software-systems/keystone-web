@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { updateSession } from "@keystone/db";
 
 // Next.js 16 renamed the `middleware.ts` convention to `proxy.ts` (same
 // functionality, new name/file — see AGENTS.md). This is that file.

@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { updateSession } from "@keystone/db";
 
 // Next.js 16 renamed the `middleware.ts` convention to `proxy.ts` (same
 // functionality, new name/file — see AGENTS.md). This is that file.
 
-const PUBLIC_PATHS = ["/login", "/auth/confirm", "/auth/auth-code-error"];
+const PUBLIC_PATHS = ["/login", "/signup", "/auth/confirm", "/auth/auth-code-error"];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
@@ -25,8 +25,9 @@ export async function proxy(request: NextRequest) {
 
   // Authenticated with Supabase, but do they have a provisioned, active
   // `profiles` row (role 'client' or 'engineer')? Client accounts are
-  // self-serve (created on first portal submission), but the row still has
-  // to exist and be active before anything behind auth is reachable.
+  // self-serve — `ensureClientProfile` (lib/auth.ts) provisions the row at
+  // signup/first magic-link — but it still has to exist and be active
+  // before anything behind auth is reachable.
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, active")

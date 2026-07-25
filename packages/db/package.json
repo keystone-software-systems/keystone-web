@@ -9,5 +9,12 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --local > src/types.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.8"
+  },
+  "peerDependencies": {
+    "next": "16.2.10"
   }
 }

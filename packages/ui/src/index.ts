@@ -1,6 +1,7 @@
 export { inter, plexMono } from "./fonts";
 export { HtmlShell } from "./html-shell";
 export { DashboardShell } from "./dashboard-shell";
+export { AuthForm } from "./auth-form";
 export { KeystoneIcon, KEYSTONE_ICON_PATH } from "./icon";
 export { KeystoneWordmark } from "./wordmark";
 export { KeystoneLogo } from "./logo";

@@ -1,1 +1,5 @@
 export type { Database, Json } from './types'
+export { createClient } from './supabase/server'
+export { createAdminClient } from './supabase/admin'
+export { updateSession } from './supabase/middleware'
+export { sendMagicLink, signInWithPassword, signOut, type AuthActionState } from './auth-actions'
