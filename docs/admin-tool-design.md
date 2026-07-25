@@ -67,8 +67,8 @@ Rationale: it shares the toolchain, brand tokens, and TypeScript config with `ap
 public site stays fully static and unauthenticated; the admin app is gated end-to-end. They do not
 share a runtime, a domain, or a set of secrets.
 
-Suggested host: `admin.keystone.systems` (or a Vercel-generated URL behind auth — no public link
-from the marketing site).
+Host: `admin.keystone.systems` (resolved 2026-07, §15 decision 5) — no public link from the
+marketing site.
 
 ### Stack (matches `apps/web`)
 
@@ -611,11 +611,19 @@ lint / build run on it too.
 Each phase is independently shippable and useful. The Notion doc link folds into Phase 1 (it is one
 field); the deeper two-way Notion integration is deferred, not scheduled here.
 
-**Phase 0 — Scaffold & auth**
-- Scaffold `apps/admin` (Next 16, Tailwind v4, TS), brand tokens, app shell.
-- Supabase project; `profiles` table; Google OAuth + magic link; middleware gate; `requireRole`.
-- Seed the founder as `owner`. Deploy behind auth. *Outcome: a locked-down empty app you can log
-  into.*
+**Phase 0 — Scaffold & auth** — done 2026-07-24
+- [x] Scaffold `apps/admin` (Next 16, Tailwind v4, TS), brand tokens, app shell.
+- [x] `profiles` table + RLS. Landed in `packages/db`'s shared migration (the schema is shared with
+      `apps/portal` — same Supabase project, one source of truth — not a migration local to this
+      app; see `docs/intake-portal-design.md` §2).
+- [x] Magic-link auth (per §15 decision 2 — Google deferred, not in Phase 0); `proxy.ts`
+      (Next.js 16 renamed `middleware.ts` → `proxy.ts`, confirmed against `node_modules/next/dist/docs`)
+      + `requireRole`.
+- [ ] Seed the founder as `owner`. Deferred — no real `auth.users` row exists yet in the local dev
+      stack to attach a profile to; this is a manual step once real auth/deploy exists.
+- [ ] Deploy behind auth. Deliberately left for a manual step — creating a Vercel project is an
+      account-level action, not something to do unprompted.
+- *Outcome: a locked-down empty app you can log into (once deployed and seeded).*
 
 **Phase 1 — Clients & projects (+ Notion doc link)**
 - Migrations for `clients`, `contacts`, `projects` (incl. `notion_url` / `notion_page_id`),
@@ -677,16 +685,22 @@ extending. Scoped in §8 and `docs/admin-tool-notion-workspace.md`.
 4. **Notion scope (v1).** Just link a Notion doc to a project (paste a URL; optional one-click
    create). Deeper two-way integration is designed (`docs/admin-tool-notion-workspace.md`) but
    deferred.
+5. **Domain.** `admin.keystone.systems`, a real subdomain rather than a bare Vercel URL — the apex
+   domain stays reserved for `apps/web` (marketing) so `keystone.systems` never conditionally
+   resolves to a login-gated app depending on auth state. Same reasoning applied to `apps/portal`
+   → `portal.keystone.systems` (see `docs/intake-portal-design.md` §2). A subdomain here is
+   slightly more discoverable via certificate-transparency logs than an obscure Vercel URL, but
+   that's not a real security boundary either way — auth + RLS are what actually protect it.
 
 **Still open (not blocking Phase 0/1):**
 
-5. **Notion "Create doc" button.** Paste-to-link only (default, zero-dependency) vs. also the
+6. **Notion "Create doc" button.** Paste-to-link only (default, zero-dependency) vs. also the
    optional API-backed create (needs `NOTION_TOKEN` + a parent page). Defaulting to paste-only.
-6. **Zoho product.** Zoho **Sign** assumed for "contracts" — confirm before Phase 3.
-7. **Invoicing model detail (Phase 2).** Hosted-invoice email from Stripe (assumed) vs. quotes
+7. **Zoho product.** Zoho **Sign** assumed for "contracts" — confirm before Phase 3.
+8. **Invoicing model detail (Phase 2).** Hosted-invoice email from Stripe (assumed) vs. quotes
    first; whether milestone-staged billing (deposit/midpoint/handoff) is needed day one.
-8. **Domain & email.** `admin.keystone.systems` vs. a Vercel URL to start; whether Resend (already
-   in `apps/web`) sends internal notifications later.
+9. **Internal email.** Whether Resend (already in `apps/web`) sends internal notifications later
+   (e.g. overdue-invoice nudges, per §4 Phase 4).
 
 ---
 

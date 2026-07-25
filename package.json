@@ -2,13 +2,20 @@
   "name": "keystone",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
     "dev:web": "npm run dev -w apps/web",
     "dev:stackdiligence": "npm run dev -w apps/stackdiligence",
+    "dev:admin": "npm run dev -w apps/admin",
+    "dev:portal": "npm run dev -w apps/portal",
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "db:start": "npm run db:start -w packages/db",
+    "db:stop": "npm run db:stop -w packages/db",
+    "db:reset": "npm run db:reset -w packages/db",
+    "db:types": "npm run db:types -w packages/db"
   }
 }
