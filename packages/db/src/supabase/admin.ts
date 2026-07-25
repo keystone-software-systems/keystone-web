@@ -1,5 +1,5 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@keystone/db";
+import type { Database } from "../types";
 
 // This client uses the service-role key and bypasses RLS entirely. It must
 // only ever run on the server — Route Handlers, Server Actions, webhooks —
@@ -13,7 +13,7 @@ import type { Database } from "@keystone/db";
 // instead of silently leaking a working client.
 if (typeof window !== "undefined") {
   throw new Error(
-    "lib/supabase/admin.ts must never be imported into client-side code.",
+    "@keystone/db's supabase/admin must never be imported into client-side code.",
   );
 }
 

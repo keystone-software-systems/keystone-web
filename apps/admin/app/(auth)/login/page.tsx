@@ -1,34 +1,14 @@
-"use client";
-
-import { useActionState } from "react";
-import { Button, TextInput } from "@keystone/ui";
-import { sendMagicLink, type SendMagicLinkState } from "@/actions/auth";
-
-const initialState: SendMagicLinkState = {};
+import { AuthForm } from "@keystone/ui";
+import { sendMagicLink, signInWithPassword } from "@keystone/db";
 
 export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(sendMagicLink, initialState);
-
   return (
-    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6">
-      <h1 className="text-xl font-semibold text-blueprint-navy">Keystone Admin</h1>
-      <p className="mt-1 text-sm text-slate">
-        Enter your email and we&apos;ll send you a sign-in link.
-      </p>
-
-      {state.success ? (
-        <p className="mt-6 text-sm text-blueprint-navy">
-          Check your email for a sign-in link.
-        </p>
-      ) : (
-        <form action={formAction} className="mt-6 flex flex-col gap-3">
-          <TextInput type="email" name="email" required placeholder="you@keystone.systems" />
-          <Button type="submit" disabled={pending}>
-            {pending ? "Sending…" : "Send sign-in link"}
-          </Button>
-          {state.error && <p className="text-sm text-red-600">{state.error}</p>}
-        </form>
-      )}
-    </div>
+    <AuthForm
+      title="Keystone Admin"
+      emailPlaceholder="you@keystone.systems"
+      variant="signin"
+      passwordAction={signInWithPassword}
+      magicLinkAction={sendMagicLink}
+    />
   );
 }

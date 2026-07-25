@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "./supabase/server";
+import { createClient, createAdminClient } from "@keystone/db";
 import type { Database } from "@keystone/db";
 
 type Role = Database["public"]["Enums"]["profile_role"];
@@ -19,6 +19,24 @@ export async function getCurrentProfile(): Promise<Profile | null> {
     .maybeSingle();
 
   return profile;
+}
+
+/**
+ * Client signup is self-serve: call this right after `signUp`/`signInWithOtp`
+ * succeeds so a brand-new auth user gets a `profiles` row without staff
+ * involvement. Only ever inserts — an existing row (staff, viewer, engineer,
+ * or a returning client) is left untouched, so a routine magic-link login
+ * can never clobber someone's provisioned role.
+ */
+export async function ensureClientProfile(userId: string, email: string): Promise<void> {
+  const admin = createAdminClient();
+  const { data: existing } = await admin.from("profiles").select("id").eq("id", userId).maybeSingle();
+  if (existing) return;
+
+  const { error } = await admin.from("profiles").insert({ id: userId, email, role: "client" });
+  if (error) {
+    console.error("ensureClientProfile insert failed", error);
+  }
 }
 
 /**

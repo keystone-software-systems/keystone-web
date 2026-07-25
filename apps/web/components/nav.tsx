@@ -10,6 +10,8 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ];
 
+const PORTAL_LOGIN_URL = `${process.env.NEXT_PUBLIC_PORTAL_URL ?? "https://portal.keystone.systems"}/login`;
+
 export function Nav() {
   const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -65,6 +67,10 @@ export function Nav() {
             </Link>
           ))}
 
+          <a href={PORTAL_LOGIN_URL} className="text-sm font-medium text-blueprint-navy hover:text-technical-blue">
+            Log in
+          </a>
+
           <Link
             href="/contact"
             className="rounded-md bg-blueprint-navy px-4 py-2 text-sm font-medium text-white hover:bg-technical-blue"
@@ -116,6 +122,13 @@ export function Nav() {
                 {link.label}
               </Link>
             ))}
+            <a
+              href={PORTAL_LOGIN_URL}
+              className="rounded px-2 py-2 text-sm font-medium text-blueprint-navy hover:bg-white"
+              onClick={() => setMobileOpen(false)}
+            >
+              Log in
+            </a>
           </div>
         </nav>
       )}

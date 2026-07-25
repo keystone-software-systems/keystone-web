@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "./supabase/server";
+import { createClient } from "@keystone/db";
 import type { Database } from "@keystone/db";
 
 type Role = Database["public"]["Enums"]["profile_role"];

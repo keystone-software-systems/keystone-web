@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { DashboardShell, SignOutButton } from "@keystone/ui";
+import { signOut } from "@keystone/db";
 import { getCurrentProfile } from "@/lib/auth";
-import { signOut } from "@/actions/auth";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const profile = await getCurrentProfile();

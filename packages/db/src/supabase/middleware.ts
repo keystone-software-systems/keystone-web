@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import type { Database } from "@keystone/db";
+import type { Database } from "../types";
 
 /**
  * Refreshes the Supabase session cookie for the current request and returns
