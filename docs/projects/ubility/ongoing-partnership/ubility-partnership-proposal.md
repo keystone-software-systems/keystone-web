@@ -83,7 +83,7 @@ The tradeoff is that outcome pricing only works if the outcome is specific. That
 
 ### Where the platform is today
 
-<!-- TODO (Google Docs): render this diagram to an image and embed it, since Docs does not render mermaid natively. -->
+<!-- For Google Docs: use diagram-current-state.png in this same directory instead of the mermaid source below, since Docs does not render mermaid natively. -->
 
 ```mermaid
 graph TD
@@ -117,7 +117,7 @@ Single environment, single backend instance, and the business rules that decide 
 
 ### Where it lands in six months
 
-<!-- TODO (Google Docs): render this diagram to an image and embed it, since Docs does not render mermaid natively. -->
+<!-- For Google Docs: use diagram-target-state.png in this same directory instead of the mermaid source below, since Docs does not render mermaid natively. -->
 
 ```mermaid
 graph TD
@@ -183,7 +183,7 @@ One important clarification on scope: the horizontally scaled production topolog
 
 ## The six-month roadmap
 
-<!-- TODO (Google Docs): render this Gantt chart to an image and embed it, since Docs does not render mermaid natively. -->
+<!-- For Google Docs: use diagram-roadmap-gantt.png in this same directory instead of the mermaid source below, since Docs does not render mermaid natively. -->
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': {
@@ -374,11 +374,14 @@ Ubility is weighing this against a dedicated junior engineer bundled with a host
 | **Hosting** | Migration to the vendor's platform required | No change today, and the same roadmap work also makes a future move to Azure or another major cloud possible if Ubility ever wants it, not just staying put on AWS. |
 | **Infrastructure foundation** | Vendor's own data centers, two facilities, both in Utah | Hyperscale cloud (AWS today; Azure or another major provider remains Ubility's option), built for national scale regardless of who maintains the application on top of it |
 | **Seniority applied** | Execution capacity | Senior judgment on the decisions that are expensive to reverse, applied to a platform where those decisions are pending |
+| **Who you're talking to** | Routed through the vendor's own account and management structure | The people actually building it, directly, every time |
 | **Continuity** | One assigned person doing the day-to-day work. If they move on, whoever replaces them has to ramp up on this codebase from the same starting point Ubility is at today. | Two engineers already ramped up on this codebase, with a network available for surge capacity |
 | **Cost of ending the relationship** | An infrastructure migration off the vendor's platform, on top of finding new engineering help | Nothing to migrate. Code and infrastructure stay in Ubility's own accounts throughout. |
 | **Effect on future options** | Ubility becomes more dependent on one vendor over time | Ubility becomes handoff-ready to any firm over time (see the portability section above) |
 
 Worth spelling out beyond the table: the dedicated-headcount offer moves Ubility onto that vendor's own two data centers, both in Utah, not a hyperscale cloud provider. That may not matter for day-to-day stability, but if the goal is to scale nationwide, that infrastructure choice is as much a scale decision as who's doing the engineering.
+
+Keystone is built to stay lean on purpose. The people running the firm are the same people writing the code, not an account or management layer sitting on top of a separate delivery team. There is no information lost in translation between whoever Ubility talks to and whoever does the work, and no question that has to travel up a chain to get answered. Every conversation is with the builder.
 
 Put simply: if what Ubility needs is a steady volume of smaller fixes handled and the hosting move works for the business, dedicated junior headcount is a reasonable way to get that. The difference shows up earlier than that, in deciding which of the 599 stored procedures move first, which stay as they are, and in what order, so a resident's bill doesn't come out wrong along the way. Those are exactly the decisions Phase A is built around, and they benefit from senior judgment from the start.
 
