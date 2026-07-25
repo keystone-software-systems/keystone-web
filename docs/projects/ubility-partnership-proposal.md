@@ -104,8 +104,8 @@ graph TD
     BE --> EX
     EX --> BE
 
-    style PROD fill:#f5f5f5,stroke:#999
-    style DB fill:#ffe9e9,stroke:#c66
+    style PROD fill:#f5f5f5,stroke:#999,color:#1a1a1a
+    style DB fill:#ffe9e9,stroke:#c66,color:#1a1a1a
 ```
 
 Single environment, single backend instance, and the business rules that decide what a resident owes are stored in a place that cannot be reviewed, versioned, or tested.
@@ -154,9 +154,9 @@ graph TD
         OPS --> Q
     end
 
-    style CI fill:#eef4fa,stroke:#3E7CB1
-    style STG fill:#eef4fa,stroke:#3E7CB1
-    style PRD fill:#f5f5f5,stroke:#999
+    style CI fill:#eef4fa,stroke:#3E7CB1,color:#1a1a1a
+    style STG fill:#eef4fa,stroke:#3E7CB1,color:#1a1a1a
+    style PRD fill:#f5f5f5,stroke:#999,color:#1a1a1a
 ```
 
 One important clarification on scope: the horizontally scaled production topology above is delivered in this engagement as the enabling work (packaging the backend so it can run as multiple identical copies, externalizing its configuration, making session state independent of any one instance, and a costed cutover plan with a recommended target). The cutover itself follows the same pattern as every other change in this roadmap: build and prove it in staging first, then stand up production and cut over, never modify the live system in place. It is sequenced by that plan rather than assumed to finish inside the six months, because doing it correctly depends on what the assessment finds. Everything else in the target diagram is committed roadmap scope.
