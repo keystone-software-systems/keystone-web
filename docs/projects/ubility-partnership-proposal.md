@@ -13,8 +13,8 @@ Worth stating plainly before anything else: this platform has been stable for mo
 Part of why it has stayed stable is that nothing new has been added to it. No changes means nothing has had the chance to break. Building it out further, and doing that safely, needs a sustainable way of making changes that does not exist today. That is what the gaps below add up to, and they have nothing to do with the quality of the work that was done, and everything to do with the fact that it was built and operated by one person who is no longer here:
 
 - **No staging environment.** Every change goes directly to production. The current remediation contract names this explicitly as an assumed risk, mitigated with pre-deploy snapshots, because nothing better is available today.
-- **No automated test coverage.** The remediation engagement adds build-verification CI, which confirms the application compiles. It does not confirm the application is correct. That was a deliberate scope boundary, not an oversight.
-- **599 stored-procedure-backed functions carrying core business logic, existing only inside the live RDS database.** They are not in version control. There is no history of who changed what, no way to review a change before it ships, and no way to test one outside production. This is the single largest constraint on both maintainability and scale.
+- **No automated test coverage.** The remediation engagement adds a build-verification step that confirms the application compiles. It does not confirm the application is correct. That was a deliberate scope boundary, not an oversight.
+- **599 stored-procedure-backed functions carrying core business logic, existing only inside the live production database.** They are not in version control. There is no history of who changed what, no way to review a change before it ships, and no way to test one outside production. This is the single largest constraint on both maintainability and scale. Keystone has already built a full inventory of all 599, with a best-effort read on what each one does: [ubility-stored-procedures.md](./ubility-stored-procedures.md). <!-- TODO (Google Docs): relative link won't resolve outside this repo, so attach the file separately or swap in a real URL. This same TODO applies to the matching link in roadmap item 5 below. -->
 - **A single .NET application on one Windows VM with one SQL Server instance.** Everything funnels through it. There is no horizontal scaling path from where it sits today.
 - **No engineer who has the system in their head.** The person who did is gone. Right now the closest thing to institutional knowledge about this platform is the audit and architecture work Keystone has already produced.
 - **No visibility into the business itself.** Revenue billed versus collected, delinquency by property, provider cost trends, none of it exists as a dashboard or a report. Seeing any of it today means writing a one-off database query. There is no observability layer for the business side of the platform, only for whether the servers are up.
@@ -41,6 +41,18 @@ Before any roadmap work starts, the platform has to keep running. That is the ba
 
 - **Nothing moves.** Ubility stays on its current AWS infrastructure. No hosting migration is required, requested, or implied by this proposal. Changing where the platform runs at the same time as changing how it is built would compound risk for no benefit.
 - **Production support is included, not billed separately.** Bugs, incidents, integration failures, and customer-reported issues are handled inside the monthly engagement. There is no separate support contract, and no incentive on our side to classify work one way or the other.
+- **The deploy pipeline built during remediation is the mechanism.** Every change reaches production through a known, repeatable pipeline tied to a specific commit, rather than a manual copy from someone's machine.
+- **Snapshots before every deploy** continue until the staging environment exists, at which point staging replaces them as the primary safety net.
+- **Existing behavior is preserved by default.** Where business logic moves out of a stored procedure, the target is identical output for identical input, verified by tests written against the current behavior before anything is changed. Migration is not an excuse to redesign.
+
+Keystone has already read all six repositories, verified the security findings line by line, and produced the system architecture map. There is no ramp-up period being billed here.
+
+---
+
+## How we work
+
+### Communications
+
 - **A direct line to the people doing the work.** A shared channel connects Ubility staff to Tanner and Alex directly, not a ticket queue that has to escalate before anyone who actually knows the codebase sees it. Both monitor it, so one person being unreachable does not leave Ubility without a way to reach someone.
 - **Automated detection, not waiting for a resident to notice first.** Uptime and health checks against the backend, frontend, and bill-processing pipeline, wired into an alerting tool (PagerDuty or incident.io, whichever fits the budget better) that pages Tanner and Alex directly the moment something fails, rather than relying on a customer complaint or someone happening to check. Set up on the free or low-cost tier of whichever tool is chosen, since monitoring at Ubility's current scale does not need an enterprise incident platform, and included in the monthly engagement rather than billed separately.
 - **Response times, tiered by what's actually broken:**
@@ -51,11 +63,7 @@ Before any roadmap work starts, the platform has to keep running. That is the ba
 | High | A specific feature or integration broken, a workaround exists | Acknowledged by the next business day |
 | Standard | A bug, a small request, a question that isn't blocking day-to-day operation | Handled in the normal weekly cadence alongside roadmap work |
 
-- **The deploy pipeline built during remediation is the mechanism.** Every change reaches production through a known, repeatable pipeline tied to a specific commit, rather than a manual copy from someone's machine.
-- **Snapshots before every deploy** continue until the staging environment exists, at which point staging replaces them as the primary safety net.
-- **Existing behavior is preserved by default.** Where business logic moves out of a stored procedure, the target is identical output for identical input, verified by tests written against the current behavior before anything is changed. Migration is not an excuse to redesign.
-
-Keystone has already read all six repositories, verified the security findings line by line, and produced the system architecture map. There is no ramp-up period being billed here.
+- **A self-serve client portal, in progress.** Keystone is also building a client portal, not something priced into this proposal. Anyone on Ubility's side of this, not just one point of contact, will be able to get their own account with access to see what work is actually happening, leave comments, ask questions, and follow progress in real time, rather than waiting on the monthly written summary. It also carries read-only contract and invoice status. It is still in development, not yet live. Whatever lands from it becomes available to Ubility automatically as it ships, at no additional cost. It is a side benefit of working with Keystone during this period, not the reason to, and it reflects the same transparency the rest of this section is built around.
 
 ---
 
@@ -75,6 +83,8 @@ The tradeoff is that outcome pricing only works if the outcome is specific. That
 
 ### Where the platform is today
 
+<!-- TODO (Google Docs): render this diagram to an image and embed it, since Docs does not render mermaid natively. -->
+
 ```mermaid
 graph TD
     DEV["Developer change"] -->|"no test gate,<br/>no staging"| PROD
@@ -82,7 +92,7 @@ graph TD
     subgraph PROD["Production (only environment)"]
         FE["c4-frontend<br/>Next.js"]
         BE["c4-backend<br/>single Windows VM<br/>no horizontal scaling"]
-        DB[("SQL Server on RDS<br/>599 stored procs<br/>business logic lives here,<br/>not in git")]
+        DB[("SQL Server database<br/>599 stored procs<br/>business logic lives here,<br/>not in git")]
         SC["c4-scrape<br/>synchronous call,<br/>no queue, no retry"]
         EX["c4-extract<br/>Claude bill extraction"]
     end
@@ -102,11 +112,13 @@ Single environment, single backend instance, and the business rules that decide 
 
 ### Where it lands in six months
 
+<!-- TODO (Google Docs): render this diagram to an image and embed it, since Docs does not render mermaid natively. -->
+
 ```mermaid
 graph TD
     DEV["Developer change"] --> CI
 
-    subgraph CI["CI pipeline"]
+    subgraph CI["Automated build & test pipeline"]
         BUILD["Build verification<br/>(delivered in remediation)"]
         TEST["Automated test suite<br/>(added in this engagement)"]
         BUILD --> TEST
@@ -147,11 +159,13 @@ graph TD
     style PRD fill:#f5f5f5,stroke:#999
 ```
 
-One important clarification on scope: the horizontally scaled production topology above is delivered in this engagement as the enabling work (containerized backend build, externalized configuration, stateless session handling, a costed cutover plan with a recommended target). The cutover itself follows the same pattern as every other change in this roadmap: build and prove it in staging first, then stand up production and cut over, never modify the live system in place. It is sequenced by that plan rather than assumed to finish inside the six months, because doing it correctly depends on what the assessment finds. Everything else in the target diagram is committed roadmap scope.
+One important clarification on scope: the horizontally scaled production topology above is delivered in this engagement as the enabling work (packaging the backend so it can run as multiple identical copies, externalizing its configuration, making session state independent of any one instance, and a costed cutover plan with a recommended target). The cutover itself follows the same pattern as every other change in this roadmap: build and prove it in staging first, then stand up production and cut over, never modify the live system in place. It is sequenced by that plan rather than assumed to finish inside the six months, because doing it correctly depends on what the assessment finds. Everything else in the target diagram is committed roadmap scope.
 
 ---
 
 ## The six-month roadmap
+
+<!-- TODO (Google Docs): render this Gantt chart to an image and embed it, since Docs does not render mermaid natively. -->
 
 ```mermaid
 gantt
@@ -162,7 +176,7 @@ gantt
     section Phase A: Foundation
     Staging environment stood up           :a1, 2026-09-08, 35d
     Stored procs extracted into git        :a2, 2026-09-08, 45d
-    Test harness and CI test gate          :a3, 2026-09-22, 40d
+    Test harness and automated test gate    :a3, 2026-09-22, 40d
     Characterization tests, billing path   :a4, 2026-10-06, 30d
 
     section Phase B: Migration and features
@@ -187,10 +201,10 @@ Nothing else on this roadmap is safe to do until this exists.
 | # | Deliverable | Why it is first |
 |---|---|---|
 | 1 | **Staging environment.** A second backend instance and a database restored from the existing daily backup, wired into the deploy pipeline built during remediation. Changes land here before production. | Removes the assumed-risk clause from the remediation contract. Today there is no place to try anything. |
-| 2 | **Every stored procedure extracted into version control.** All 599 procs scripted out of RDS into versioned migration files in git, with the deploy pipeline applying them. No logic is rewritten in this step. | Core business logic currently exists in exactly one place: the live production database. If that instance is lost, the rules for what a resident owes are lost with it. This step alone removes the largest single point of failure on the platform. |
-| 3 | **Automated test harness and CI test gate.** A test project wired into the existing CI so that failing tests block a deploy, upgrading the build-verification pipeline from remediation into an actual correctness check. | The remediation contract explicitly scoped a test suite out. This is where that gap gets closed. |
+| 2 | **Every stored procedure extracted into version control.** All 599 procs scripted out of the production database into versioned migration files in git, with the deploy pipeline applying them. No logic is rewritten in this step. | Core business logic currently exists in exactly one place: the live production database. If that instance is lost, the rules for what a resident owes are lost with it. This step alone removes the largest single point of failure on the platform. |
+| 3 | **Automated test harness and test gate.** A test project wired into the existing build pipeline so that failing tests block a deploy, upgrading the build-verification step from remediation into an actual correctness check. | The remediation contract explicitly scoped a test suite out. This is where that gap gets closed. |
 | 4 | **Characterization tests over the billing calculation path.** Tests written against current behavior, on the highest-traffic path first, so that current output is pinned down before any logic moves. | Migration without a behavioral baseline is a guess. This is what makes Phase B a safe operation instead of a risky one. |
-| 5 | **A written migration plan for the remaining procedures**, ordered by traffic and risk, with each one classified as move, keep, or retire. | Turns 599 procedures from an unbounded problem into a prioritized, finite list Ubility can track progress against. |
+| 5 | **A written migration plan for the remaining procedures**, ordered by traffic and risk, with each one classified as move, keep, or retire, building on the [initial inventory](./ubility-stored-procedures.md) already done. | Turns 599 procedures from an unbounded problem into a prioritized, finite list Ubility can track progress against. |
 
 ### Phase B, months 3 and 4: logic out of the database, first new capability
 
@@ -209,7 +223,7 @@ Nothing else on this roadmap is safe to do until this exists.
 | 11 | **AI bill extraction expanded.** The existing Claude integration in `c4-extract` gets broader utility-provider and bill-format coverage, per-field confidence scoring, and automatic routing of low-confidence extractions into the exception queue from item 8 instead of into the ledger. | This is an existing, working foundation, not a new capability being invented. The gap today is that extraction results are trusted or not trusted with no gradient, and there is nowhere for a doubtful result to go. |
 | 12 | **AI extraction applied to provider invoices**, reusing the same pipeline against the payables side rather than only resident utility bills. | Same machinery, a second revenue-relevant workflow, and meaningfully less manual data entry. |
 | 13 | **Natural-language query over billing and operational data**, including the metrics layer from item 9, for admin staff, scoped to read-only reporting against the data model, so a staff member can ask a question without an engineer writing a report. | Second half of the better-tools ask: instead of only a fixed dashboard, staff can ask a specific question directly. Deliberately scoped read-only. |
-| 14 | **Scale assessment and enabling work.** Containerized backend build, configuration externalized, session state made instance-independent, plus a written assessment with a recommended target topology, a cost comparison, and a sequenced cutover plan. The containerized backend gets built and proven in the staging environment from Phase A first; only once it holds up there does a production instance get stood up and traffic cut over to it, rather than changing the live Windows VM in place. | The current single Windows VM has no horizontal scaling path. This phase makes the backend capable of running as more than one instance and produces the plan for actually doing it, with real numbers attached. |
+| 14 | **Scale assessment and enabling work.** Packaging the backend so it can run as multiple identical copies instead of one, externalizing its configuration, making session state independent of any single copy, plus a written assessment with a recommended target setup, a cost comparison, and a sequenced cutover plan. This new version of the backend gets built and proven in the staging environment from Phase A first; only once it holds up there does a production copy get stood up and traffic cut over to it, rather than changing the live Windows VM in place. | The current single Windows VM has no horizontal scaling path. This phase makes the backend capable of running as more than one instance and produces the plan for actually doing it, with real numbers attached. |
 | 15 | **Performance work on the paths surfaced by the assessment**, now measurable because the logic is in code and covered by tests. | Optimizing stored procedures nobody can test is guesswork. By month 5, it is not. |
 
 Every item above traces back to a specific finding in the security audit or the system architecture map already delivered. None of it is generic modernization work.
@@ -222,9 +236,9 @@ Two separate answers, because they are two separate things.
 
 **In the product.** Ubility already runs Claude in production through `c4-extract` for utility bill extraction. That is a real foundation and the reason the AI items on this roadmap are extensions rather than experiments. The roadmap expands it along the axes that actually reduce manual work: more bill formats, confidence scoring so uncertain results are routed to a human instead of silently accepted, the same pipeline applied to provider invoices, and natural-language reporting for admin staff. The constraint we hold to is that AI output touching billing data is either verified by a deterministic check or routed to a person, never written straight to the ledger on confidence alone.
 
-**One thing we don't yet know, and will confirm early.** The `ANTHROPIC_API_KEY` currently in production is a single, shared credential, but its provenance is not confirmed from the repos alone: whose account it is billed to, what usage tier or rate limits it runs under, and whether it is still tied to the prior engineer personally rather than a Ubility-owned account. That last possibility deserves the same treatment as the other credentials already being rotated in the remediation work: a key tied to a person who is no longer here is a real operational risk, not just an administrative detail. Confirming ownership, and re-provisioning under a Ubility-owned account if needed, happens early rather than being left as an assumption.
+**One thing we don't yet know, and will confirm early.** The Anthropic (Claude) API key currently in production is a single, shared credential, but where it actually comes from is not confirmed from the repos alone: whose account it is billed to, what usage limits it runs under, and whether it is still tied to the prior engineer personally rather than a Ubility-owned account. That last possibility deserves the same treatment as the other credentials already being rotated in the remediation work: a key tied to a person who is no longer here is a real operational risk, not just an administrative detail. Confirming ownership, and moving it to a Ubility-owned account if needed, happens early rather than being left as an assumption.
 
-**Cost is worth a second look alongside correctness.** The service already tracks estimated spend per invoice, by model and by token count, which is a useful thing to already have. Once the key's ownership is confirmed, the same roadmap work is a natural point to check whether the current setup is the cheapest way to hit the same accuracy: caching the repeated system prompt and extraction instructions, batching extraction work that does not need real-time latency, and confirming Sonnet is actually the right default rather than a carryover choice, versus reserving it for chunks a cheaper pass cannot handle. Nothing here is a committed savings number. It is a real lever worth checking once the current baseline is confirmed, not assumed to already be optimal.
+**Cost is worth a second look alongside correctness.** The service already tracks estimated spend on every extraction, which is a useful thing to already have. Once the key's ownership is confirmed, the same roadmap work is a natural point to check whether the current setup is the cheapest way to get the same accuracy: not paying to re-send the same instructions on every single call, processing work that isn't time-sensitive in a cheaper batch mode instead of paying for an instant answer every time, and confirming the more expensive AI model is only used where a cheaper one genuinely cannot do the job, not by default. Nothing here is a committed savings number. It is a real lever worth checking once the current baseline is confirmed, not assumed to already be optimal.
 
 **In how the work gets done.** Keystone uses AI tooling heavily in its own engineering process, which is part of why two senior engineers can commit to this volume of work. The stored-procedure migration in particular is high-volume mechanical translation with high consequence for getting it wrong, which is exactly the shape of work where tooling handles the volume and senior review handles the judgment. That leverage is why this is offered as a fixed roadmap rather than an open-ended hours arrangement. It is not the reason to hire Keystone, and it does not replace the tests, the staging environment, or the review that catch the cases where the tooling is confidently wrong.
 
@@ -307,9 +321,9 @@ This is a stated goal of the engagement, not a side effect of it. When the six m
 | Stored procedures extracted into version control | A new engineer can read the business rules in git instead of having to be granted production database access and reverse-engineer them |
 | Business logic moved into application code with tests | The rules become reviewable and verifiable by someone who was not here when they were written |
 | Staging environment | A new engineer can learn the system by trying things, without their learning curve running through production |
-| Automated test suite | A new engineer finds out they broke something from CI rather than from a customer |
+| Automated test suite | A new engineer finds out they broke something from the automated tests rather than from a customer |
 | Architecture and system documentation kept current | The knowledge exists in a document instead of in one person's head, which is precisely the failure Ubility is recovering from now |
-| Containerized backend build, externalized configuration | The application can be stood up somewhere else by someone else, rather than being tied to one hand-configured machine |
+| Packaging the backend so it can run as multiple identical copies, with its configuration externalized | The application can be stood up somewhere else by someone else, rather than being tied to one hand-configured machine |
 
 Every one of those is a handoff asset first and a productivity improvement second.
 
