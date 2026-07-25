@@ -53,8 +53,8 @@ Keystone has already read all six repositories, verified the security findings l
 
 ### Communications
 
-- **A direct line to the people doing the work.** A shared channel connects Ubility staff to Tanner and Alex directly, not a ticket queue that has to escalate before anyone who actually knows the codebase sees it. Both monitor it, so one person being unreachable does not leave Ubility without a way to reach someone.
-- **Automated detection, not waiting for a resident to notice first.** Uptime and health checks against the backend, frontend, and bill-processing pipeline, wired into an alerting tool (PagerDuty or incident.io, whichever fits the budget better) that pages Tanner and Alex directly the moment something fails, rather than relying on a customer complaint or someone happening to check. Set up on the free or low-cost tier of whichever tool is chosen, since monitoring at Ubility's current scale does not need an enterprise incident platform, and included in the monthly engagement rather than billed separately.
+- **A direct line to the people doing the work.** A shared channel connects Ubility staff to the Keystone team directly, not a ticket queue that has to escalate before anyone who actually knows the codebase sees it. The team monitors it together, so one person being unreachable does not leave Ubility without a way to reach someone.
+- **Automated detection, not waiting for a resident to notice first.** Uptime and health checks against the backend, frontend, and bill-processing pipeline, wired into an alerting tool (PagerDuty or incident.io, whichever fits the budget better) that pages the Keystone team directly the moment something fails, rather than relying on a customer complaint or someone happening to check. Set up on the free or low-cost tier of whichever tool is chosen, since monitoring at Ubility's current scale does not need an enterprise incident platform, and included in the monthly engagement rather than billed separately.
 - **Response times, tiered by what's actually broken:**
 
 | Severity | What it looks like | Response |
@@ -246,9 +246,9 @@ Two separate answers, because they are two separate things.
 
 ## Who does the work
 
-Tanner and Alex are both actively working on this engagement and have been through the full six-repository audit, the independent verification of the security review, and the architecture mapping.
+The Keystone team working on this engagement has been through the full six-repository audit, the independent verification of the security review, and the architecture mapping.
 
-Both have led engineering on systems where getting it wrong is not an option. Tanner led engineering on Stripe's core payments infrastructure and was a Principal Engineer at Microsoft. Alex built and led the software that manages Amazon's satellite fleet. Both come out of environments moving billions of transactions a day, where scale, durability, security, and correctness are not features added later, they are load-bearing from the start, because at that scale the failure mode is a public outage, not a bug ticket. That is the same discipline applied here, just on a platform sized very differently: the habits that keep a payments network and a satellite fleet running show up here as a bill calculated correctly and a change that does not take the platform down.
+That team has led engineering on systems where getting it wrong is not an option. Tanner led engineering on Stripe's core payments infrastructure and was a Principal Engineer at Microsoft. Alex built and led the software that manages Amazon's satellite fleet. Both come out of environments moving billions of transactions a day, where scale, durability, security, and correctness are not features added later, they are load-bearing from the start, because at that scale the failure mode is a public outage, not a bug ticket. That is the same discipline applied here, just on a platform sized very differently: the habits that keep a payments network and a satellite fleet running show up here as a bill calculated correctly and a change that does not take the platform down.
 
 Keystone maintains a small network of equally experienced independent engineers who are brought in when a piece of work calls for surge capacity or specific expertise. Engagements stay founder-scoped: Tanner scopes the work and decides who is looped in.
 
