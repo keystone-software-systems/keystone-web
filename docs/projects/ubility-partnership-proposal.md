@@ -10,7 +10,7 @@ Ubility has a working product with real customers, real revenue, and real third-
 
 Worth stating plainly before anything else: this platform has been stable for months with nobody actively maintaining it. Nothing has broken on its own. Whatever else is true about how it was built, the parts that are running work.
 
-Part of why it has stayed stable is that nothing new has been added to it. No changes means nothing has had the chance to break. Building it out further, and doing that safely, needs a sustainable way of making changes that does not exist today. That is what the gaps below add up to, and they have nothing to do with the quality of the work that was done, and everything to do with the fact that it was built and operated by one person who is no longer here:
+Part of why it has stayed stable is that nothing new has been added to it. No changes means nothing has had the chance to break. Building it out further, and doing that safely, needs a sustainable way of making changes that does not exist today. That is what the gaps below add up to, and they have nothing to do with the quality of the work that was done:
 
 - **No staging environment.** Every change goes directly to production. The current remediation contract names this explicitly as an assumed risk, mitigated with pre-deploy snapshots, because nothing better is available today.
 - **No automated test coverage.** The remediation engagement adds a build-verification step that confirms the application compiles. It does not confirm the application is correct. That was a deliberate scope boundary, not an oversight.
@@ -19,7 +19,7 @@ Part of why it has stayed stable is that nothing new has been added to it. No ch
 - **No engineer who has the system in their head.** The person who did is gone. Right now the closest thing to institutional knowledge about this platform is the audit and architecture work Keystone has already produced.
 - **No visibility into the business itself.** Revenue billed versus collected, delinquency by property, provider cost trends, none of it exists as a dashboard or a report. Seeing any of it today means writing a one-off database query. There is no observability layer for the business side of the platform, only for whether the servers are up.
 
-The remediation engagement closes the security holes and puts a real build-and-deploy pipeline underneath the platform. That is the floor. It is not a platform that can absorb new features, new customers, or new load without something breaking.
+The remediation engagement closes the security holes and puts a real build-and-deploy pipeline underneath the platform. That is the floor. It is not a platform that can absorb new features, new customers, or new load without something breaking. Every additional month in that condition is a month where a database incident, a bad manual deploy, or a misunderstood billing rule has no safety net underneath it.
 
 This proposal covers what comes after: six months of committed work to move Ubility from a system that one person maintained by hand into a platform a team can safely change, test, and grow.
 
@@ -27,11 +27,11 @@ This proposal covers what comes after: six months of committed work to move Ubil
 
 ## What kind of relationship this is
 
-Said plainly up front: the goal is a long-term partnership, not a single project. The roadmap, the pricing, and how support is handled below are all built on that assumption.
+The goal is a long-term partnership, not a single project. The roadmap, the pricing, and how support is handled below are all built on that assumption.
 
-That goal is also why this proposal does not lock Ubility in. A relationship that only survives because leaving costs more than staying isn't really a partnership. Keystone would rather earn next month's work than make this month's work expensive to walk away from. That is the reasoning behind staying on Ubility's own infrastructure, behind moving business logic out of one person's head and into something documented and version-controlled, and behind both pricing options below ending cleanly whenever Ubility wants them to. The Portability section later in this document covers exactly how that gets built in, not just promised.
+That goal is also why this proposal does not lock Ubility in. A relationship that only survives because leaving costs more than staying isn't really a partnership. Keystone would rather earn next month's work than make this month's work expensive to walk away from. The Portability section later in this document covers exactly how that gets built in, not just promised.
 
-If this becomes a multi-year relationship, which is the intent, it will be because it kept earning that every month, not because Ubility ran out of ways to leave.
+At the end of these six months, the plan is to sit down together, look at what Ubility actually needs from there, and decide the path forward, rather than assume it by default. The goal is the long-term partnership itself, not just this six months of it.
 
 ---
 
@@ -54,7 +54,7 @@ Keystone has already read all six repositories, verified the security findings l
 ### Communications
 
 - **A direct line to the people doing the work.** A shared channel connects Ubility staff to the Keystone team directly, not a ticket queue that has to escalate before anyone who actually knows the codebase sees it. The team monitors it together, so one person being unreachable does not leave Ubility without a way to reach someone.
-- **Automated detection, not waiting for a resident to notice first.** Uptime and health checks against the backend, frontend, and bill-processing pipeline, wired into an alerting tool (PagerDuty or incident.io, whichever fits the budget better) that pages the Keystone team directly the moment something fails, rather than relying on a customer complaint or someone happening to check. Set up on the free or low-cost tier of whichever tool is chosen, since monitoring at Ubility's current scale does not need an enterprise incident platform, and included in the monthly engagement rather than billed separately.
+- **Automated detection, not waiting for a resident to notice first.** Uptime and health checks against the backend, frontend, and bill-processing pipeline, wired into an alerting tool (PagerDuty or incident.io, whichever fits the budget better) that pages the Keystone team directly the moment something fails, rather than relying on a customer complaint or someone happening to check. Set up on the free or low-cost tier of whichever tool is chosen, since monitoring at Ubility's current scale does not need an enterprise incident platform.
 - **Response times, tiered by what's actually broken:**
 
 | Severity | What it looks like | Response |
@@ -63,7 +63,7 @@ Keystone has already read all six repositories, verified the security findings l
 | High | A specific feature or integration broken, a workaround exists | Acknowledged by the next business day |
 | Standard | A bug, a small request, a question that isn't blocking day-to-day operation | Handled in the normal weekly cadence alongside roadmap work |
 
-- **A self-serve client portal, coming soon.** Keystone is building a client portal, included in this partnership at no additional cost, not something that turns into a paid add-on later. Anyone on Ubility's side of this, not just one point of contact, will be able to get their own account with access to see what work is actually happening, leave comments, ask questions, and follow progress in real time, rather than waiting on the monthly written summary. It also carries read-only contract and invoice status. It is on track to be ready soon, and it comes online automatically for Ubility the moment it is, at no extra charge. It is a side benefit of working with Keystone during this period, not the reason to, and it reflects the same transparency the rest of this section is built around.
+- **A self-serve client portal, coming soon.** Keystone is building a client portal, included in this partnership at no additional cost, not something that turns into a paid add-on later. Anyone on Ubility's side of this, not just one point of contact, will be able to get their own account with access to see what work is actually happening, leave comments, ask questions, and follow progress in real time, rather than waiting on the monthly written summary. It also carries read-only contract and invoice status. It is on track to be ready soon and comes online automatically the moment it is. It is a side benefit of working with Keystone, not the reason to.
 
 ---
 
@@ -177,7 +177,7 @@ graph TD
     style OPS fill:#e3f7e3,stroke:#0ca30c,color:#0b4d0b
 ```
 
-One important clarification on scope: the horizontally scaled production topology above is delivered in this engagement as the enabling work (packaging the backend so it can run as multiple identical copies, externalizing its configuration, making session state independent of any one instance, and a costed cutover plan with a recommended target). The cutover itself follows the same pattern as every other change in this roadmap: build and prove it in staging first, then stand up production and cut over, never modify the live system in place. It is sequenced by that plan rather than assumed to finish inside the six months, because doing it correctly depends on what the assessment finds. Everything else in the target diagram is committed roadmap scope.
+One important clarification on scope: the horizontally scaled production topology above is delivered in this engagement as the enabling work (packaging the backend so it can run as multiple identical copies, externalizing its configuration, making session state independent of any one instance, and a costed cutover plan with a recommended target). The cutover itself is sequenced by that plan rather than assumed to finish inside the six months, because doing it correctly depends on what the assessment finds. Everything else in the target diagram is committed roadmap scope.
 
 ---
 
@@ -256,7 +256,7 @@ Two separate answers, because they are two separate things.
 
 **One thing we don't yet know, and will confirm early.** The Anthropic (Claude) API key currently in production is a single, shared credential, but where it actually comes from is not confirmed from the repos alone: whose account it is billed to, what usage limits it runs under, and whether it is still tied to the prior engineer personally rather than a Ubility-owned account. That last possibility deserves the same treatment as the other credentials already being rotated in the remediation work: a key tied to a person who is no longer here is a real operational risk, not just an administrative detail. Confirming ownership, and moving it to a Ubility-owned account if needed, happens early rather than being left as an assumption.
 
-**Cost is worth a second look alongside correctness.** The service already tracks estimated spend on every extraction, which is a useful thing to already have. Once the key's ownership is confirmed, the same roadmap work is a natural point to check whether the current setup is the cheapest way to get the same accuracy: not paying to re-send the same instructions on every single call, processing work that isn't time-sensitive in a cheaper batch mode instead of paying for an instant answer every time, and confirming the more expensive AI model is only used where a cheaper one genuinely cannot do the job, not by default. Nothing here is a committed savings number. It is a real lever worth checking once the current baseline is confirmed, not assumed to already be optimal.
+**Cost is worth a second look alongside correctness.** The service already tracks estimated spend on every extraction, which is a useful thing to already have. Once the key's ownership is confirmed, the same roadmap work is a natural point to check whether the current setup is the cheapest way to get the same accuracy: not paying to re-send the same instructions on every single call, processing work that isn't time-sensitive in a cheaper batch mode instead of paying for an instant answer every time, and confirming the more expensive AI model is only used where a cheaper one genuinely cannot do the job, not by default. Nothing here is a committed savings number, just a real lever worth checking once the current baseline is confirmed.
 
 **In how the work gets done.** Keystone uses AI tooling heavily in its own engineering process, which is part of why two senior engineers can commit to this volume of work. The stored-procedure migration in particular is high-volume mechanical translation with high consequence for getting it wrong, which is exactly the shape of work where tooling handles the volume and senior review handles the judgment. That leverage is why this is offered as a fixed roadmap rather than an open-ended hours arrangement. It is not the reason to hire Keystone, and it does not replace the tests, the staging environment, or the review that catch the cases where the tooling is confidently wrong.
 
@@ -266,7 +266,7 @@ Two separate answers, because they are two separate things.
 
 The Keystone team working on this engagement has been through the full six-repository audit, the independent verification of the security review, and the architecture mapping.
 
-That team has led engineering on systems where getting it wrong is not an option. Tanner led engineering on Stripe's core payments infrastructure and was a Principal Engineer at Microsoft. Alex built and led the software that manages Amazon's satellite fleet. Both come out of environments moving billions of transactions a day, where scale, durability, security, and correctness are not features added later, they are load-bearing from the start, because at that scale the failure mode is a public outage, not a bug ticket. That is the same discipline applied here, just on a platform sized very differently: the habits that keep a payments network and a satellite fleet running show up here as a bill calculated correctly and a change that does not take the platform down.
+That team has built production systems where getting it wrong is not an option. Tanner was an individual contributor on Stripe's core payments infrastructure and a Principal Engineer at Microsoft. Alex was an individual contributor on the software that manages Amazon's satellite fleet, and has led individual projects there. That same discipline applied to a platform this size looks like a bill calculated correctly and a change that does not take the platform down.
 
 Keystone maintains a small network of equally experienced independent engineers who are brought in when a piece of work calls for surge capacity or specific expertise. Engagements stay founder-scoped: Tanner scopes the work and decides who is looped in.
 
@@ -305,24 +305,11 @@ Same roadmap, same phase sequence, same included production support. Ubility can
 
 ### What is committed and what is held back
 
-Under either option, the named deliverables above are scoped to roughly four fifths of each month's capacity. The remainder is deliberately unallocated and held for production incidents, customer-reported bugs, requests that come up mid-month, and the discovery work that legacy systems reliably produce. That reserve is why a production issue in week two does not push a roadmap deliverable into the next month, and why an unexpected request does not require a change order.
+Under either option, the named deliverables above are scoped to roughly four fifths of each month's capacity. The remaining fifth is kept open on purpose, for Ubility's benefit, not Keystone's: ad-hoc requests, feedback on work in progress, a production incident, a bug a resident reports, whatever comes up that wasn't on the roadmap when it was written. That reserve is why a production issue in week two does not push a roadmap deliverable into the next month, and why an unexpected request does not require a change order.
+
+This is also where fixed-outcome pricing pays off in a way hourly billing never does. If a phase finishes ahead of schedule, Ubility isn't paying for idle time, and Keystone isn't waiting around for more to bill. Both sides want the same thing: the roadmap done well, and done as fast as that allows.
 
 Work that falls genuinely outside the roadmap (a new integration with a property-management system not already connected, the scale cutover itself once the plan is approved, a database platform migration) is flagged and scoped before anything is started, never billed after the fact.
-
----
-
-## What Ubility gets that is durable
-
-Independent of how long the engagement runs, each of these is an asset that stays:
-
-- **Business logic in version control.** Reviewable, testable, and recoverable if the database instance is not.
-- **A staging environment.** A place to try a change before customers see it.
-- **A test suite that blocks bad deploys**, growing with each phase rather than existing as a one-time artifact.
-- **A pipeline and business metrics dashboard** that lets operations staff act on failed bill fetches and lets leadership see revenue, collections, and property-level performance, without an engineer pulling either by hand.
-- **Architecture and system documentation** kept current as the platform changes, extending the document already delivered.
-- **A costed, sequenced scale plan** with a recommended target, usable whether Keystone executes it or someone else does.
-
-Handoff is the default posture at Keystone. Everything above is built so that Ubility, or whoever Ubility hires next, is not dependent on us to keep it running.
 
 ---
 
@@ -332,7 +319,7 @@ This is a stated goal of the engagement, not a side effect of it. When the six m
 
 **Everything stays on infrastructure Ubility owns.** The code stays in Ubility's own repositories. The platform stays in Ubility's own AWS account, under Ubility's own billing relationship, with Ubility holding root access. Keystone works inside those accounts rather than moving anything into a Keystone-controlled environment. There is nothing in this proposal that Ubility would have to migrate off of in order to stop working with Keystone.
 
-**The modernization work is what creates the portability.** This is worth being explicit about, because the two goals are the same goal:
+**The modernization work is what creates the portability, and it's the same list of what stays behind as a durable asset regardless of how long this engagement runs.** This is worth being explicit about, because the two goals are the same goal:
 
 | Roadmap item | What it does for portability |
 |---|---|
@@ -340,22 +327,20 @@ This is a stated goal of the engagement, not a side effect of it. When the six m
 | Business logic moved into application code with tests | The rules become reviewable and verifiable by someone who was not here when they were written |
 | Staging environment | A new engineer can learn the system by trying things, without their learning curve running through production |
 | Automated test suite | A new engineer finds out they broke something from the automated tests rather than from a customer |
-| Architecture and system documentation kept current | The knowledge exists in a document instead of in one person's head, which is precisely the failure Ubility is recovering from now |
+| Architecture and system documentation kept current | The knowledge exists in a document instead of in one person's head |
 | Packaging the backend so it can run as multiple identical copies, with its configuration externalized | The application can be stood up somewhere else by someone else, rather than being tied to one hand-configured machine |
+| Operations and business metrics dashboard | Whoever runs this platform next can see what's happening in it without asking an engineer to pull a report by hand |
+| Costed, sequenced scale plan | Usable whether Keystone executes it or someone else does |
 
-Every one of those is a handoff asset first and a productivity improvement second.
+Handoff is the default posture at Keystone. Everything above is built so that Ubility, or whoever Ubility hires next, is not dependent on us to keep it running.
 
-**Why this cuts the other way for a hosting-bundled arrangement.** An offer that requires moving hosting onto the vendor's own platform makes leaving expensive by design. If that relationship changes for any reason, including reasons that have nothing to do with anyone's performance (the assigned engineer leaves, the vendor's priorities shift, pricing changes), Ubility is looking at an infrastructure migration on top of finding new engineering help, at the exact moment it has the least capacity to absorb either. The dependency is not on the engineering. It is on the hosting, and it survives after the engineering relationship ends.
+**Two decisions, not one.** Who maintains this platform and where it runs are separate questions. They do not need the same answer. An offer that bundles them together, like the hosting-bundled arrangement under consideration, makes leaving expensive by design: if that relationship ever changes, for any reason, Ubility is looking at an infrastructure migration on top of finding new engineering help, at the exact moment it has the least capacity to absorb either. This proposal keeps the two decoupled on purpose. Ubility can change engineering partners without touching infrastructure, and can change infrastructure without touching the engineering relationship, because neither one is a condition of the other.
 
 Leaving the platform as it is today has the same shape of problem for a different reason: undocumented business logic living only in a production database means whoever touches it next has leverage over Ubility, whether that is Keystone or anyone else. Ubility's negotiating position with every future engineer is set by how legible the platform is.
 
-**Two decisions, not one.** Who maintains this platform and where it runs are separate questions. They do not need the same answer, and bundling them together is what makes a hosting-bundled offer expensive to walk away from. If Ubility becomes unhappy with the engineering side, it is also stuck re-litigating the hosting side at the same time, starting from scratch. This proposal keeps the two decoupled on purpose. Ubility can change engineering partners without touching infrastructure, and can change infrastructure without touching the engineering relationship, because neither one is a condition of the other.
+**This works whether Ubility ever leaves unhappy or simply outgrows needing outside help.** If Ubility scales the way this roadmap is built to support, at some point it may make more sense to bring engineering in-house entirely, and that is not a failure of this engagement, it is what success looks like. Because the code and infrastructure stay in Ubility's own accounts and the business logic lives in reviewable, tested application code rather than in anyone's head, that transition is exactly as clean as the one described above.
 
-**Where it runs is its own decision, independent of who runs it.** The dedicated-headcount offer under consideration moves Ubility onto the vendor's own infrastructure: two data centers, both in Utah. That is a materially different category of infrastructure from a hyperscale cloud provider. AWS and Azure each operate dozens of physically distinct data centers across many regions, with a scale and reliability record no single company's own two facilities can match, regardless of how long that company has been running them. If the goal is to keep Ubility running, the difference may not matter day to day. If the goal is to scale this nationwide, the infrastructure foundation is as much a scale decision as the engineering is, and a small company's own data center is a ceiling on that regardless of the quality of their maintenance work. Staying on AWS, or moving to Azure if that ever made sense, keeps that ceiling as high as it can be and keeps it Ubility's decision to make, not a byproduct of who happens to be maintaining the platform this year.
-
-**This same decoupling covers the good version of leaving, not just the bad one.** Everything above assumes something went wrong with the engineering relationship. There is a second, better reason this matters: if Ubility scales the way this roadmap is built to support, at some point it may make more sense to bring engineering in-house than to keep relying on an outside firm at all. That is not a failure of this engagement, it is what success looks like. A company running its own infrastructure with its own engineering team has no real use for an outside contractor managing it for them. Because the code and infrastructure stay in Ubility's own accounts throughout, and the business logic lives in reviewable, tested application code rather than in anyone's head, that transition is exactly as clean as the one described above. Decoupling who maintains the platform from where it runs makes both versions of parting ways equally straightforward, whether it's driven by dissatisfaction or by outgrowing the need for outside help.
-
-**The test to hold this proposal to:** at any point during or after this engagement, could Ubility hand these repositories and this AWS account to a new firm and have them productive without Keystone's cooperation? If the answer is yes, the work is doing what it should. That is the state this roadmap is built to reach, and Ubility should feel free to check it against that standard at each phase boundary.
+**The test to hold this proposal to:** at any point during or after this engagement, could Ubility hand these repositories and this AWS account to a new firm and have them productive without Keystone's cooperation? If the answer is yes, the work is doing what it should. That is the state this roadmap is built to reach.
 
 ---
 
@@ -375,21 +360,9 @@ Ubility is weighing this against a dedicated junior engineer bundled with a host
 | **Cost of ending the relationship** | An infrastructure migration off the vendor's platform, on top of finding new engineering help | Nothing to migrate. Code and infrastructure stay in Ubility's own accounts throughout. |
 | **Effect on future options** | Ubility becomes more dependent on one vendor over time | Ubility becomes handoff-ready to any firm over time (see the portability section above) |
 
+Worth spelling out beyond the table: the dedicated-headcount offer moves Ubility onto that vendor's own two data centers, both in Utah, not a hyperscale cloud provider. That may not matter for day-to-day stability, but if the goal is to scale nationwide, that infrastructure choice is as much a scale decision as who's doing the engineering.
+
 Put simply: if what Ubility needs is a steady volume of smaller fixes handled and the hosting move works for the business, dedicated junior headcount is a reasonable way to get that. The difference shows up earlier than that, in deciding which of the 599 stored procedures move first, which stay as they are, and in what order, so a resident's bill doesn't come out wrong along the way. Those are exactly the decisions Phase A is built around, and they benefit from senior judgment from the start.
-
----
-
-## Why the timing matters
-
-Not as a sales point, just as a description of the current state:
-
-- Business logic for how customers are billed exists in one live database, not in version control.
-- There is no environment in which a change can be tested before customers see it.
-- There is no automated check that a change is correct, only that it compiles.
-- The one person who understood the system end to end is gone, and the platform has been without a maintainer for months.
-- Every additional month in that condition is a month where a database incident, a bad manual deploy, or a misunderstood billing rule has no safety net underneath it.
-
-Phase A exists specifically to remove those conditions, which is why it comes before any feature work regardless of which pricing structure Ubility picks.
 
 ---
 
