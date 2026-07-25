@@ -1,0 +1,20 @@
+- markdown rendering - especially mermaid diagrams
+- MCP server so that claude can write files directly to the server
+- give customers links to the project and the associated files
+- kanban-style board for customers to see their own project
+- connect a repo (maybe)
+- tasks for a project and status of those tasks
+- conversation on a project
+- MCP from notion 
+- contracts for a project
+  - initial contract
+  - extensions of work
+- stripe subscriptions for retainers
+- PDF rendering for contracts
+  - zoho?
+    - easiest to scale probably
+  - google doc?
+- all in one toolbox for software engineering consultancy
+- page for a company (person's company) to submit a project
+- issues with a developer and a project share with keystone
+- 
