@@ -1,13 +1,56 @@
 # Ubility: Stored Procedure Inventory
 
-This is a full inventory of every stored procedure referenced in the `c4-backend` repo (EF6 Database-First `.edmx` model files, plus raw `EXEC`-style invocations through the codebase's own `BulkSqlUpdates.CallStoredProc` helper). It is prep material for the "extract all stored procedures into version control" phase of the modernization roadmap: a working list of what exists, where it's called from, and a best-effort read on what each one does, so the actual extraction work has a map to follow instead of starting blind.
+This document lists every stored procedure Keystone found referenced in Ubility's backend code (`c4-backend`), along with a best-effort read on what each one likely does. It exists to support one specific piece of the modernization roadmap: moving business logic out of the database and into regular, reviewable application code. Before that move can happen safely, Keystone needed a full map of what currently exists.
 
-**Limitation, stated plainly:** there is no access to the live production RDS database for this pass, so nothing here comes from an actual procedure body. Every "Inferred Intent" and "Confidence" call is built entirely from what's visible in this git repo: the procedure's name, its parameter list (name and SQL type, pulled straight from the `.edmx` `StorageModels` `<Function>` definitions), the C# method name EF6 maps it to (`FunctionImportMapping`), and the surrounding code at each call site. This is not a behavioral spec. Treat every row as a hypothesis to confirm once the actual `CREATE PROCEDURE` bodies are pulled from the database, not as ground truth.
+The next few sections explain the underlying concept in plain terms, for anyone reading this who isn't an engineer. The full technical methodology and the procedure-by-procedure tables follow after that.
+
+---
+
+## What is a stored procedure?
+
+Most of the time, when software needs to do something (calculate a bill, look up a resident's account, send data to a report), the instructions for how to do that live in the application's own code, the same code engineers write, review, and track changes to.
+
+A stored procedure works differently: it is a small program that lives inside the database itself, rather than in the application's code. Instead of the application doing the work and then asking the database for raw numbers, the database is told to run its own built-in set of instructions and hand back a finished answer.
+
+This is a completely normal thing to do, especially for a smaller system or one built quickly by a single person. Stored procedures are fast to write and sit close to the data, and they were an especially common pattern for the kind of Microsoft-centered stack Ubility is built on.
+
+## Why heavy reliance on stored procedures can be a problem
+
+The tradeoff shows up as a system grows. A stored procedure lives inside the database, not in the application's own code, which means:
+
+- **It is not reviewed the way other code is.** Nobody can look at a proposed change the way a reviewer would normally look at a code change, because it does not live anywhere a reviewer would look.
+- **It has no change history.** There is no record of who changed a given procedure, when, or why. If something breaks, there is no way to see what changed recently.
+- **It cannot be tested outside of production.** Application code can normally be tested on its own before it ever touches a real customer's data. A stored procedure can really only be tested against the live database.
+- **It takes a narrower, specific skill to touch safely.** Editing one means knowing SQL specifically, not just the application's main programming language, which shrinks the number of people who can safely maintain it.
+- **The application's own record of it can quietly drift from what's actually in the database.** Nothing forces the description of a stored procedure that the application code keeps on file to stay in sync with the real procedure sitting in the database. The two can disagree for a long time with nobody noticing, until something breaks. This document has already found a concrete example of exactly that inside Ubility's own code, described further down.
+
+None of this is a problem with a handful of these. It becomes a real, growing tax once there are hundreds of them, spread across a business with no single up-to-date list of what exists, what calls what, or what would break if one changed. That is the situation described below.
+
+## What we found in Ubility's system, in plain terms
+
+Ubility's backend relies on **599 separate stored procedures** to run core parts of the business: calculating resident bills, processing payments to utility providers, tracking maintenance tickets, reading meter data, and more. All 599 currently exist only inside the live database, not as reviewable code anywhere in the application's own codebase.
+
+That is the exact pattern described above, at real scale. It is the single biggest reason a change to how the platform handles billing, payments, or anything else covered by these procedures cannot currently be made with real confidence that nothing else breaks.
+
+## An important limitation: this is inferred, not confirmed
+
+Keystone does not have access to Ubility's live production database. Everything in this document comes from what is visible in the application's own code: the name of each procedure, what data it expects, and where in the code it gets called. Keystone has not read the actual SQL instructions inside a single one of these 599 procedures.
+
+That means every entry in the "Inferred Intent" column below is a best-effort, educated read, not a confirmed description of what a procedure actually does. Every row should be treated as a hypothesis to verify once there is real access to the database and each procedure can actually be read, not as settled fact.
+
+This limitation is not just caution for its own sake. The "Red flags" section near the end of this document describes two procedures where the application's own code disagrees with itself about what the procedure expects, because two different files describing it were never kept in sync. That is the drift problem described above, already found, not a hypothetical one. It means even the parameter lists and descriptions in this document are only as reliable as the application's own, possibly outdated, record of the database, not the database itself.
+
+---
+
+## Technical details
+
+*This section is written for a technical reader and goes deeper into exactly how this inventory was built. Skip ahead to the procedure tables below if that level of detail isn't useful to you.*
 
 **Actual count vs. the ~480 estimate:** the prior audit's "480 or more" figure was based on EF6 function imports, and that number holds up well: this pass found **473 distinct procedures** declared and mapped across the five `.edmx` models (`CoreModel`, `ImportModel`, `LogsModel`, `SharedModel`, `Api/ApiModel`), which is squarely in line with "480 or more." What that prior figure missed is a second, entirely separate invocation path: a generic ADO.NET helper, `Models/BulkSqlUpdates.CallStoredProc(db, "spProcName", parameters, ...)`, called from about 125 sites across `ViewModels/`, `Models/`, `ThirdParty/`, and `API/Admin/`, that runs stored procedures by string literal with no EF6 model behind them at all. That path accounts for **122 additional distinct procedures** not represented in any `.edmx` file (4 more procedure names are called both ways and are counted once). Total, deduplicated: **599 distinct stored procedures** confirmed referenced somewhere in this repo, about 25% more than the "480 or more" figure implied, because that figure was only ever counting one of the two call paths into the database. No other raw-SQL mechanisms (Dapper, ad hoc `SqlCommand`/`ExecuteReader`, string-built `EXEC` statements) turned up in a repo-wide search beyond that one helper class.
 
 **Coverage:** this is a complete pass, not a sample. Every `<Function>` definition in all five `.edmx` files was extracted mechanically (structural XML parsing, not manual reading), matched against its `FunctionImportMapping` C# method name, and then cross-referenced against a full repo-wide scan for call sites of that method. Every call site of `BulkSqlUpdates.CallStoredProc` was located and its literal procedure-name argument extracted the same way. All 599 distinct procedures found are listed below with an inferred intent and a confidence rating; none were dropped for scope reasons. What's genuinely partial: for procedures called only through `CallStoredProc`, parameter types aren't available (the `.edmx` files don't cover them, and the call sites often build parameters dynamically via reflection or table-valued parameters rather than literal `SqlParameter` constructors), so those rows list parameter names only, or note that none could be extracted. Confidence ratings are honest about this: a name-only guess is marked Low, a name-plus-params-plus-call-site match is marked High, everything in between is Medium.
 
+---
 
 ## Resident Billing (157 procedures)
 
