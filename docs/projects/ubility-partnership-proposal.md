@@ -8,7 +8,7 @@
 
 Ubility has a working product with real customers, real revenue, and real third-party integrations.
 
-Worth stating plainly before anything else: this platform has been stable for months with nobody actively maintaining it. That says something good about how it was originally built.
+Worth stating plainly before anything else: this platform has been stable for months with nobody actively maintaining it. Nothing has broken on its own. Whatever else is true about how it was built, the parts that are running work.
 
 Part of why it has stayed stable is that nothing new has been added to it. No changes means nothing has had the chance to break. Building it out further, and doing that safely, needs a sustainable way of making changes that does not exist today. That is what the gaps below add up to, and they have nothing to do with the quality of the work that was done, and everything to do with the fact that it was built and operated by one person who is no longer here:
 
