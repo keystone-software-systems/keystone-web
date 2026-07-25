@@ -186,22 +186,37 @@ One important clarification on scope: the horizontally scaled production topolog
 <!-- TODO (Google Docs): render this Gantt chart to an image and embed it, since Docs does not render mermaid natively. -->
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {
+    'critBkgColor': '#cde2fb',
+    'critBorderColor': '#3E7CB1',
+    'activeTaskBkgColor': '#d7f2d7',
+    'activeTaskBorderColor': '#0ca30c',
+    'taskBkgColor': '#fbeecb',
+    'taskBorderColor': '#c98500',
+    'taskTextColor': '#14324D',
+    'taskTextOutsideColor': '#14324D',
+    'taskTextDarkColor': '#14324D',
+    'sectionBkgColor': '#f7f7f5',
+    'altSectionBkgColor': '#ffffff',
+    'gridColor': '#e1e0d9',
+    'todayLineColor': '#d03b3b'
+}}}%%
 gantt
     title Ubility platform roadmap
     dateFormat YYYY-MM-DD
     axisFormat %b
 
     section Phase A: Foundation
-    Staging environment stood up           :a1, 2026-09-08, 35d
-    Stored procs extracted into git        :a2, 2026-09-08, 45d
-    Test harness and automated test gate    :a3, 2026-09-22, 40d
-    Characterization tests, billing path   :a4, 2026-10-06, 30d
+    Staging environment stood up           :crit, a1, 2026-09-08, 35d
+    Stored procs extracted into git        :crit, a2, 2026-09-08, 45d
+    Test harness and automated test gate   :crit, a3, 2026-09-22, 40d
+    Characterization tests, billing path   :crit, a4, 2026-10-06, 30d
 
     section Phase B: Migration and features
-    Billing logic out of procs             :b1, 2026-11-03, 50d
-    Test coverage, payables and invoicing  :b2, 2026-11-03, 45d
-    Queued bill pipeline with retry        :b3, 2026-11-24, 35d
-    Operations & business dashboard        :b4, 2026-12-08, 30d
+    Billing logic out of procs             :active, b1, 2026-11-03, 50d
+    Test coverage, payables and invoicing  :active, b2, 2026-11-03, 45d
+    Queued bill pipeline with retry        :active, b3, 2026-11-24, 35d
+    Operations & business dashboard        :active, b4, 2026-12-08, 30d
 
     section Phase C: AI and scale
     AI extraction expansion                :c1, 2027-01-05, 45d
@@ -282,14 +297,13 @@ Two structures for the same roadmap. The work, the deliverables, and the phase s
 
 The entire six-month roadmap quoted as one total, invoiced in six equal installments.
 
-| Phase | Months | Committed scope | Price |
-|---|---|---|---|
-| Phase A | 1 to 2 | Staging environment, stored procedures into version control, test harness and CI test gate, characterization tests on the billing path, migration plan | $34,000 |
-| Phase B | 3 to 4 | Billing logic migrated out of stored procedures, test coverage on payables and invoicing, queued bill pipeline with retry and exception handling, operations and business metrics dashboard, jointly scoped feature slot | $34,000 |
-| Phase C | 5 to 6 | AI extraction expansion with confidence scoring, provider invoice extraction, natural-language reporting, scale assessment and enabling work, performance work | $34,000 |
-| **Total** | **6 months** | | **$102,000** |
+| Phase | Months | Committed scope |
+|---|---|---|
+| Phase A | 1 to 2 | Staging environment, stored procedures into version control, test harness and CI test gate, characterization tests on the billing path, migration plan |
+| Phase B | 3 to 4 | Billing logic migrated out of stored procedures, test coverage on payables and invoicing, queued bill pipeline with retry and exception handling, operations and business metrics dashboard, jointly scoped feature slot |
+| Phase C | 5 to 6 | AI extraction expansion with confidence scoring, provider invoice extraction, natural-language reporting, scale assessment and enabling work, performance work |
 
-Invoiced at **$17,000 per month for six months**. Production support, incident response, and the weekly check-in are included throughout at no additional charge.
+Invoiced at **$17,000 per month for six months** ($102,000 total). Production support, incident response, and the weekly check-in are included throughout at no additional charge.
 
 This option prices the outcome of the full roadmap rather than a month of availability. Both sides commit to the six months, and Ubility gets a lower total in exchange for that commitment.
 
