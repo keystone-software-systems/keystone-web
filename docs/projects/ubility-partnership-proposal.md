@@ -323,6 +323,8 @@ Under either option, the named deliverables above are scoped to roughly four fif
 
 This is also where fixed-outcome pricing pays off in a way hourly billing never does. If a phase finishes ahead of schedule, Ubility isn't paying for idle time, and Keystone isn't waiting around for more to bill. Both sides want the same thing: the roadmap done well, and done as fast as that allows.
 
+None of this works as a way to quietly stretch deliverables out. The capacity needed to hit each roadmap commitment is reserved first, always; the fifth described above is what's left over, not a pool to borrow against. If other work in a given month frees up more time than expected, that time goes toward delivering value for Ubility sooner, not toward finding a reason to wait.
+
 Work that falls genuinely outside the roadmap (a new integration with a property-management system not already connected, the scale cutover itself once the plan is approved, a database platform migration) is flagged and scoped before anything is started, never billed after the fact.
 
 ---
