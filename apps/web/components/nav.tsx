@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
+import { KeystoneLogo } from "@keystone/ui";
 import { solutions } from "@/app/solutions/content";
 
 const navLinks = [
@@ -17,19 +17,8 @@ export function Nav() {
   return (
     <header className="border-b border-slate/20 bg-off-white">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
-          <Image
-            src="/brand/keystone-icon-navy.svg"
-            alt=""
-            width={34}
-            height={32}
-            priority
-            className="h-8 w-auto"
-          />
-          <span className="flex items-baseline gap-1.5">
-            <span className="text-xl font-bold tracking-wide text-blueprint-navy">KEYSTONE</span>
-            <span className="text-xl font-bold tracking-wide text-slate">SYSTEMS</span>
-          </span>
+        <Link href="/" onClick={() => setMobileOpen(false)}>
+          <KeystoneLogo />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

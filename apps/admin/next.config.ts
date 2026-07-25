@@ -5,9 +5,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname, "../.."),
   },
-  // @keystone/db ships TypeScript source (no build step), so it needs to be
-  // transpiled by Next.js rather than consumed as a pre-built package.
-  transpilePackages: ["@keystone/db"],
+  // @keystone/db and @keystone/ui ship TypeScript source (no build step), so
+  // they need to be transpiled by Next.js rather than consumed pre-built.
+  transpilePackages: ["@keystone/db", "@keystone/ui"],
 };
 
 export default nextConfig;
