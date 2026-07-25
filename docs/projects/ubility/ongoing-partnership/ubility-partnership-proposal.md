@@ -159,8 +159,8 @@ graph TD
         OPS --> Q
     end
 
-    style CI fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
-    style STG fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
+    style CI fill:#f5f5f5,stroke:#999999,color:#1a1a1a
+    style STG fill:#f5f5f5,stroke:#999999,color:#1a1a1a
     style PRD fill:#f5f5f5,stroke:#999999,color:#1a1a1a
     style DEV fill:#eaeaea,stroke:#999999,color:#1a1a1a
     style BUILD fill:#eaf1f8,stroke:#3E7CB1,color:#14324D
