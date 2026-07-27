@@ -299,11 +299,7 @@ The practical point is coverage. A single-engineer arrangement, whether that eng
 
 ## Pricing
 
-Two structures for the same roadmap. The work, the deliverables, and the phase sequencing are identical. The difference is the commitment shape.
-
-### Option 1: Fixed roadmap price, invoiced monthly
-
-The entire six-month roadmap quoted as one total, invoiced in six equal installments.
+The six-month roadmap is priced as one fixed total, invoiced in six equal monthly installments. One structure, not several, because a single number is easier to hold onto than a menu of them.
 
 | Phase | Months | Committed scope |
 |---|---|---|
@@ -311,23 +307,23 @@ The entire six-month roadmap quoted as one total, invoiced in six equal installm
 | Phase B | 3 to 4 | Billing logic migrated out of stored procedures, test coverage on payables and invoicing, queued bill pipeline with retry and exception handling, operations and business metrics dashboard, jointly scoped feature slot |
 | Phase C | 5 to 6 | AI extraction expansion with confidence scoring, provider invoice extraction, natural-language reporting, customer-facing support chatbot, scale assessment and enabling work, performance work |
 
-Invoiced at **$17,000 per month for six months** ($102,000 total). Production support, incident response, and the weekly check-in are included throughout at no additional charge.
+**$102,000 total, invoiced at $17,000 per month for six months.** Production support, incident response, and the weekly check-in are included throughout at no additional charge. If Ubility needs to end the engagement early, only completed phases are invoiced. Nothing is owed for a phase that hasn't started.
 
-This option prices the outcome of the full roadmap rather than a month of availability. Both sides commit to the six months, and Ubility gets a lower total in exchange for that commitment.
+This prices the outcome of the full roadmap, not a month of availability. If a piece of work takes longer than estimated, that is absorbed by Keystone, not billed as a change order.
 
-### Option 2: Monthly retainer
+### Capacity reserved for whatever matters most
 
-| Item | Price |
-|---|---|
-| Ongoing engineering partnership | **$18,000 per month** |
-| Minimum initial term | 3 months |
-| After the initial term | Month to month, 30 days notice |
+The named deliverables above are scoped to roughly four fifths of each month's capacity. The remaining fifth is deliberately not assigned to anything specific, so there is real, unscoped capacity available for whatever turns out to matter most: a production incident, a bug a resident reports, feedback on work in progress, a problem that was not visible when this roadmap was written. Nothing in that reserve gets scoped or billed unless it is actually needed, and if a given month doesn't need it, that capacity goes straight into moving the roadmap forward instead of sitting unused. That is why a production issue in week two does not push a roadmap deliverable into the next month, and why an unexpected request does not require a change order.
 
-Same roadmap, same phase sequence, same included production support. Ubility can stop after any month past the initial term without owing the balance of the roadmap. Over a full six months this comes to $108,000, a $6,000 premium over Option 1, which is the price of that flexibility.
+This is also where fixed-outcome pricing pays off in a way hourly billing never does. If a phase finishes ahead of schedule, Ubility isn't paying for idle time, and Keystone isn't waiting around for more to bill. Both sides want the same thing: the roadmap done well, and done as fast as that allows.
 
-### Option 3: Maintenance-only, once the foundation is in place
+None of this works as a way to quietly stretch deliverables out. The capacity needed to hit each roadmap commitment is reserved first, always; the fifth described above is what's left over, not a pool to borrow against. If other work in a given month frees up more time than expected, that time goes toward delivering value for Ubility sooner, not toward finding a reason to wait.
 
-Not available starting today, and deliberately so: the platform isn't in a state where hands-off maintenance is safe until the roadmap's foundational work is done. Once it is, this becomes a real, lower-cost path if Ubility wants to shift from active development to just keeping things running.
+Work that falls genuinely outside the roadmap (a new integration with a property-management system not already connected, the scale cutover itself once the plan is approved, a database platform migration) is flagged and scoped before anything is started, never billed after the fact.
+
+### After the roadmap: a lower-cost option to just maintain it
+
+Not available starting today, and deliberately so: the platform isn't in a state where hands-off maintenance is safe until the six-month roadmap above is actually finished, staging, tests, and the highest-risk billing logic out of the database included. Once it is, this becomes a real, lower-cost path if Ubility wants to shift from active development to just keeping things running.
 
 | Item | Price |
 |---|---|
@@ -335,17 +331,7 @@ Not available starting today, and deliberately so: the platform isn't in a state
 | Minimum term | 3 months |
 | After the initial term | Month to month, 30 days notice |
 
-This covers production support, incident response, and the same monitoring and response times described earlier, plus ongoing security hygiene, but does not carry a committed development scope the way Options 1 and 2 do. It is the right fit if the six-month roadmap gets Ubility to where it needs to be and active feature work should pause, not the right fit if new development is still wanted, in which case Option 2 stays available on the same terms. This is one concrete version of the conversation described above about revisiting scope together at the end of the six months, not the only one.
-
-### Capacity reserved for whatever matters most
-
-Under either option, the named deliverables above are scoped to roughly four fifths of each month's capacity. The remaining fifth is deliberately not assigned to anything specific, so there is real, unscoped capacity available for whatever turns out to matter most: a production incident, a bug a resident reports, feedback on work in progress, a problem that was not visible when this roadmap was written. Nothing in that reserve gets scoped or billed unless it is actually needed, and if a given month doesn't need it, that capacity goes straight into moving the roadmap forward instead of sitting unused. That is why a production issue in week two does not push a roadmap deliverable into the next month, and why an unexpected request does not require a change order.
-
-This is also where fixed-outcome pricing pays off in a way hourly billing never does. If a phase finishes ahead of schedule, Ubility isn't paying for idle time, and Keystone isn't waiting around for more to bill. Both sides want the same thing: the roadmap done well, and done as fast as that allows.
-
-None of this works as a way to quietly stretch deliverables out. The capacity needed to hit each roadmap commitment is reserved first, always; the fifth described above is what's left over, not a pool to borrow against. If other work in a given month frees up more time than expected, that time goes toward delivering value for Ubility sooner, not toward finding a reason to wait.
-
-Work that falls genuinely outside the roadmap (a new integration with a property-management system not already connected, the scale cutover itself once the plan is approved, a database platform migration) is flagged and scoped before anything is started, never billed after the fact.
+For a concrete total: the six-month roadmap plus six months of this afterward comes to $138,000 across a full year, $102,000 for the roadmap and $36,000 for the six months of maintenance that follow. This tier covers production support, incident response, and the same monitoring and response times described earlier, plus ongoing security hygiene, but no committed development scope. If Ubility wants to keep building rather than just maintain, that becomes its own scoped, priced conversation at that point, based on what is actually wanted next rather than decided now. This is one concrete version of the conversation described earlier about revisiting scope together at the end of the six months, not the only one.
 
 ---
 
