@@ -12,7 +12,7 @@ Ubility has a working product with real customers, real revenue, and real third-
 
 ### The proposal
 
-Keystone is proposing a six-month, fixed-scope roadmap that turns this platform into something a team can safely change, test, and grow, not just keep alive: a staging environment and real test coverage first, then the highest-risk business logic moved out of the database into reviewable, tested code, the business-visibility tools Ubility has been asking for, and an expansion of the AI extraction already running in production, alongside a costed plan for real horizontal scale. **Keystone is already inside this codebase**: the six-repository audit is done, the original security report has been independently verified and corrected, and all 599 stored procedures are already inventoried, so none of that ramp-up gets billed here. The engineers doing the work have built production systems at Stripe, Microsoft, and Amazon, where a mistake is a public outage, not a support ticket, and every conversation is directly with the person doing the work, with no account layer in between. **Pricing is to the outcome, not the hour**, so the incentive on both sides is the same: get it done well, and get it done fast. And unlike the alternative Ubility is weighing, **nothing here locks Ubility in**: the code and infrastructure stay in Ubility's own accounts throughout, so this platform stays just as easy to hand to another firm, or bring in-house, as it is to keep working with Keystone.
+Keystone is proposing a six-month, fixed-scope roadmap that turns this platform into something a team can safely change, test, and grow, not just keep alive: a staging environment and real test coverage first, then the highest-risk business logic moved out of the database into reviewable, tested code, the business-visibility tools Ubility has been asking for, and an expansion of the AI extraction already running in production, including a customer-facing support chatbot, alongside a costed plan for real horizontal scale. **Keystone is already inside this codebase**: the six-repository audit is done, the original security report has been independently verified and corrected, and all 599 stored procedures are already inventoried, so none of that ramp-up gets billed here. The engineers doing the work have built production systems at Stripe, Microsoft, and Amazon, where a mistake is a public outage, not a support ticket, and every conversation is directly with the person doing the work, with no account layer in between. **Pricing is to the outcome, not the hour**, so the incentive on both sides is the same: get it done well, and get it done fast. And unlike the alternative Ubility is weighing, **nothing here locks Ubility in**: the code and infrastructure stay in Ubility's own accounts throughout, so this platform stays just as easy to hand to another firm, or bring in-house, as it is to keep working with Keystone.
 
 ---
 
@@ -237,6 +237,7 @@ gantt
     Provider invoice extraction            :c2, 2027-01-19, 35d
     Scale assessment and enabling work     :c3, 2027-01-05, 55d
     Performance work on hot paths          :c4, 2027-02-02, 30d
+    Customer support chatbot               :c5, 2027-01-19, 40d
 ```
 
 Dates assume a start as the remediation engagement completes. They shift together if the start shifts.
@@ -272,8 +273,9 @@ Nothing else on this roadmap is safe to do until this exists.
 | 13 | **Natural-language query over billing and operational data**, including the metrics layer from item 9, for admin staff, scoped to read-only reporting against the data model, so a staff member can ask a question without an engineer writing a report. | Second half of the better-tools ask: instead of only a fixed dashboard, staff can ask a specific question directly. Deliberately scoped read-only. |
 | 14 | **Scale assessment and enabling work.** Packaging the backend so it can run as multiple identical copies instead of one, in a way that is not tied to AWS specifically, so a future move to Azure or another major cloud stays possible rather than locking Ubility further into one provider. Also externalizing its configuration, making session state independent of any single copy, plus a written assessment with a recommended target setup, a cost comparison, and a sequenced cutover plan. This new version of the backend gets built and proven in the staging environment from Phase A first; only once it holds up there does a production copy get stood up and traffic cut over to it, rather than changing the live Windows VM in place. | The current single Windows VM has no horizontal scaling path. This phase makes the backend capable of running as more than one instance and produces the plan for actually doing it, with real numbers attached. |
 | 15 | **Performance work on the paths surfaced by the assessment**, now measurable because the logic is in code and covered by tests. | Optimizing stored procedures nobody can test is guesswork. By month 5, it is not. |
+| 16 | **Customer-facing support chatbot**, built on the same Claude integration already running in production, answering common billing and account questions directly (balance, due date, payment history, how a charge was calculated), with a clear handoff to a person for anything it cannot answer with confidence. | Turns AI capability the end customer never sees today into something they interact with directly, and is a fast, visible result once the underlying data is trustworthy from the earlier phases. |
 
-Every item above traces back to a specific finding in the security audit or the system architecture map already delivered. None of it is generic modernization work.
+Every item above traces back to a specific finding in the security audit or the system architecture map already delivered, or a direct ask from Ubility's team. None of it is generic modernization work.
 
 ---
 
@@ -281,7 +283,7 @@ Every item above traces back to a specific finding in the security audit or the 
 
 Two separate answers, because they are two separate things.
 
-**In the product.** Ubility already runs Claude in production through `c4-extract` for utility bill extraction. That is a real foundation and the reason the AI items on this roadmap are extensions rather than experiments. The roadmap expands it along the axes that actually reduce manual work: more bill formats, confidence scoring so uncertain results are routed to a human instead of silently accepted, the same pipeline applied to provider invoices, and natural-language reporting for admin staff. The constraint we hold to is that AI output touching billing data is either verified by a deterministic check or routed to a person, never written straight to the ledger on confidence alone.
+**In the product.** Ubility already runs Claude in production through `c4-extract` for utility bill extraction. That is a real foundation and the reason the AI items on this roadmap are extensions rather than experiments, not new capability being invented from scratch. The roadmap expands it along the axes that actually reduce manual work and directly touch the end customer: more bill formats, confidence scoring so uncertain results are routed to a human instead of silently accepted, the same pipeline applied to provider invoices, natural-language reporting for admin staff, and a customer-facing support chatbot answering common billing and account questions directly. The constraint we hold to is the same across all of it: AI output touching billing data, or an answer given directly to a customer, is either verified by a deterministic check or handed off to a person, never written straight to the ledger or stated to a customer on confidence alone.
 
 **One thing we don't yet know, and will confirm early.** The Anthropic (Claude) API key currently in production is a single, shared credential, but where it actually comes from is not confirmed from the repos alone: whose account it is billed to, what usage limits it runs under, and whether it is still tied to the prior engineer personally rather than a Ubility-owned account. That last possibility deserves the same treatment as the other credentials already being rotated in the remediation work: a key tied to a person who is no longer here is a real operational risk, not just an administrative detail. Confirming ownership, and moving it to a Ubility-owned account if needed, happens early rather than being left as an assumption.
 
@@ -315,7 +317,7 @@ The entire six-month roadmap quoted as one total, invoiced in six equal installm
 |---|---|---|
 | Phase A | 1 to 2 | Staging environment, stored procedures into version control, test harness and automated test gate, characterization tests on the billing path, migration plan |
 | Phase B | 3 to 4 | Billing logic migrated out of stored procedures, test coverage on payables and invoicing, queued bill pipeline with retry and exception handling, operations and business metrics dashboard, jointly scoped feature slot |
-| Phase C | 5 to 6 | AI extraction expansion with confidence scoring, provider invoice extraction, natural-language reporting, scale assessment and enabling work, performance work |
+| Phase C | 5 to 6 | AI extraction expansion with confidence scoring, provider invoice extraction, natural-language reporting, customer-facing support chatbot, scale assessment and enabling work, performance work |
 
 Invoiced at **$17,000 per month for six months** ($102,000 total). Production support, incident response, and the weekly check-in are included throughout at no additional charge.
 
@@ -330,6 +332,18 @@ This option prices the outcome of the full roadmap rather than a month of availa
 | After the initial term | Month to month, 30 days notice |
 
 Same roadmap, same phase sequence, same included production support. Ubility can stop after any month past the initial term without owing the balance of the roadmap. Over a full six months this comes to $108,000, a $6,000 premium over Option 1, which is the price of that flexibility.
+
+### Option 3: Maintenance-only, once the foundation is in place
+
+Not available starting today, and deliberately so: the platform isn't in a state where hands-off maintenance is safe until the roadmap's foundational work is done. Once it is, this becomes a real, lower-cost path if Ubility wants to shift from active development to just keeping things running.
+
+| Item | Price |
+|---|---|
+| Maintenance and support, no active development | **$6,000 per month** |
+| Minimum term | 3 months |
+| After the initial term | Month to month, 30 days notice |
+
+This covers production support, incident response, and the same monitoring and response times described earlier, plus ongoing security hygiene, but does not carry a committed development scope the way Options 1 and 2 do. It is the right fit if the six-month roadmap gets Ubility to where it needs to be and active feature work should pause, not the right fit if new development is still wanted, in which case Option 2 stays available on the same terms. This is one concrete version of the conversation described above about revisiting scope together at the end of the six months, not the only one.
 
 ### Capacity reserved for whatever matters most
 
