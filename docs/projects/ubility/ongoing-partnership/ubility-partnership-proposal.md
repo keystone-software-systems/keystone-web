@@ -309,6 +309,8 @@ The six-month roadmap is priced as one fixed total, invoiced in six equal monthl
 
 **$102,000 total, invoiced at $17,000 per month for six months.** Production support, incident response, and the weekly check-in are included throughout at no additional charge. If Ubility needs to end the engagement early, only completed phases are invoiced. Nothing is owed for a phase that hasn't started.
 
+That is a different case from the work itself finishing faster than expected, say in three months instead of six. If that happens, the full $102,000 is still due, and Ubility can still pay it across all six monthly installments rather than being asked to accelerate payment to match. Finishing early means the result lands sooner, not a lower price. The reverse holds too: work is never intentionally drawn out to fill six months just because that is the invoicing schedule. Get it done well and get it done fast stays the incentive, regardless of how the payments land.
+
 This prices the outcome of the full roadmap, not a month of availability. If a piece of work takes longer than estimated, that is absorbed by Keystone, not billed as a change order.
 
 ### Capacity reserved for whatever matters most
