@@ -12,7 +12,7 @@ Ubility has a working product with real customers, real revenue, and real third-
 
 ### The proposal
 
-Keystone is proposing a six-month, fixed-scope roadmap that turns this platform into something a team can safely change, test, and grow, not just keep alive: a staging environment and real test coverage first, then the highest-risk business logic moved out of the database into reviewable, tested code, the business-visibility tools Ubility has been asking for, and an expansion of the AI extraction already running in production, including a customer-facing support chatbot, alongside a costed plan for real horizontal scale.
+Keystone is proposing a fixed-scope roadmap, six months at the outside, that turns this platform into something a team can safely change, test, and grow, not just keep alive: a staging environment and real test coverage first, then the highest-risk business logic moved out of the database into reviewable, tested code, the business-visibility tools Ubility has been asking for, and an expansion of the AI extraction already running in production, including a customer-facing support chatbot, alongside a costed plan for real horizontal scale.
 
 **Keystone has already ramped up on this codebase**: we've done a full audit of all six repositories, the original security report has been independently verified and corrected, and all 599 stored procedures are already inventoried, so none of that ramp-up gets billed here. The engineers doing the work have built production systems at Stripe, Microsoft, and Amazon and every conversation is directly with the person doing the work, with no account layer in between. 
 
