@@ -4,6 +4,18 @@
 
 ---
 
+## Executive summary
+
+### The situation
+
+Ubility has a working product with real customers, real revenue, and real third-party integrations, and it has stayed stable for months with nobody actively maintaining it. That is a credit to the original build, not evidence it is safe to grow. **All of the platform's core business logic, the rules that decide what a resident owes, lives in 599 stored procedures inside the live production database, not in version control.** There is no history of who changed what, no way to review a change before it ships, and no way to test one outside production, the single largest constraint on the platform today. There is **no staging environment**, so every change ships straight to production, and **no automated test coverage** beyond confirming the code compiles. The backend is **a single Windows VM with no horizontal scaling path**, and there is **no visibility into the business itself**: no dashboard for revenue, collections, or property performance, only for whether the servers are up. The one person who understood this system end to end is gone, and it has been without a maintainer for months.
+
+### The proposal
+
+Keystone is proposing a six-month, fixed-scope roadmap that turns this platform into something a team can safely change, test, and grow, not just keep alive: a staging environment and real test coverage first, then the highest-risk business logic moved out of the database into reviewable, tested code, the business-visibility tools Ubility has been asking for, and an expansion of the AI extraction already running in production, alongside a costed plan for real horizontal scale. **Keystone is already inside this codebase**: the six-repository audit is done, the original security report has been independently verified and corrected, and all 599 stored procedures are already inventoried, so none of that ramp-up gets billed here. The engineers doing the work have built production systems at Stripe, Microsoft, and Amazon, where a mistake is a public outage, not a support ticket, and every conversation is directly with the person doing the work, with no account layer in between. **Pricing is to the outcome, not the hour**, so the incentive on both sides is the same: get it done well, and get it done fast. And unlike the alternative Ubility is weighing, **nothing here locks Ubility in**: the code and infrastructure stay in Ubility's own accounts throughout, so this platform stays just as easy to hand to another firm, or bring in-house, as it is to keep working with Keystone.
+
+---
+
 ## The situation
 
 Ubility has a working product with real customers, real revenue, and real third-party integrations.
