@@ -18,6 +18,8 @@ Keystone is proposing a fixed-scope roadmap, six months at the outside, that tur
 
 **Pricing is to the outcome, not the hour**, so the incentive on both sides is the same: get it done well, and get it done fast. And unlike the alternative Ubility is weighing, **nothing here locks Ubility in**: the code and infrastructure stay in Ubility's own accounts throughout, so this platform stays just as easy to hand to another firm, or bring in-house, as it is to keep working with Keystone.
 
+**We are building for flexibility**: Ubility's infrastructure stays Ubility's own, in Ubility's own accounts, no matter who is doing the engineering. Where this runs and who maintains it are two separate decisions, and we intend to keep them that way.
+
 We are committed to a long-term partnership that is earned by the quality of the work, not by making it expensive to leave. At the end of six months, we will sit down together and decide what comes next, rather than assuming it by default.
 
 ---
@@ -143,8 +145,9 @@ graph TD
         SVC["Versioned business logic<br/>in application code,<br/>covered by tests"]
         DB2[("SQL Server<br/>data store;<br/>remaining procs<br/>versioned in git")]
         Q["Queued bill pipeline<br/>retry + exception queue"]
-        EX2["c4-extract<br/>expanded AI extraction,<br/>confidence scoring"]
+        EX2["c4-extract<br/>expanded AI extraction:<br/>resident bills + provider invoices,<br/>confidence scoring"]
         OPS["Operations & business dashboard<br/>pipeline + revenue/collections metrics"]
+        CHAT["Customer support chatbot<br/>account & billing Q&A,<br/>hands off to a person when unsure"]
 
         LB --> BE1
         LB --> BE2
@@ -154,6 +157,7 @@ graph TD
         SVC --> Q
         Q --> EX2
         OPS --> Q
+        CHAT --> SVC
     end
 
     style CI fill:#f5f5f5,stroke:#999999,color:#1a1a1a
@@ -172,6 +176,7 @@ graph TD
     style Q fill:#e3f7e3,stroke:#0ca30c,color:#0b4d0b
     style EX2 fill:#e3f7e3,stroke:#0ca30c,color:#0b4d0b
     style OPS fill:#e3f7e3,stroke:#0ca30c,color:#0b4d0b
+    style CHAT fill:#e3f7e3,stroke:#0ca30c,color:#0b4d0b
 ```
 
 One important clarification on scope: the horizontally scaled production topology above is delivered in this engagement as the enabling work (packaging the backend so it can run as multiple identical copies, externalizing its configuration, making session state independent of any one instance, and a costed cutover plan with a recommended target). The cutover itself is sequenced by that plan rather than assumed to finish inside the six months, because doing it correctly depends on what the assessment finds. Everything else in the target diagram is committed roadmap scope.
@@ -284,9 +289,9 @@ Two separate answers, because they are two separate things.
 
 The Keystone team working on this engagement has been through the full six-repository audit, the independent verification of the security review, and the architecture mapping.
 
-That team has built production systems where getting it wrong is not an option. Tanner was an individual contributor on Stripe's core payments infrastructure and a Principal Engineer at Microsoft. Alex was an individual contributor on the software that manages Amazon's satellite fleet, and has led individual projects there. That same discipline applied to a platform this size looks like a bill calculated correctly and a change that does not take the platform down.
+That team has built production systems where getting it wrong is not an option. Tanner was a Senior Engineer on Stripe's core payments infrastructure and a Principal Engineer at Microsoft. Alex was a Senior Engineer on the software that manages Amazon's satellite fleet, and has led individual projects there. That same discipline applied to a platform this size looks like a bill calculated correctly and a change that does not take the platform down.
 
-Keystone maintains a small network of equally experienced independent engineers who are brought in when a piece of work calls for surge capacity or specific expertise. Engagements stay founder-scoped: Tanner scopes the work and decides who is looped in.
+Keystone also maintains a small network of equally experienced independent engineers who are brought in when a piece of work calls for surge capacity or specific expertise. Engagements stay founder-scoped: Tanner scopes the work and decides who is looped in. While we don't anticipate the need to bring in more people for this roadmap, the option exists if a specific deliverable calls for it. The team is not a single person, and it is not a single point of failure.
 
 The practical point is coverage. A single-engineer arrangement, whether that engineer is a contractor or a full-time hire, reproduces the exact situation Ubility is recovering from now.
 
