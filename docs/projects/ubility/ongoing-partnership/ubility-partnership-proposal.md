@@ -227,6 +227,8 @@ gantt
 
 Dates assume a start as the remediation engagement completes. They shift together if the start shifts.
 
+The durations above already include buffer against the unexpected, not a best-case timeline assuming nothing goes wrong. If a phase lands ahead of it, the next one starts early rather than waiting out the calendar, so finishing faster than planned shortens the roadmap itself, not just this estimate of it.
+
 ### Phase A, months 1 and 2: a system that can be changed safely
 
 Nothing else on this roadmap is safe to do until this exists.
