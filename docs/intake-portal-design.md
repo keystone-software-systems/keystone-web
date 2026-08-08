@@ -213,6 +213,26 @@ RLS additions follow the same pattern as `admin-tool-design.md` §5 — helper f
 `is_active_staff()`, used in `for select using (...)` policies on `projects`, `submission_comments`,
 and `project_assignments`.
 
+**How "find `clients` row by email" actually resolves (§5 depends on this):** `clients` has no
+direct email column — matching goes through `contacts.email`. On submit, look up a `contacts` row
+by case-insensitive email match; if found, reuse its `client_id`; if not, create a new `clients` row
+(`name` left null — the founder names it on promotion to `lead`, per the existing comment on
+`projects.name`) plus a `contacts` row (`email`, `is_primary = true`) for it. Add
+`create index idx_contacts_email_lower on contacts (lower(email))` to keep that lookup cheap. No
+new column, no new table — this reuses schema that already exists.
+
+**Account claiming is automatic, not a manual step.** `client_users` links get created by
+email-match, not by the client clicking anything labeled "claim": every time someone completes auth
+provisioning (self-serve password signup, or verifying a magic link at `/auth/confirm`) with a given
+email, that provisioning step looks up every `contacts` row matching that email, resolves the
+`client_id`(s), and upserts a `client_users` row for each (`on conflict (client_id, user_id) do
+nothing` — idempotent, safe to run on every login, not just the first). This runs on *every*
+provisioning touchpoint, not only account creation, specifically so a second anonymous submission
+made after someone already has an account still shows up the next time they authenticate, without
+them doing anything differently. This is what makes "no account to submit, easy account after"
+actually true: the account, once it exists under a matching email, always ends up wired to
+everything that email ever submitted — nothing to remember to link.
+
 ---
 
 ## 5. Client intake flow
@@ -231,8 +251,12 @@ Brief form (no login required to start):
   - contact email
       │
       ▼
-Submit → creates a `clients` row (if new) + `projects` row (status='submitted')
-        + sends a magic link to set up portal access
+Submit → finds or creates a `clients` row (matched by contact email, see §4)
+        + `projects` row (status='submitted')
+        + sends a magic link (account creation is optional, not required — the
+          submission is already saved either way; clicking the link is how they
+          later check on it, and auto-attaches every past submission under that
+          email, see §4)
       │
       ▼
 Client's dashboard (/dashboard, after auth):
@@ -248,10 +272,16 @@ Client's dashboard (/dashboard, after auth):
     hosted page)
 ```
 
-Design choice: **capture the brief before asking for an account.** The single biggest lever for
-"fast and easy," per the stated goal, is not making someone create a password before they've told
-you what they need. Account creation is the very next step (magic link sent immediately on submit)
-but doesn't block the first, highest-value action.
+Design choice: **capture the brief before asking for an account, and never make claiming it a
+separate action.** The single biggest lever for "fast and easy," per the stated goal, is not making
+someone create a password before they've told you what they need. The submission itself never
+depends on auth — a `clients` + `projects` row exist the moment the form is submitted, full stop.
+The magic link that goes out immediately after is an invitation, not a requirement: ignore it, and
+the submission is still in the founder's pipeline; click it (now or in three weeks, doesn't matter)
+and the account that comes out the other side is already wired to that submission and any other one
+made under the same email, because the email-match/auto-link logic in §4 runs at every auth
+provisioning step, not just the first. Nothing about "creating the account" is a distinct feature
+from "logging in" — they're the same action.
 
 The founder's side of this (reviewing a `submitted` project, promoting it to `lead`, replying in
 the comment thread) happens **inside `apps/admin`**, not a new founder-facing UI in the portal —
@@ -422,7 +452,10 @@ entire phase to wait on one line item.
 - [x] `lib/auth.ts`: `requireRole('client' | 'engineer')`.
 - [x] `proxy.ts` (Next.js 16 renamed `middleware.ts` → `proxy.ts` — confirmed against
       `node_modules/next/dist/docs`): session refresh + redirect unauthenticated users to `/login`.
-- [x] `/login` — magic-link form (no password flow needed at launch).
+- [x] `/login` and `/signup` — both magic-link and password forms shipped (superseded the original
+      plan of magic-link-only). Password stays as an option for returning users who'd rather not
+      wait on email each time; magic link stays the mechanism the intake-claim flow in Phase 1
+      relies on (see below).
 - [x] `/dashboard` — empty state, behind auth, confirms the role gate works end to end.
 - [x] `.env.example` for `apps/portal`.
 - [ ] Deploy: new Vercel project, Root Directory `apps/portal`, behind a Vercel-generated URL to
@@ -435,14 +468,29 @@ entire phase to wait on one line item.
 - *Outcome: a client can log in and see an empty dashboard. No submissions yet.*
 
 **Phase 1 — Intake** — 🟢 no blockers
-- [ ] Migration: `projects.engagement_type` enum (`short_term_project` | `long_term_project` |
+- [x] Migration: `projects.engagement_type` enum (`short_term_project` | `long_term_project` |
       `retainer`); `submitted` added to `projects.status`; `submission_comments` table + RLS.
+      Already landed in the initial migration alongside Phase 0's schema, same as `client_users` —
+      not a separate migration after all.
+- [ ] Migration: `create index idx_contacts_email_lower on contacts (lower(email))` — supports the
+      email-match lookup below at submission volume.
 - [ ] `/submit` — public brief form (description, engagement type, optional budget/timeline,
-      contact email), no auth required.
+      contact email), no auth required. Submitting alone is the complete action — no account is
+      created or required as part of this form.
 - [ ] Abuse protection on `/submit`: honeypot field + basic rate limiting (per-IP or per-email) on
       the Server Action.
-- [ ] Server Action: create/find `clients` row by email → `projects` row (`status='submitted'`) →
-      send magic link.
+- [ ] Server Action `submitProjectBrief`: look up `contacts` by case-insensitive email match → reuse
+      `client_id` if found, else create a `clients` row (`name` left null) + a `contacts` row
+      (`email`, `is_primary=true`) → insert `projects` row (`status='submitted'`) → call the
+      existing `sendMagicLink` action for that email. The magic link is an invitation to check
+      status, not a requirement — the row exists whether or not it's ever clicked.
+- [ ] `packages/db`: extend `ensureClientProfile` (or add a sibling step called alongside it) to run
+      on *every* provisioning touchpoint — `signUpWithPassword` and the magic-link verify in
+      `/auth/confirm` — not just first-time profile creation: look up all `contacts` rows matching
+      the authenticated email, resolve their `client_id`(s), and upsert a `client_users` row for
+      each (`on conflict (client_id, user_id) do nothing`). This is the "account, once it exists,
+      auto-attaches to everything that email ever submitted" behavior from §4/§5 — no separate
+      claim UI, no token.
 - [ ] Client dashboard: submission/project list with status.
 - [ ] Client project detail page: `submission_comments` thread (read + reply Server Action).
 - [ ] `apps/admin`: new "Submission" tab on the existing project detail page — reads
