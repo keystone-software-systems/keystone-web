@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { inter } from "./fonts";
+import { plexSans } from "./fonts";
 
 type Props = {
   children: ReactNode;
@@ -9,7 +9,7 @@ type Props = {
 
 export function HtmlShell({ children, fontVariables = "" }: Props) {
   return (
-    <html lang="en" className={`${inter.variable} ${fontVariables} h-full antialiased`}>
+    <html lang="en" className={`${plexSans.variable} ${fontVariables} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-off-white font-sans text-blueprint-navy">
         {children}
       </body>

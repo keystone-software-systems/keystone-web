@@ -42,7 +42,7 @@ export function Nav() {
               </svg>
             </button>
             {solutionsOpen && (
-              <div className="absolute left-0 top-full w-72 rounded-lg border border-slate/20 bg-white py-2 shadow-lg">
+              <div className="absolute left-0 top-full w-72 rounded-lg border border-slate/20 bg-white py-2">
                 {solutions.map((s) => (
                   <Link
                     key={s.slug}

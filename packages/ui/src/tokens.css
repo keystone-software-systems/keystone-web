@@ -13,7 +13,7 @@
   --color-technical-blue: var(--color-technical-blue);
   --color-slate: var(--color-slate);
   --color-off-white: var(--color-off-white);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-plex-sans);
 }
 
 body {

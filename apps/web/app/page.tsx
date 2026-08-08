@@ -73,7 +73,8 @@ export default function Home() {
             <p className="mt-6 text-lg text-blueprint-navy/70">
               AI tools made code cheap to produce. They didn&apos;t make it easier to know if it&apos;s
               sound. Keystone Systems is a network of senior-plus engineers, with backgrounds at
-              companies like Stripe, Amazon, and Microsoft, brought in for the decisions that are
+              companies like Stripe, Airbnb, Amazon, and Microsoft, and other companies at that
+              scale, brought in for the decisions that are
               expensive to get wrong and hard to undo later, from new builds to production-hardening
               to AI adoption.
             </p>
@@ -100,14 +101,25 @@ export default function Home() {
 
       <section className="border-t border-slate/20 bg-white py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-technical-blue">
+          <h2 className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-technical-blue">
             How we work
           </h2>
-          <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {principles.map((principle) => (
-              <div key={principle.title}>
-                <h3 className="text-lg font-semibold text-blueprint-navy">{principle.title}</h3>
-                <p className="mt-2 text-sm text-blueprint-navy/70">{principle.description}</p>
+          <div className="mt-8 grid border-t border-slate/20 sm:grid-cols-2">
+            {principles.map((principle, i) => (
+              <div
+                key={principle.title}
+                className={`flex gap-4 border-b border-slate/20 py-6 ${
+                  i % 2 === 1 ? "sm:border-l sm:pl-8" : "sm:pr-8"
+                }`}
+              >
+                <span
+                  className="mt-1.5 h-2 w-2 shrink-0 rotate-45 bg-technical-blue"
+                  aria-hidden="true"
+                />
+                <div>
+                  <h3 className="text-lg font-semibold text-blueprint-navy">{principle.title}</h3>
+                  <p className="mt-2 text-sm text-blueprint-navy/70">{principle.description}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -116,15 +128,15 @@ export default function Home() {
 
       <section id="solutions" className="py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-technical-blue">
+          <h2 className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-technical-blue">
             Solutions
           </h2>
-          <p className="mt-2 max-w-2xl text-lg text-blueprint-navy">
+          <p className="mt-3 max-w-2xl text-lg text-blueprint-navy">
             Ways to bring in senior engineering judgment, scoped to a specific moment.
           </p>
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {solutions.map((solution) => (
-              <SolutionCard key={solution.slug} solution={solution} />
+          <div className="mt-8 border-t border-slate/20">
+            {solutions.map((solution, i) => (
+              <SolutionCard key={solution.slug} solution={solution} index={i} />
             ))}
           </div>
         </div>
@@ -132,16 +144,16 @@ export default function Home() {
 
       <section className="border-t border-slate/20 bg-white py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-technical-blue">
+          <h2 className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-technical-blue">
             The network
           </h2>
-          <p className="mt-4 max-w-2xl text-lg text-blueprint-navy">
+          <p className="mt-4 max-w-3xl text-lg text-blueprint-navy">
             Keystone Systems is built by a network of senior-plus independent engineers, senior,
-            staff, and principal level, with backgrounds at companies like Stripe, Amazon, and
-            Microsoft, including work on payments and infrastructure systems that ran at real
-            production scale. That background shapes how engagements are scoped: long-term
-            defensibility, architecture tradeoffs, and systems built to hold up under real load,
-            not just a demo.
+            staff, and principal level, with backgrounds at companies like Stripe, Airbnb, Amazon,
+            Microsoft, and other companies at that scale, including work on payments and
+            infrastructure systems that ran at real production scale. That background shapes how
+            engagements are scoped: long-term defensibility, architecture tradeoffs, and systems
+            built to hold up under real load, not just a demo.
           </p>
           <Link
             href="/about"

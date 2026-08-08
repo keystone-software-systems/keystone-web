@@ -1,4 +1,4 @@
-export { inter, plexMono } from "./fonts";
+export { plexSans, plexMono } from "./fonts";
 export { HtmlShell } from "./html-shell";
 export { DashboardShell } from "./dashboard-shell";
 export { AuthForm } from "./auth-form";
