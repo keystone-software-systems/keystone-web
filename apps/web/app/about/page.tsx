@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Keystone Systems is a solo, founder-led engineering consultancy built around senior technical judgment, not commodity development capacity.",
+    "Keystone Systems is a network of senior-plus engineers built around senior technical judgment, not commodity development capacity.",
   alternates: { canonical: "/about" },
 };
 
@@ -30,40 +30,31 @@ export default function AboutPage() {
           failed audit six months out.
         </p>
         <p>
-          Keystone Systems is a solo, founder-led software engineering
-          consultancy built around that judgment: architecture decisions,
-          scoping, and hands-on engineering, rather than commodity development
-          capacity. Clients bring it in for the decisions that are expensive to
-          get wrong and hard to undo later, not for headcount augmentation. The
+          Keystone Systems is a network of senior-plus software engineers
+          built around that judgment: architecture decisions, scoping, and
+          hands-on engineering, rather than commodity development capacity.
+          Clients bring it in for the decisions that are expensive to get
+          wrong and hard to undo later, not for headcount augmentation. The
           firm is meant to be the call a company makes before a big technical
           decision, not after.
         </p>
         <p>
-          The founder spent over a decade in engineering, starting as an intern
-          at Microsoft and reaching Senior Software Engineer within three years
-          of joining full-time, then building core payments infrastructure as a
-          senior engineer at Stripe on systems that processed billions of
-          dollars in transactions a day, then back to Microsoft as a Principal
-          Software Engineer (
-          <a
-            href="https://www.linkedin.com/in/tannerbarlow/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-technical-blue hover:underline"
-          >
-            full background on LinkedIn
-          </a>
-          ). That trajectory means having been on-call for what happens when a
-          shortcut turns out to be a landmine, which is the actual source of the
-          judgment: architecture calls that still hold up under real production
-          load two years in, not just at launch.
+          The engineers in the network are senior, staff, and principal
+          level, with backgrounds at companies like Stripe, Amazon, and
+          Microsoft, including work on infrastructure that runs at real
+          production scale rather than demo scale. That background is the
+          actual source of the judgment: architecture calls that still hold
+          up under real load two years in, made by people who&apos;ve been
+          on-call for what happens when a shortcut turns out to be a
+          landmine.
         </p>
         <p>
           Fluency with AI-assisted development tools is part of how the firm
           operates day to day, but it&apos;s the delivery mechanism, not the
-          pitch. It&apos;s what lets one person deliver senior-level judgment at
-          solo speed, without the standups, handoffs, and telephone-game
-          overhead a traditional dev shop needs to move at the same pace.
+          pitch. It&apos;s what lets a small, senior-only network deliver
+          judgment at speed, without the standups, handoffs, and
+          telephone-game overhead a traditional dev shop needs to move at the
+          same pace.
         </p>
         <p>
           Keystone Systems isn&apos;t a dev shop. It doesn&apos;t compete on
@@ -92,13 +83,12 @@ export default function AboutPage() {
           available too.
         </p>
         <p className="mt-4 text-blueprint-navy/70">
-          Keystone Systems is solo-led, but not a single point of failure: the
-          founder works alongside a small network of equally experienced
-          independent engineers who can jump in when a timeline calls for extra
-          hands, adding capacity rather than replacing who you&apos;re working
-          with. And if something delivered doesn&apos;t hold up the way it
-          should, that&apos;s on Keystone Systems to fix, not on you to discover
-          the hard way.
+          Keystone Systems draws on a small network of senior-plus independent
+          engineers rather than a single person&apos;s bandwidth, so a
+          timeline that calls for extra hands doesn&apos;t mean stepping down
+          to less experienced help. And if something delivered doesn&apos;t
+          hold up the way it should, that&apos;s on Keystone Systems to fix,
+          not on you to discover the hard way.
         </p>
         <Link
           href="/contact"

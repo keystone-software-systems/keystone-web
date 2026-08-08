@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: "%s | Keystone Systems",
   },
   description:
-    "Keystone Systems is a software engineering consultancy providing architecture, technical strategy, and senior-level engineering judgment for growing companies.",
+    "Keystone Systems is a network of senior-plus engineers providing architecture, technical strategy, and senior-level engineering judgment for growing companies.",
   openGraph: {
     type: "website",
     url: SITE_URL,

@@ -72,9 +72,10 @@ export default function Home() {
             </h1>
             <p className="mt-6 text-lg text-blueprint-navy/70">
               AI tools made code cheap to produce. They didn&apos;t make it easier to know if it&apos;s
-              sound. Keystone Systems brings senior engineering judgment to the decisions that are
-              expensive to get wrong and hard to undo later, from new builds to
-              production-hardening to AI adoption.
+              sound. Keystone Systems is a network of senior-plus engineers, with backgrounds at
+              companies like Stripe, Amazon, and Microsoft, brought in for the decisions that are
+              expensive to get wrong and hard to undo later, from new builds to production-hardening
+              to AI adoption.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
@@ -132,15 +133,15 @@ export default function Home() {
       <section className="border-t border-slate/20 bg-white py-20">
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-technical-blue">
-            About the founder
+            The network
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-blueprint-navy">
-            Keystone Systems is led by a software engineer with over a decade of experience,
-            including as a Principal Software Engineer at Microsoft and building core payments
-            infrastructure as a senior engineer at Stripe on systems that processed billions of
-            dollars in transactions a day. That background shapes how engagements are scoped:
-            long-term defensibility, architecture tradeoffs, and systems built to hold up under
-            real load, not just a demo.
+            Keystone Systems is built by a network of senior-plus independent engineers, senior,
+            staff, and principal level, with backgrounds at companies like Stripe, Amazon, and
+            Microsoft, including work on payments and infrastructure systems that ran at real
+            production scale. That background shapes how engagements are scoped: long-term
+            defensibility, architecture tradeoffs, and systems built to hold up under real load,
+            not just a demo.
           </p>
           <Link
             href="/about"
