@@ -15,8 +15,11 @@ export default function AboutPage() {
         About Keystone Systems
       </h1>
 
-      <div className="mt-8 flex flex-col gap-6 text-lg text-blueprint-navy/70">
-        <p>
+      <div className="mt-10 border-t border-slate/20 pt-8">
+        <h2 className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-technical-blue">
+          The judgment gap
+        </h2>
+        <p className="mt-4 text-lg text-blueprint-navy/70">
           AI coding tools collapsed the cost of producing code. They didn&apos;t
           collapse the cost of knowing whether that code is sound. Writing code
           was never the scarce, valuable part, and now that anyone can generate
@@ -29,7 +32,13 @@ export default function AboutPage() {
           shortcuts are harmless versus which ones quietly become an outage or a
           failed audit six months out.
         </p>
-        <p>
+      </div>
+
+      <div className="mt-10 border-t border-slate/20 pt-8">
+        <h2 className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-technical-blue">
+          What we are
+        </h2>
+        <p className="mt-4 text-lg text-blueprint-navy/70">
           Keystone Systems is a network of senior-plus software engineers
           built around that judgment: architecture decisions, scoping, and
           hands-on engineering, rather than commodity development capacity.
@@ -38,17 +47,30 @@ export default function AboutPage() {
           firm is meant to be the call a company makes before a big technical
           decision, not after.
         </p>
-        <p>
+      </div>
+
+      <div className="mt-10 border-t border-slate/20 pt-8">
+        <h2 className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-technical-blue">
+          The network
+        </h2>
+        <p className="mt-4 text-lg text-blueprint-navy/70">
           The engineers in the network are senior, staff, and principal
-          level, with backgrounds at companies like Stripe, Amazon, and
-          Microsoft, including work on infrastructure that runs at real
-          production scale rather than demo scale. That background is the
+          level, with backgrounds at companies like Stripe, Airbnb, Amazon,
+          Microsoft, and other companies at that scale, including work on
+          infrastructure that runs at real production scale rather than demo
+          scale. That background is the
           actual source of the judgment: architecture calls that still hold
           up under real load two years in, made by people who&apos;ve been
           on-call for what happens when a shortcut turns out to be a
           landmine.
         </p>
-        <p>
+      </div>
+
+      <div className="mt-10 border-t border-slate/20 pt-8">
+        <h2 className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-technical-blue">
+          AI as infrastructure
+        </h2>
+        <p className="mt-4 text-lg text-blueprint-navy/70">
           Fluency with AI-assisted development tools is part of how the firm
           operates day to day, but it&apos;s the delivery mechanism, not the
           pitch. It&apos;s what lets a small, senior-only network deliver
@@ -56,7 +78,13 @@ export default function AboutPage() {
           telephone-game overhead a traditional dev shop needs to move at the
           same pace.
         </p>
-        <p>
+      </div>
+
+      <div className="mt-10 border-t border-slate/20 pt-8">
+        <h2 className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-technical-blue">
+          Positioning
+        </h2>
+        <p className="mt-4 text-lg text-blueprint-navy/70">
           Keystone Systems isn&apos;t a dev shop. It doesn&apos;t compete on
           headcount, cheap hourly rates, or speed of delivery alone. It competes
           on the quality of technical decisions made early, which is what
@@ -67,11 +95,11 @@ export default function AboutPage() {
         </p>
       </div>
 
-      <div className="mt-12 border-t border-slate/20 pt-10">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-blueprint-navy">
+      <div className="mt-10 border-t border-slate/20 pt-8">
+        <h2 className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-technical-blue">
           Approach
         </h2>
-        <p className="mt-4 text-blueprint-navy/70">
+        <p className="mt-4 text-lg text-blueprint-navy/70">
           Every engagement starts with scoping the actual decision at hand, not
           the tech stack, and is priced to that outcome up front rather than
           billed hourly, so incentives stay aligned toward moving fast rather
@@ -82,13 +110,11 @@ export default function AboutPage() {
           leadership without a full-time hire, ongoing arrangements are
           available too.
         </p>
-        <p className="mt-4 text-blueprint-navy/70">
-          Keystone Systems draws on a small network of senior-plus independent
-          engineers rather than a single person&apos;s bandwidth, so a
-          timeline that calls for extra hands doesn&apos;t mean stepping down
-          to less experienced help. And if something delivered doesn&apos;t
-          hold up the way it should, that&apos;s on Keystone Systems to fix,
-          not on you to discover the hard way.
+        <p className="mt-4 text-lg text-blueprint-navy/70">
+          If a timeline calls for extra hands mid-engagement, that doesn&apos;t
+          mean stepping down to less experienced help. And if something
+          delivered doesn&apos;t hold up the way it should, that&apos;s on
+          Keystone Systems to fix, not on you to discover the hard way.
         </p>
         <Link
           href="/contact"
