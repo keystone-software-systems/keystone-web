@@ -294,9 +294,20 @@ create index idx_engineer_payouts_engineer on engineer_payouts(engineer_id);
 -- RLS helper functions
 -- ---------------------------------------------------------------------------
 
+-- All four helpers are `security definer`: is_project_client/is_project_engineer
+-- query projects/client_users/project_assignments/engineer_profiles, tables whose
+-- own RLS policies call back into these same functions. Without `security definer`
+-- (which runs the function as its owner, bypassing RLS on the reads inside it)
+-- that's unbounded recursion — Postgres re-evaluates the calling policy for every
+-- row the inner query touches, and unlike `profiles`' own policies (which have a
+-- cheap `id = auth.uid()` escape hatch that resolves before ever calling a
+-- helper), there's no non-recursive branch here to bottom out on. Confirmed by
+-- reproduction: `select is_project_client(...)` as an authenticated client threw
+-- "stack depth limit exceeded" before this fix.
+
 -- owner/staff only — the "can mutate anything" check.
 create or replace function is_active_staff() returns boolean
-language sql stable as $$
+language sql stable security definer set search_path = public as $$
   select exists (
     select 1 from profiles p
     where p.id = auth.uid() and p.active and p.role in ('owner', 'staff')
@@ -305,7 +316,7 @@ $$;
 
 -- owner/staff/viewer — the "can read the internal commercial spine" check.
 create or replace function is_provisioned_internal() returns boolean
-language sql stable as $$
+language sql stable security definer set search_path = public as $$
   select exists (
     select 1 from profiles p
     where p.id = auth.uid() and p.active and p.role in ('owner', 'staff', 'viewer')
@@ -313,7 +324,7 @@ language sql stable as $$
 $$;
 
 create or replace function is_project_client(p_project_id uuid) returns boolean
-language sql stable as $$
+language sql stable security definer set search_path = public as $$
   select exists (
     select 1
     from projects proj
@@ -323,7 +334,7 @@ language sql stable as $$
 $$;
 
 create or replace function is_project_engineer(p_project_id uuid) returns boolean
-language sql stable as $$
+language sql stable security definer set search_path = public as $$
   select exists (
     select 1
     from project_assignments pa

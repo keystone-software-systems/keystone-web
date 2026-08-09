@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient, type AuthActionState } from "@keystone/db";
-import { ensureClientProfile } from "@/lib/auth";
+import { ensureClientProfile, linkClientByEmail } from "@/lib/auth";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -43,6 +43,7 @@ export async function signUpWithPassword(
 
   if (data.user) {
     await ensureClientProfile(data.user.id, email);
+    await linkClientByEmail(data.user.id, email);
   }
 
   // Email confirmation off: signUp already returned an active session.

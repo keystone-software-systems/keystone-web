@@ -2,7 +2,7 @@ import { type EmailOtpType } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { type NextRequest } from "next/server";
 import { createClient } from "@keystone/db";
-import { ensureClientProfile } from "@/lib/auth";
+import { ensureClientProfile, linkClientByEmail } from "@/lib/auth";
 
 // Landing point for the magic-link/signup-confirmation email. Supabase sends
 // the signed-in user here with a one-time token_hash; verifying it
@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
     if (!error) {
       if (data.user?.email) {
         await ensureClientProfile(data.user.id, data.user.email);
+        await linkClientByEmail(data.user.id, data.user.email);
       }
       redirect(next);
     }
