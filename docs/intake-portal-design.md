@@ -472,34 +472,57 @@ entire phase to wait on one line item.
       `retainer`); `submitted` added to `projects.status`; `submission_comments` table + RLS.
       Already landed in the initial migration alongside Phase 0's schema, same as `client_users` —
       not a separate migration after all.
-- [ ] Migration: `create index idx_contacts_email_lower on contacts (lower(email))` — supports the
+- [x] Migration: `create index idx_contacts_email_lower on contacts (lower(email))` — supports the
       email-match lookup below at submission volume.
-- [ ] `/submit` — public brief form (description, engagement type, optional budget/timeline,
+- [x] `/submit` — public brief form (description, engagement type, optional budget/timeline,
       contact email), no auth required. Submitting alone is the complete action — no account is
       created or required as part of this form.
-- [ ] Abuse protection on `/submit`: honeypot field + basic rate limiting (per-IP or per-email) on
-      the Server Action.
-- [ ] Server Action `submitProjectBrief`: look up `contacts` by case-insensitive email match → reuse
-      `client_id` if found, else create a `clients` row (`name` left null) + a `contacts` row
-      (`email`, `is_primary=true`) → insert `projects` row (`status='submitted'`) → call the
-      existing `sendMagicLink` action for that email. The magic link is an invitation to check
-      status, not a requirement — the row exists whether or not it's ever clicked.
-- [ ] `packages/db`: extend `ensureClientProfile` (or add a sibling step called alongside it) to run
-      on *every* provisioning touchpoint — `signUpWithPassword` and the magic-link verify in
-      `/auth/confirm` — not just first-time profile creation: look up all `contacts` rows matching
-      the authenticated email, resolve their `client_id`(s), and upsert a `client_users` row for
-      each (`on conflict (client_id, user_id) do nothing`). This is the "account, once it exists,
-      auto-attaches to everything that email ever submitted" behavior from §4/§5 — no separate
-      claim UI, no token.
-- [ ] Client dashboard: submission/project list with status.
-- [ ] Client project detail page: `submission_comments` thread (read + reply Server Action).
-- [ ] `apps/admin`: new "Submission" tab on the existing project detail page — reads
-      `submission_comments`, lets staff reply, lets staff post internal-only notes
-      (`visible_to_client=false`).
-- [ ] `apps/admin`: "Promote to lead" action (`submitted` → `lead`).
-- [ ] Resend: new-submission email to the founder.
-- [ ] RLS test: client A cannot read client B's `projects`/`submission_comments` rows (the
-      cross-tenant case flagged in §10 — write this before shipping, not after).
+- [x] Abuse protection on `/submit`: honeypot field (`company_website`, hidden via CSS not
+      `type="hidden"`) + per-email rate limiting (3 submissions/hour, checked via existing
+      `projects.created_at` — no new table).
+- [x] Server Action `submitProjectBrief`: look up `contacts` by case-insensitive email match → reuse
+      `client_id` if found, else create a `clients` row + a `contacts` row (`email`,
+      `is_primary=true`) → insert `projects` row (`status='submitted'`) → call the existing
+      `sendMagicLink` action for that email. The magic link is an invitation to check status, not a
+      requirement — the row exists whether or not it's ever clicked. One deviation from the
+      original write-up above: `clients.name` is `not null` in the actual schema (unlike
+      `projects.name`, which is the column really left null here) — new clients get the submitted
+      email as a placeholder name, same as the new `contacts.name`, since `/submit` doesn't collect
+      a separate "your name" field.
+- [x] `apps/portal/lib/auth.ts`: `linkClientByEmail`, called alongside `ensureClientProfile` at both
+      provisioning touchpoints (`signUpWithPassword`, magic-link verify in `/auth/confirm`) — not
+      just first-time profile creation. Looks up all `contacts` rows matching the authenticated
+      email, resolves their `client_id`(s), and upserts a `client_users` row for each (idempotent).
+      This is the "account, once it exists, auto-attaches to everything that email ever submitted"
+      behavior from §4/§5 — no separate claim UI, no token. Lives in `apps/portal` rather than
+      `packages/db` as originally sketched — it's the only consumer, `packages/db`'s `auth-actions.ts`
+      is deliberately app-agnostic (see comment there), and this logic is portal-specific.
+- [x] Client dashboard: submission/project list with status (relies entirely on
+      `is_project_client`/`is_project_engineer` RLS for scoping — no manual `client_id` filter).
+- [x] Client project detail page: `submission_comments` thread (read + reply Server Action).
+- [x] `apps/admin`: new `/submissions` list + detail section — reads `submission_comments`, lets
+      staff reply, lets staff post internal-only notes (`visible_to_client=false`). Built as its own
+      route rather than a tab on "the existing project detail page" as originally sketched, because
+      no general project detail page exists yet in `apps/admin` (that's `admin-tool-design.md`
+      Phase 1, not yet built) — this covers the submission-review slice that intake actually needs,
+      not the full commercial spine (milestones, invoices, contracts) that page will eventually
+      carry. Revisit folding `/submissions/[id]` into that page once it exists.
+- [x] `apps/admin`: "Promote to lead" action (`submitted` → `lead`), on `/submissions/[id]`. Also
+      names the project (`projects.name`, per the placeholder note above), since promotion is the
+      point where the founder first assigns a real name.
+- [x] Resend: new-submission email to the founder. Skipped silently if `RESEND_API_KEY` is unset
+      (same pattern as `apps/web`'s contact form) rather than failing the submission.
+- [x] RLS test: client A cannot read client B's `projects`/`submission_comments` rows (the
+      cross-tenant case flagged in §10), verified live against local Supabase — two clients, two
+      submissions, confirmed client A's session reads only its own project and gets an empty result
+      /RLS-denied insert against client B's. Manual, not an automated suite (still no test runner in
+      the monorepo, same gap noted in Phase 0) — worth converting to a real test once a convention is
+      picked. This same session caught and fixed a real bug in the process: `is_project_client` and
+      `is_project_engineer` (and, latently, `is_active_staff`/`is_provisioned_internal`) needed
+      `security definer` — without it they recursed into the RLS policy that calls them and blew the
+      Postgres stack (`stack depth limit exceeded`) the first time a client queried their own
+      `projects` row. Fixed directly in the init migration (not deployed anywhere yet) with a comment
+      explaining why; see `packages/db/supabase/migrations/20260724000000_init_schema.sql`.
 - *Outcome: the actual ask — a fast, shareable link that gets a real submission into the founder's
   pipeline. Shippable and useful on its own, everything after this is additive.*
 

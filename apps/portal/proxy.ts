@@ -4,7 +4,7 @@ import { updateSession } from "@keystone/db";
 // Next.js 16 renamed the `middleware.ts` convention to `proxy.ts` (same
 // functionality, new name/file — see AGENTS.md). This is that file.
 
-const PUBLIC_PATHS = ["/login", "/signup", "/auth/confirm", "/auth/auth-code-error"];
+const PUBLIC_PATHS = ["/login", "/signup", "/submit", "/auth/confirm", "/auth/auth-code-error"];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));

@@ -40,6 +40,41 @@ export async function ensureClientProfile(userId: string, email: string): Promis
 }
 
 /**
+ * Auto-link-on-auth claiming (intake-portal-design.md §4): every `contacts`
+ * row matching this email gets its `client_id` wired to this auth user via
+ * `client_users`, upserted idempotently. Unlike `ensureClientProfile`, this
+ * runs on *every* provisioning touchpoint, not just first-time creation, so
+ * a submission made after someone already has an account still attaches the
+ * next time they authenticate.
+ */
+export async function linkClientByEmail(userId: string, email: string): Promise<void> {
+  const admin = createAdminClient();
+  const { data: contacts, error: lookupError } = await admin
+    .from("contacts")
+    .select("client_id")
+    .ilike("email", email);
+
+  if (lookupError) {
+    console.error("linkClientByEmail lookup failed", lookupError);
+    return;
+  }
+  if (!contacts?.length) return;
+
+  const rows = [...new Set(contacts.map((c) => c.client_id))].map((client_id) => ({
+    client_id,
+    user_id: userId,
+  }));
+
+  const { error } = await admin.from("client_users").upsert(rows, {
+    onConflict: "client_id,user_id",
+    ignoreDuplicates: true,
+  });
+  if (error) {
+    console.error("linkClientByEmail upsert failed", error);
+  }
+}
+
+/**
  * Server Action / Route Handler guard: redirects to /login if there's no
  * active, provisioned caller, and throws if their role isn't in `roles`.
  * This re-asserts what proxy.ts and RLS already enforce — a missing or

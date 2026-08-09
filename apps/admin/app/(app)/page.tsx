@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 
 export default async function DashboardPage() {
@@ -10,9 +11,12 @@ export default async function DashboardPage() {
       <p className="mt-1 text-sm text-slate">
         Signed in as {profile.email} ({profile.role}).
       </p>
-      <div className="mt-8 rounded-md border border-dashed border-slate/30 p-8 text-center text-sm text-slate">
-        No projects yet.
-      </div>
+      <Link
+        href="/submissions"
+        className="mt-8 block rounded-md border border-dashed border-slate/30 p-8 text-center text-sm text-slate hover:border-technical-blue"
+      >
+        Review portal submissions →
+      </Link>
     </div>
   );
 }
