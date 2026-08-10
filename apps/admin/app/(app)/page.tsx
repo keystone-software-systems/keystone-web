@@ -11,12 +11,20 @@ export default async function DashboardPage() {
       <p className="mt-1 text-sm text-slate">
         Signed in as {profile.email} ({profile.role}).
       </p>
-      <Link
-        href="/submissions"
-        className="mt-8 block rounded-md border border-dashed border-slate/30 p-8 text-center text-sm text-slate hover:border-technical-blue"
-      >
-        Review portal submissions →
-      </Link>
+      <div className="mt-8 flex flex-col gap-3">
+        <Link
+          href="/submissions"
+          className="block rounded-md border border-dashed border-slate/30 p-8 text-center text-sm text-slate hover:border-technical-blue"
+        >
+          Review portal submissions →
+        </Link>
+        <Link
+          href="/prospects"
+          className="block rounded-md border border-dashed border-slate/30 p-8 text-center text-sm text-slate hover:border-technical-blue"
+        >
+          Prospects & outreach →
+        </Link>
+      </div>
     </div>
   );
 }

@@ -4,7 +4,10 @@ import { updateSession } from "@keystone/db";
 // Next.js 16 renamed the `middleware.ts` convention to `proxy.ts` (same
 // functionality, new name/file — see AGENTS.md). This is that file.
 
-const PUBLIC_PATHS = ["/login", "/auth/confirm", "/auth/auth-code-error"];
+// /api/cron routes are unauthenticated (no Supabase session — Vercel Cron calls them
+// directly) and instead verify a bearer secret inside the route handler, same shape as the
+// webhook routes described in docs/admin-tool-design.md.
+const PUBLIC_PATHS = ["/login", "/auth/confirm", "/auth/auth-code-error", "/api/cron"];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
