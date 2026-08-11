@@ -379,6 +379,45 @@ export type Database = {
           },
         ]
       }
+      feed_sources: {
+        Row: {
+          active: boolean
+          brand: Database["public"]["Enums"]["brand"]
+          config_json: Json
+          created_at: string
+          id: string
+          key: string
+          kind: string
+          label: string
+          last_run_at: string | null
+          segment: Database["public"]["Enums"]["prospect_segment"]
+        }
+        Insert: {
+          active?: boolean
+          brand: Database["public"]["Enums"]["brand"]
+          config_json: Json
+          created_at?: string
+          id?: string
+          key: string
+          kind: string
+          label: string
+          last_run_at?: string | null
+          segment: Database["public"]["Enums"]["prospect_segment"]
+        }
+        Update: {
+          active?: boolean
+          brand?: Database["public"]["Enums"]["brand"]
+          config_json?: Json
+          created_at?: string
+          id?: string
+          key?: string
+          kind?: string
+          label?: string
+          last_run_at?: string | null
+          segment?: Database["public"]["Enums"]["prospect_segment"]
+        }
+        Relationships: []
+      }
       integration_events: {
         Row: {
           created_at: string
@@ -621,6 +660,29 @@ export type Database = {
           },
         ]
       }
+      profile_brand_access: {
+        Row: {
+          brand: Database["public"]["Enums"]["brand"]
+          profile_id: string
+        }
+        Insert: {
+          brand: Database["public"]["Enums"]["brand"]
+          profile_id: string
+        }
+        Update: {
+          brand?: Database["public"]["Enums"]["brand"]
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_brand_access_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           active: boolean
@@ -778,6 +840,137 @@ export type Database = {
           },
         ]
       }
+      prospect_feed_items: {
+        Row: {
+          brand: Database["public"]["Enums"]["brand"]
+          created_at: string
+          external_id: string
+          feed_source_id: string
+          id: string
+          prospect_id: string | null
+          raw_json: Json | null
+          segment: Database["public"]["Enums"]["prospect_segment"]
+          snippet: string | null
+          status: string
+          title: string
+          url: string | null
+        }
+        Insert: {
+          brand: Database["public"]["Enums"]["brand"]
+          created_at?: string
+          external_id: string
+          feed_source_id: string
+          id?: string
+          prospect_id?: string | null
+          raw_json?: Json | null
+          segment: Database["public"]["Enums"]["prospect_segment"]
+          snippet?: string | null
+          status?: string
+          title: string
+          url?: string | null
+        }
+        Update: {
+          brand?: Database["public"]["Enums"]["brand"]
+          created_at?: string
+          external_id?: string
+          feed_source_id?: string
+          id?: string
+          prospect_id?: string | null
+          raw_json?: Json | null
+          segment?: Database["public"]["Enums"]["prospect_segment"]
+          snippet?: string | null
+          status?: string
+          title?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospect_feed_items_feed_source_id_fkey"
+            columns: ["feed_source_id"]
+            isOneToOne: false
+            referencedRelation: "feed_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospect_feed_items_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospects: {
+        Row: {
+          brand: Database["public"]["Enums"]["brand"]
+          company: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          last_contacted_at: string | null
+          linkedin_url: string | null
+          location: string | null
+          name: string
+          next_follow_up_on: string | null
+          notes: string | null
+          segment: Database["public"]["Enums"]["prospect_segment"]
+          source: string | null
+          status: Database["public"]["Enums"]["prospect_status"]
+          title: string | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          brand: Database["public"]["Enums"]["brand"]
+          company?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          last_contacted_at?: string | null
+          linkedin_url?: string | null
+          location?: string | null
+          name: string
+          next_follow_up_on?: string | null
+          notes?: string | null
+          segment: Database["public"]["Enums"]["prospect_segment"]
+          source?: string | null
+          status?: Database["public"]["Enums"]["prospect_status"]
+          title?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          brand?: Database["public"]["Enums"]["brand"]
+          company?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          last_contacted_at?: string | null
+          linkedin_url?: string | null
+          location?: string | null
+          name?: string
+          next_follow_up_on?: string | null
+          notes?: string | null
+          segment?: Database["public"]["Enums"]["prospect_segment"]
+          source?: string | null
+          status?: Database["public"]["Enums"]["prospect_status"]
+          title?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospects_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       submission_comments: {
         Row: {
           author_id: string
@@ -825,6 +1018,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_brand_access: {
+        Args: { p_brand: Database["public"]["Enums"]["brand"] }
+        Returns: boolean
+      }
       is_active_staff: { Args: never; Returns: boolean }
       is_project_client: { Args: { p_project_id: string }; Returns: boolean }
       is_project_engineer: { Args: { p_project_id: string }; Returns: boolean }
@@ -832,6 +1029,7 @@ export type Database = {
     }
     Enums: {
       assignment_status: "offered" | "accepted" | "declined" | "completed"
+      brand: "keystone" | "stackdiligence"
       connect_status: "not_started" | "onboarding" | "active" | "restricted"
       contract_status:
         | "draft"
@@ -856,6 +1054,24 @@ export type Database = {
         | "handoff"
         | "closed"
         | "lost"
+      prospect_segment:
+        | "vibe_code_to_production"
+        | "codebase_improvement"
+        | "ai_training_setup"
+        | "warm_network"
+        | "partner_referral"
+        | "referral_partner"
+        | "live_deal"
+        | "independent_sponsor"
+      prospect_status:
+        | "new"
+        | "researching"
+        | "contacted"
+        | "replied"
+        | "call_booked"
+        | "engaged"
+        | "not_now"
+        | "dead"
       service_line:
         | "net_new_development"
         | "vibe_code_to_production"
@@ -993,6 +1209,7 @@ export const Constants = {
   public: {
     Enums: {
       assignment_status: ["offered", "accepted", "declined", "completed"],
+      brand: ["keystone", "stackdiligence"],
       connect_status: ["not_started", "onboarding", "active", "restricted"],
       contract_status: [
         "draft",
@@ -1018,6 +1235,26 @@ export const Constants = {
         "handoff",
         "closed",
         "lost",
+      ],
+      prospect_segment: [
+        "vibe_code_to_production",
+        "codebase_improvement",
+        "ai_training_setup",
+        "warm_network",
+        "partner_referral",
+        "referral_partner",
+        "live_deal",
+        "independent_sponsor",
+      ],
+      prospect_status: [
+        "new",
+        "researching",
+        "contacted",
+        "replied",
+        "call_booked",
+        "engaged",
+        "not_now",
+        "dead",
       ],
       service_line: [
         "net_new_development",

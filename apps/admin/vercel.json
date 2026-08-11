@@ -10,5 +10,6 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
-  ]
+  ],
+  "crons": [{ "path": "/api/cron/prospect-feeds", "schedule": "0 13 * * *" }]
 }
