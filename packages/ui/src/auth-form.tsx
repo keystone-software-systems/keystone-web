@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { AuthActionState } from "@keystone/db";
 import { Button } from "./button";
 import { TextInput } from "./input";
+import { KeystoneLogo } from "./logo";
 
 type ServerAction = (state: AuthActionState, formData: FormData) => Promise<AuthActionState>;
 
@@ -62,7 +63,8 @@ export function AuthForm({
 
   return (
     <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6">
-      <h1 className="text-xl font-semibold text-blueprint-navy">{title}</h1>
+      <KeystoneLogo />
+      <h1 className="mt-6 text-xl font-semibold text-blueprint-navy">{title}</h1>
       <p className="mt-1 text-sm text-slate">{mode === "password" ? copy.passwordPrompt : copy.magicLinkPrompt}</p>
 
       {mode === "password" ? (
