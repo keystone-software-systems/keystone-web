@@ -1,11 +1,30 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "./supabase/server";
 
 export type AuthActionState = { error?: string; success?: boolean };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Derives the base URL from the incoming request's Host header instead of a
+ * manually-maintained APP_BASE_URL env var, so magic links are correct on
+ * production, preview deployments, and local dev without per-environment
+ * config. Falls back to APP_BASE_URL/localhost only if Host is somehow absent.
+ */
+async function resolveBaseUrl(): Promise<string> {
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("host");
+  if (!host) return process.env.APP_BASE_URL ?? "http://localhost:3000";
+
+  const proto =
+    requestHeaders.get("x-forwarded-proto") ??
+    (host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https");
+
+  return `${proto}://${host}`;
+}
 
 /**
  * Generic magic-link/password/sign-out actions shared by apps/admin and

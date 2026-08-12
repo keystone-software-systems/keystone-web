@@ -88,7 +88,7 @@ export async function requireRole(...roles: Role[]): Promise<Profile> {
     redirect("/login");
   }
 
-  if (!roles.includes(profile.role)) {
+  if (profile.role !== "admin" && !roles.includes(profile.role)) {
     throw new Error(`Forbidden: requires role ${roles.join(" or ")}, caller is ${profile.role}`);
   }
 
