@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@import "@keystone/ui/src/tokens.css";
+@source "../../../../packages/ui/src";
+
+:root {
+  --color-pale-blue: #b7cbdd;
+}
+
+@theme inline {
+  --color-pale-blue: var(--color-pale-blue);
+  --font-mono: var(--font-plex-mono);
+}
+
+.blueprint-grid {
+  background-image:
+    linear-gradient(to right, rgba(62, 124, 177, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(62, 124, 177, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-mark-in {
+    opacity: 0;
+    animation: hero-mark-fade-in 1.4s ease-out 0.2s both;
+  }
+}
+
+@keyframes hero-mark-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
