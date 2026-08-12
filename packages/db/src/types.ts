@@ -1044,7 +1044,13 @@ export type Database = {
       milestone_status: "pending" | "invoiced" | "paid"
       payout_status: "pending" | "paid" | "reversed" | "failed"
       pricing_type: "fixed" | "retainer"
-      profile_role: "owner" | "staff" | "viewer" | "client" | "engineer"
+      profile_role:
+        | "owner"
+        | "staff"
+        | "viewer"
+        | "client"
+        | "engineer"
+        | "admin"
       project_status:
         | "submitted"
         | "lead"
@@ -1225,7 +1231,7 @@ export const Constants = {
       milestone_status: ["pending", "invoiced", "paid"],
       payout_status: ["pending", "paid", "reversed", "failed"],
       pricing_type: ["fixed", "retainer"],
-      profile_role: ["owner", "staff", "viewer", "client", "engineer"],
+      profile_role: ["owner", "staff", "viewer", "client", "engineer", "admin"],
       project_status: [
         "submitted",
         "lead",
