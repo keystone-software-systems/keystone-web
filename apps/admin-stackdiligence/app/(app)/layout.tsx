@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { DashboardShell, SignOutButton } from "@keystone/ui";
 import { signOut } from "@keystone/db";
 import { getCurrentProfile } from "@keystone/admin-core";
+import { StackDiligenceLogo } from "@/components/stackdiligence-logo";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const profile = await getCurrentProfile();
@@ -9,6 +10,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <DashboardShell
       appLabel="Admin"
+      logo={<StackDiligenceLogo />}
       profile={
         profile && (
           <span>

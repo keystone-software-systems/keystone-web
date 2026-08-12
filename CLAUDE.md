@@ -84,22 +84,36 @@ icon mark) — revisit if/when real brand work happens.
 
 ## Stack & Structure
 
-- **Monorepo:** npm workspaces, two apps: `apps/web` (Keystone) and `apps/stackdiligence`
-  (StackDiligence)
-- **Framework:** Next.js 16 App Router, static generation, for both apps
-- **Styling:** Tailwind CSS v4, brand palette as CSS variables (each app has its own palette)
+- **Monorepo:** npm workspaces. Two marketing sites — `apps/web` (Keystone) and
+  `apps/stackdiligence` (StackDiligence) — plus two internal, auth-gated tools: `apps/admin`
+  (Keystone ops: submissions review, prospects/outreach) and `apps/admin-stackdiligence`
+  (StackDiligence prospects/outreach only — no submissions pipeline yet), and `apps/portal`
+  (client-facing project portal, Keystone only).
+- **Framework:** Next.js 16 App Router, static generation, for both marketing sites
+- **Styling:** Tailwind CSS v4, brand palette as CSS variables (each marketing site has its own
+  palette; the two admin apps share Keystone's neutral navy/slate/blue tokens since they're
+  internal tools, not brand surfaces — only the header wordmark differs)
 - **Font:** Inter via `next/font/google`
 - **Contact form:** Resend, one API route per app (`app/api/contact/route.ts`) — separate
   from/to addresses per brand
+- **Shared admin logic:** `packages/admin-core` holds the brand-agnostic prospects/outreach
+  code (auth, brand-access check, server actions, components, feed-source fetchers) used by both
+  `apps/admin` and `apps/admin-stackdiligence`. This is the one intentional exception to "don't
+  share components between brands" below — it's internal tooling, not brand-facing content, and
+  each app still hardcodes its own `Brand` in `lib/brand.ts` rather than switching at runtime.
 - **Deployment:** Vercel, native GitHub integration, one Vercel project per app (Root Directory
-  = `apps/web` or `apps/stackdiligence`). No deploy step in CI — `.github/workflows/ci.yml` runs
+  = the app's path under `apps/`). No deploy step in CI — `.github/workflows/ci.yml` runs
   typecheck/lint/build only.
 
 ```
-apps/web/             Keystone Systems site — see apps/web/CLAUDE.md for Next.js-16-specific rules
-apps/stackdiligence/  StackDiligence site — same Next.js-16 rules via its own CLAUDE.md
-branding/             Keystone logo SVGs + brand guide
-docs/                 Company context, build plan, open TODOs, StackDiligence spec
+apps/web/                  Keystone Systems site — see apps/web/CLAUDE.md for Next.js-16-specific rules
+apps/stackdiligence/       StackDiligence site — same Next.js-16 rules via its own CLAUDE.md
+apps/admin/                Keystone internal ops tool (submissions + prospects/outreach)
+apps/admin-stackdiligence/ StackDiligence internal ops tool (prospects/outreach only)
+apps/portal/               Keystone client-facing project portal
+packages/admin-core/       Shared prospects/outreach logic for the two admin apps
+branding/                  Keystone logo SVGs + brand guide
+docs/                      Company context, build plan, open TODOs, StackDiligence spec
 ```
 
 Both apps have their own `CLAUDE.md` (Next.js 16 breaking-change warning — read the bundled docs

@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@keystone/ui";
-import { logTouch, type ProspectActionState } from "@/actions/prospects";
+import { logTouch, type ProspectActionState } from "../actions/prospects";
 
 type Activity = {
   id: string;

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@keystone/db";
-import { requireRole } from "@/lib/auth";
+import { requireRole } from "@keystone/admin-core";
 import { StaffCommentThread } from "@/components/staff-comment-thread";
 import { PromoteForm } from "@/components/promote-form";
 

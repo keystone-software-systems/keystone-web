@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@keystone/db";
-import { requireRole } from "@/lib/auth";
+import { requireRole } from "@keystone/admin-core";
 
 export default async function SubmissionsPage() {
   await requireRole("owner", "staff", "viewer");

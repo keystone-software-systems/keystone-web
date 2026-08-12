@@ -1,15 +1,14 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { Button, TextInput } from "@keystone/ui";
-import { createProspect, type ProspectActionState } from "@/actions/prospects";
-import { SEGMENTS_BY_BRAND, BRAND_LABEL, label, type ProspectSegment } from "@/lib/segments";
-import type { Brand } from "@/lib/brands";
+import { createProspect, type ProspectActionState } from "../actions/prospects";
+import { SEGMENTS_BY_BRAND, label, type ProspectSegment } from "../segments";
+import type { Brand } from "../brand-access";
 
 const initialState: ProspectActionState = {};
 
 type Defaults = {
-  brand?: Brand;
   segment?: ProspectSegment;
   name?: string;
   source?: string;
@@ -18,39 +17,20 @@ type Defaults = {
 };
 
 export function ProspectForm({
-  accessibleBrands,
+  brand,
   feedItemId,
   defaults,
 }: {
-  accessibleBrands: Brand[];
+  brand: Brand;
   feedItemId?: string;
   defaults?: Defaults;
 }) {
   const [state, formAction, pending] = useActionState(createProspect, initialState);
-  const [brand, setBrand] = useState<Brand>(defaults?.brand ?? accessibleBrands[0]);
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
+      <input type="hidden" name="brand" value={brand} />
       {feedItemId && <input type="hidden" name="feed_item_id" value={feedItemId} />}
-
-      <div className="flex flex-col gap-1">
-        <label htmlFor="brand" className="text-sm font-medium text-blueprint-navy">
-          Brand
-        </label>
-        <select
-          id="brand"
-          name="brand"
-          value={brand}
-          onChange={(e) => setBrand(e.target.value as Brand)}
-          className="rounded-md border border-slate/30 bg-white px-3 py-2 text-sm text-blueprint-navy"
-        >
-          {accessibleBrands.map((b) => (
-            <option key={b} value={b}>
-              {BRAND_LABEL[b]}
-            </option>
-          ))}
-        </select>
-      </div>
 
       <div className="flex flex-col gap-1">
         <label htmlFor="segment" className="text-sm font-medium text-blueprint-navy">

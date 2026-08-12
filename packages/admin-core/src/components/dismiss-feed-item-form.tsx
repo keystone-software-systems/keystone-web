@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { dismissFeedItem, type ProspectActionState } from "@/actions/prospects";
+import { dismissFeedItem, type ProspectActionState } from "../actions/prospects";
 
 const initialState: ProspectActionState = {};
 

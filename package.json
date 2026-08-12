@@ -9,6 +9,7 @@
     "dev:web": "npm run dev -w apps/web",
     "dev:stackdiligence": "npm run dev -w apps/stackdiligence",
     "dev:admin": "npm run dev -w apps/admin",
+    "dev:admin-stackdiligence": "npm run dev -w apps/admin-stackdiligence",
     "dev:portal": "npm run dev -w apps/portal",
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",

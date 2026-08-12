@@ -2,8 +2,8 @@
 
 import { useActionState } from "react";
 import { Button } from "@keystone/ui";
-import { updateProspectStatus, type ProspectActionState } from "@/actions/prospects";
-import { STATUS_OPTIONS, label, type ProspectStatus } from "@/lib/segments";
+import { updateProspectStatus, type ProspectActionState } from "../actions/prospects";
+import { STATUS_OPTIONS, label, type ProspectStatus } from "../segments";
 
 const initialState: ProspectActionState = {};
 

@@ -26,7 +26,8 @@ export async function getCurrentProfile(): Promise<Profile | null> {
  * active, provisioned caller, and throws if their role isn't in `roles`.
  * This re-asserts what proxy.ts and RLS already enforce — a missing or
  * loose policy shouldn't be the only thing standing between a `viewer` and
- * a privileged write.
+ * a privileged write. `admin` passes every check, same as RLS's is_active_staff /
+ * is_provisioned_internal helpers.
  */
 export async function requireRole(...roles: Role[]): Promise<Profile> {
   const profile = await getCurrentProfile();

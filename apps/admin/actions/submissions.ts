@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@keystone/db";
-import { requireRole } from "@/lib/auth";
+import { requireRole } from "@keystone/admin-core";
 
 export type SubmissionActionState = { error?: string };
 

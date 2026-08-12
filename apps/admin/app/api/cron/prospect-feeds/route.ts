@@ -1,9 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@keystone/db";
 import type { Database } from "@keystone/db";
-import { fetchProductHuntTopic } from "@/lib/feed-sources/producthunt";
-import { fetchRssFeed } from "@/lib/feed-sources/rss";
-import type { FeedItemCandidate } from "@/lib/feed-sources/types";
+import { fetchProductHuntTopic, fetchRssFeed, type FeedItemCandidate } from "@keystone/admin-core";
 
 type Brand = Database["public"]["Enums"]["brand"];
 type ProspectSegment = Database["public"]["Enums"]["prospect_segment"];

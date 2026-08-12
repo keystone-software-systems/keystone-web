@@ -1,13 +1,8 @@
 import type { Database } from "@keystone/db";
-import type { Brand } from "./brands";
+import type { Brand } from "./brand-access";
 
 export type ProspectSegment = Database["public"]["Enums"]["prospect_segment"];
 export type ProspectStatus = Database["public"]["Enums"]["prospect_status"];
-
-export const BRAND_LABEL: Record<Brand, string> = {
-  keystone: "Keystone",
-  stackdiligence: "StackDiligence",
-};
 
 export const SEGMENTS_BY_BRAND: Record<Brand, ProspectSegment[]> = {
   keystone: [

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@keystone/db";
 import type { Database } from "@keystone/db";
-import { requireRole } from "@/lib/auth";
+import { requireRole } from "../auth";
 
 type Brand = Database["public"]["Enums"]["brand"];
 type ProspectSegment = Database["public"]["Enums"]["prospect_segment"];
