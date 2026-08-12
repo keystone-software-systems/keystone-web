@@ -1,22 +1,23 @@
 # Keystone Systems / StackDiligence — Repo Instructions
 
 This monorepo holds two marketing sites for two separate brands/entities run by the same
-founder: **Keystone Systems** (`apps/web`) and **StackDiligence** (`apps/stackdiligence`). This
-repo is unrelated to Land Catalyst/PropDog.ai — treat it as a separate client context even though
-the same person operates both.
+founder: **Keystone Systems** (`apps/keystone/web`) and **StackDiligence**
+(`apps/stackdiligence/web`). Apps are grouped by brand under `apps/`. This repo is unrelated to
+Land Catalyst/PropDog.ai — treat it as a separate client context even though the same person
+operates both.
 
 Full business context for Keystone lives in `docs/company-context.md`; StackDiligence's spec is
 in `docs/stack-diligence-init.md`. Read the relevant one before writing any copy, not just this
 summary.
 
-## Keystone Systems (`apps/web`)
+## Keystone Systems (`apps/keystone/web`)
 
 One-line pitch: **senior engineering judgment, without the full-time hire.** The founder
 (Senior/Staff-level engineer, background at Stripe and Microsoft) sells judgment applied at a
 specific, well-scoped moment — not staff augmentation, not "AI-assisted development" as a
 headline claim.
 
-**Five service lines** (`apps/web/app/solutions/content.ts`):
+**Five service lines** (`apps/keystone/web/app/solutions/content.ts`):
 1. Net New Development
 2. Vibe-Code to Production
 3. Business Process Automation
@@ -62,13 +63,14 @@ closer to Stripe/Linear/Vercel than a creative agency. Monochrome-first with a s
 color (Blueprint Navy `#14324D`, Technical Blue `#3E7CB1`). No gradients, glow effects, mascots,
 or literal stone/arch imagery.
 
-## StackDiligence (`apps/stackdiligence`)
+## StackDiligence (`apps/stackdiligence/web`)
 
 One-line pitch: technical due diligence for software acquisitions — a full-stack assessment of
 what a buyer is actually buying, delivered in plain deal-language for PE/VC deal teams without
 in-house technical staff. Full spec in `docs/stack-diligence-init.md`. Separate LLC/entity from
 Keystone Systems (see the entity-setup checklist in that doc) — **don't conflate the two brands
-in copy**, and don't share components/content between `apps/web` and `apps/stackdiligence`.
+in copy**, and don't share components/content between `apps/keystone/web` and
+`apps/stackdiligence/web`.
 
 Same house style as Keystone's guardrails above: no superlatives, no em dashes, no invented
 numbers for pricing or a support/disclaimer window until decided. The Cedar/current-job rule
@@ -84,11 +86,11 @@ icon mark) — revisit if/when real brand work happens.
 
 ## Stack & Structure
 
-- **Monorepo:** npm workspaces. Two marketing sites — `apps/web` (Keystone) and
-  `apps/stackdiligence` (StackDiligence) — plus two internal, auth-gated tools: `apps/admin`
-  (Keystone ops: submissions review, prospects/outreach) and `apps/admin-stackdiligence`
-  (StackDiligence prospects/outreach only — no submissions pipeline yet), and `apps/portal`
-  (client-facing project portal, Keystone only).
+- **Monorepo:** npm workspaces, apps grouped by brand under `apps/<brand>/<app>`. Two marketing
+  sites — `apps/keystone/web` and `apps/stackdiligence/web` — plus two internal, auth-gated
+  tools — `apps/keystone/admin` (Keystone ops: submissions review, prospects/outreach) and
+  `apps/stackdiligence/admin` (prospects/outreach only — no submissions pipeline yet) — and
+  `apps/keystone/portal` (client-facing project portal, Keystone only).
 - **Framework:** Next.js 16 App Router, static generation, for both marketing sites
 - **Styling:** Tailwind CSS v4, brand palette as CSS variables (each marketing site has its own
   palette; the two admin apps share Keystone's neutral navy/slate/blue tokens since they're
@@ -98,25 +100,26 @@ icon mark) — revisit if/when real brand work happens.
   from/to addresses per brand
 - **Shared admin logic:** `packages/admin-core` holds the brand-agnostic prospects/outreach
   code (auth, brand-access check, server actions, components, feed-source fetchers) used by both
-  `apps/admin` and `apps/admin-stackdiligence`. This is the one intentional exception to "don't
-  share components between brands" below — it's internal tooling, not brand-facing content, and
-  each app still hardcodes its own `Brand` in `lib/brand.ts` rather than switching at runtime.
+  `apps/keystone/admin` and `apps/stackdiligence/admin`. This is the one intentional exception
+  to "don't share components between brands" below — it's internal tooling, not brand-facing
+  content, and each app still hardcodes its own `Brand` in `lib/brand.ts` rather than switching
+  at runtime.
 - **Deployment:** Vercel, native GitHub integration, one Vercel project per app (Root Directory
   = the app's path under `apps/`). No deploy step in CI — `.github/workflows/ci.yml` runs
   typecheck/lint/build only.
 
 ```
-apps/web/                  Keystone Systems site — see apps/web/CLAUDE.md for Next.js-16-specific rules
-apps/stackdiligence/       StackDiligence site — same Next.js-16 rules via its own CLAUDE.md
-apps/admin/                Keystone internal ops tool (submissions + prospects/outreach)
-apps/admin-stackdiligence/ StackDiligence internal ops tool (prospects/outreach only)
-apps/portal/               Keystone client-facing project portal
-packages/admin-core/       Shared prospects/outreach logic for the two admin apps
-branding/                  Keystone logo SVGs + brand guide
-docs/                      Company context, build plan, open TODOs, StackDiligence spec
+apps/keystone/web/            Keystone Systems site — see its CLAUDE.md for Next.js-16-specific rules
+apps/keystone/admin/          Keystone internal ops tool (submissions + prospects/outreach)
+apps/keystone/portal/         Keystone client-facing project portal
+apps/stackdiligence/web/      StackDiligence site — same Next.js-16 rules via its own CLAUDE.md
+apps/stackdiligence/admin/    StackDiligence internal ops tool (prospects/outreach only)
+packages/admin-core/          Shared prospects/outreach logic for the two admin apps
+branding/                     Keystone logo SVGs + brand guide
+docs/                         Company context, build plan, open TODOs, StackDiligence spec
 ```
 
-Both apps have their own `CLAUDE.md` (Next.js 16 breaking-change warning — read the bundled docs
+Every app has its own `CLAUDE.md` (Next.js 16 breaking-change warning — read the bundled docs
 in `node_modules/next/dist/docs/` before writing Next.js code, don't assume training-data APIs).
 
 ## Commands
@@ -125,22 +128,26 @@ Run from repo root (workspace-aware):
 
 ```
 npm install
-npm run dev:web              # apps/web on localhost:3000
-npm run dev:stackdiligence   # apps/stackdiligence on localhost:3000 (run one at a time, same port)
-npm run typecheck            # both apps
-npm run lint                 # both apps
-npm run build                # both apps
+npm run dev:web                     # apps/keystone/web on localhost:3000
+npm run dev:stackdiligence          # apps/stackdiligence/web on localhost:3000 (same port — run one at a time)
+npm run dev:admin                   # apps/keystone/admin
+npm run dev:admin-stackdiligence    # apps/stackdiligence/admin
+npm run dev:portal                  # apps/keystone/portal
+npm run typecheck                   # all apps
+npm run lint                        # all apps
+npm run build                       # all apps
 ```
 
 Run `npm run typecheck && npm run lint && npm run build` before considering any change done —
-this mirrors CI exactly, across both apps.
+this mirrors CI exactly, across every app.
 
 ## Conventions
 
-- TypeScript, functional components, App Router conventions throughout, both apps.
-- Keystone's solutions pages are template-driven off `apps/web/app/solutions/content.ts` —
-  add/edit a service there, not by hand-writing a new page. StackDiligence has a single service
-  line, so its pages are hand-written (`apps/stackdiligence/app/*/page.tsx`), not template-driven.
+- TypeScript, functional components, App Router conventions throughout, every app.
+- Keystone's solutions pages are template-driven off `apps/keystone/web/app/solutions/content.ts`
+  — add/edit a service there, not by hand-writing a new page. StackDiligence has a single
+  service line, so its pages are hand-written (`apps/stackdiligence/web/app/*/page.tsx`), not
+  template-driven.
 - `generateMetadata()` on every route; keep each app's `sitemap.ts` and `robots.ts` in sync when
   adding routes.
 - Minimal comments, no unnecessary abstraction — same house style as other Tanner projects.

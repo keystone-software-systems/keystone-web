@@ -2,15 +2,15 @@
   "name": "keystone",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "apps/*/*",
     "packages/*"
   ],
   "scripts": {
-    "dev:web": "npm run dev -w apps/web",
-    "dev:stackdiligence": "npm run dev -w apps/stackdiligence",
-    "dev:admin": "npm run dev -w apps/admin",
-    "dev:admin-stackdiligence": "npm run dev -w apps/admin-stackdiligence",
-    "dev:portal": "npm run dev -w apps/portal",
+    "dev:web": "npm run dev -w apps/keystone/web",
+    "dev:stackdiligence": "npm run dev -w apps/stackdiligence/web",
+    "dev:admin": "npm run dev -w apps/keystone/admin",
+    "dev:admin-stackdiligence": "npm run dev -w apps/stackdiligence/admin",
+    "dev:portal": "npm run dev -w apps/keystone/portal",
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",

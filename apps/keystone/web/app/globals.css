@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "@keystone/ui/src/tokens.css";
-@source "../../../packages/ui/src";
+@source "../../../../packages/ui/src";
 
 :root {
   --color-pale-blue: #b7cbdd;
